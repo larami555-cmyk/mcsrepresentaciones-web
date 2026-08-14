@@ -41,13 +41,29 @@ Casos ya resueltos así: `.mcs-logo`, `.mcs-brandname`, `.mcs-brandsub`, `.mcs-p
 - **Logo del header tapaba el contenido al hacer scroll:** el logo medía 190px pero el header solo 72px de alto, con `overflow-visible`. Fix: logo reducido a 58px (cabe dentro del header) y quitado el overflow-visible.
 - **Fotos de marca de tamaño visual inconsistente:** el contenedor usaba `h-[260px]` (clase arbitraria no compilada, ver lección de arriba). Fix: `.mcs-photo-box{height:260px}`.
 
+## Cambios recientes (11-14 agosto 2026)
+
+- Instagram corregido a `@mcsrepresentaciones` (antes tenía una "s" de más)
+- Más espacio entre el texto y los iconos sociales en el bloque "Síguenos"
+- **Eliminada por completo** la sección negra "Área Profesional / Catálogos y tarifas actualizadas siempre a mano" (y su enlace "Catálogos" del menú de navegación, ya no tenía destino)
+- "WhatsApp Business" (footer) y "Agendar visita" ahora abren WhatsApp (619 620 363) con mensaje prellenado, antes no hacían nada
+- Enlace de Facebook corregido de formato con espacio (`MCarmen%20Sánchez.792`, inválido) a formato con puntos (`MCarmen.Sanchez.792`) — **pendiente de que MCarmen confirme si abre bien**, si no, pedirle que copie el enlace directamente desde "Copiar enlace al perfil" en Facebook
+- Añadido icono de la app (favicon + manifest.json PWA) usando el logo `icon.png` que envió MCarmen — ahora al instalar el sitio como app en móvil/escritorio usa ese icono en vez de uno genérico. Archivos: `images/icon-32/180/192/512.png`, `manifest.json`
+- Quitado el estilo "destacado" (borde dorado) de la tarjeta de Essenzia Dormire — las 6 tarjetas de marca ahora son visualmente idénticas (`featured:!1` en las 6)
+- Generado QR de la web con el logo MCS incrustado en el centro, verificado que escanea correctamente a mcsrepresentaciones.es (entregado como PNG, no vive en el repo)
+
+## Pendiente
+
+- Confirmar que el enlace de Facebook corregido (`facebook.com/MCarmen.Sanchez.792`) abre correctamente. Si no, pedirle a MCarmen que copie el enlace directo desde su perfil de Facebook ("Copiar enlace al perfil").
+- Los 3 enlaces duplicados de mcsCatalogos (ver detalle abajo), pendientes de que MCarmen confirme los correctos desde su app IONOS.
+
 ## Estructura de datos dentro del código
 
 - **`ql` (array):** las 6 marcas (Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor, KingSofá). Cada una tiene `id, name, logo, photo, web, zoom, pos, year, desc, tag, estancia, featured`. `zoom` y `pos` controlan el encuadre de la foto de portada (algunas fotos son tomas de habitación completa y necesitan más zoom para verse a un tamaño similar a las demás).
 - **`mcsCatalogos` (array):** catálogos PDF públicos descargables por marca, se muestran al pulsar "Ver catálogo" en cada tarjeta. Campos: `marca, nombre, url`.
 - **`mcsTarifas` (array):** tarifas privadas por marca (área profesional), se filtran por el selector de marca. Campos: `marca, nombre, url`. **KingSofá y Essenzia Dormire NO tienen tarifa** (confirmado, no es un error).
 
-## ⚠️ Pendiente — enlaces duplicados en mcsCatalogos
+## Detalle: enlaces duplicados en mcsCatalogos
 
 Tres pares de catálogos apuntan al mismo enlace de IONOS por error de origen (vienen así del Excel/app de gestión de MCarmen), pendientes de que ella confirme los enlaces correctos:
 1. "Telas 2026" (Essenzia) y "Ares-Denver" (KingSofá) → mismo link `KM6M0pZqc`
