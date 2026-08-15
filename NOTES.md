@@ -32,7 +32,9 @@ Síntomas de este bug: algo que debería tener tamaño fijo (logo, caja de foto)
 .mcs-photo-box{height:260px}
 ```
 
-Casos ya resueltos así: `.mcs-logo`, `.mcs-brandname`, `.mcs-brandsub`, `.mcs-photo-box`.
+Casos ya resueltos así: `.mcs-logo`, `.mcs-brandname`, `.mcs-brandsub`, `.mcs-photo-box`, `.mcs-novedad-img`, `.mcs-img-contain`.
+
+**Ojo:** no es solo cuestión de valores arbitrarios con corchetes — clases *core* de Tailwind que simplemente no se usaban en ningún otro sitio del diseño original tampoco están en el bundle. Ejemplo real: `object-contain` no estaba (aunque `object-cover` sí, por usarse en las fotos de marca), y el navegador la ignoraba silenciosamente cayendo al `object-fit` por defecto (`fill`, deformando la imagen) sin ningún error visible. Si una clase Tailwind no se ve reflejada en el render aunque el className esté bien escrito, comprobar con `grep -c "nombre-clase{" index.html` si existe en el bundle antes de asumir que el código está mal.
 
 ## Historial de bugs importantes ya resueltos
 
