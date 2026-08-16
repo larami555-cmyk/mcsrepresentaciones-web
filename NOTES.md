@@ -65,7 +65,17 @@ Casos ya resueltos así: `.mcs-logo`, `.mcs-brandname`, `.mcs-brandsub`, `.mcs-p
 - **`mcsCatalogos` (array):** catálogos PDF públicos descargables por marca, se muestran al pulsar "Ver catálogo" en cada tarjeta. Campos: `marca, nombre, url`.
 - **`mcsTarifas` (array):** tarifas privadas por marca (área profesional), se filtran por el selector de marca. Campos: `marca, nombre, url`. **KingSofá y Essenzia Dormire NO tienen tarifa** (confirmado, no es un error).
 
-## Detalle: enlaces duplicados en mcsCatalogos
+## Área Profesional / Modal Documentos (16 agosto 2026)
+
+Nueva función: el botón "Área Profesional" (header desktop y menú móvil) abre un modal con pestaña "Documentos". Dentro hay un selector de las 6 marcas y, para la marca seleccionada, se listan sus documentos (instrucciones, fichas técnicas, enlaces...). Si una marca no tiene documentos aún, se muestra el mensaje "Todavía no hay documentos para esta marca. Vuelve pronto."
+
+- **Array de datos:** `mcsDocumentos`, definido justo antes de `function Su()`. Campos: `id, marca, tipo, titulo, desc, videoUrl (opcional), videoPass (opcional)`. `marca` debe coincidir exactamente con `s.name` de `ql` (ej. "TREKU", "BAIXMODULS", "TAPIZADOS MAYOR", "KINGSOFÁ").
+- **Estado:** `dO`/`dS` (abierto/cerrado del modal) y `dB`/`dSB` (marca seleccionada, por defecto "TREKU"), declarados en el `useState` inicial de `Su()`.
+- **Para añadir un documento nuevo:** añadir un objeto más al array `mcsDocumentos` con la marca correspondiente. No hace falta tocar nada más del render, la lista se filtra automáticamente por marca.
+- **⚠️ Otro caso del bug de CSS del bundle precompilado:** clases Tailwind como `fixed`, `inset-0`, `overflow-y-auto`, `overflow-x-auto`, `gap-1.5` NO estaban en el bundle y el modal no se posicionaba ni bloqueaba el scroll. Solución: se crearon clases CSS propias `.mcs-modal-overlay`, `.mcs-modal-box`, `.mcs-modal-tabs` en el `<style>` inline (mismo patrón que `.mcs-logo` etc.). Antes de usar cualquier clase Tailwind nueva en este proyecto, comprobar con `grep -o '\.NOMBRE-CLASE{' index.html` que existe en el bundle.
+- Primer documento cargado: TREKU · "Configurador DecoTreku" (instrucciones de uso, enlace al vídeo tutorial de Vimeo y contraseña).
+
+
 
 Tres pares de catálogos apuntan al mismo enlace de IONOS por error de origen (vienen así del Excel/app de gestión de MCarmen), pendientes de que ella confirme los enlaces correctos:
 1. "Telas 2026" (Essenzia) y "Ares-Denver" (KingSofá) → mismo link `KM6M0pZqc`
