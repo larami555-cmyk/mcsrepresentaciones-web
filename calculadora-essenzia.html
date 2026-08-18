@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
+<meta name="robots" content="noindex, nofollow">
+<title>Essenzia Dormire · Calculadora de precio de coste</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./images/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./images/icon-180.png">
+<style>
+  :root{
+    --navy:#16305e; --ink:#232323; --muted:#767469; --line:#e4e2da;
+    --cream:#faf9f6; --paper:#ffffff; --accent:#b1893f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);
+    font-family:'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;}
+  header{background:var(--navy);color:#fff;padding:20px 24px;}
+  .brand{font-size:21px;font-weight:600;letter-spacing:.3px;}
+  .brand span{color:var(--accent);}
+  .subtitle{margin-top:5px;font-size:13px;color:#cfd6e8;max-width:680px;line-height:1.4;}
+  nav{display:flex;gap:2px;background:#0e2148;padding:0 24px;flex-wrap:wrap;}
+  nav button{padding:11px 16px;font-size:12.5px;font-weight:600;color:#a9b3d1;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
+  nav button.active{color:#fff;border-bottom-color:var(--accent);}
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 60px;}
+  section{display:none;} section.active{display:block;}
+  .bar{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-bottom:16px;
+    display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .f{display:flex;flex-direction:column;gap:4px;}
+  .f label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600;}
+  select{border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:13px;background:#fff;color:var(--ink);}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;}
+  .chip{padding:5px 11px;border-radius:20px;border:1px solid var(--line);font-size:11.5px;cursor:pointer;background:#fff;color:var(--navy);}
+  .chip.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .info{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;border-left:3px solid var(--accent);padding-left:10px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 15px;display:flex;flex-direction:column;gap:8px;}
+  .card h3{margin:0;font-size:15.5px;font-weight:600;color:var(--navy);}
+  .card .sub{font-size:11px;color:var(--muted);}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:3px 7px;border-radius:5px;background:#eef1f8;color:var(--navy);white-space:nowrap;}
+  .tag.alt{background:#f6ece0;color:var(--accent);}
+  .extras{font-size:11.5px;border-top:1px solid var(--line);padding-top:7px;display:flex;flex-direction:column;gap:4px;}
+  .extras label{display:flex;gap:6px;align-items:center;cursor:pointer;}
+  .extras small{color:var(--muted);}
+  .pricebox{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;}
+  .price{font-size:19px;font-weight:700;color:var(--navy);}
+  .pricenote{font-size:10.5px;color:var(--muted);}
+  .sizelist{display:flex;flex-direction:column;gap:2px;}
+  .sizelist .r{display:flex;justify-content:space-between;font-size:12.5px;padding:1px 0;}
+  h2.h{font-size:16px;color:var(--navy);margin:22px 0 10px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:6px;}
+  .empty{color:var(--muted);font-size:13px;padding:24px;text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Essenzia <span>Dormire</span></div>
+  <div class="subtitle">Calculadora de precio de coste — colchones, canapés, bases, cabezales, camas eléctricas y almohadas. Precio de coste = tarifa en puntos × 0,40 €/punto, aplicado en toda la app.</div>
+</header>
+
+<nav>
+  <button class="active" data-t="colchones">Colchones</button>
+  <button data-t="canapes">Canapés</button>
+  <button data-t="bases">Bases</button>
+  <button data-t="cabezales">Cabezales</button>
+  <button data-t="camas">Camas eléctricas</button>
+  <button data-t="almohadas">Almohadas</button>
+</nav>
+
+<main>
+
+  <section class="active" id="s-colchones">
+    <div class="info">35 modelos del catálogo oficial + 7 modelos de línea adicional fuera de catálogo (marcados como tal). Todos a precio de coste.</div>
+    <div class="bar">
+      <div class="f"><label>Ancho</label><select id="c-ancho"></select></div>
+      <div class="f"><label>Largo</label><select id="c-largo"><option value="180-190">180 · 190 cm</option><option value="200">200 cm</option></select></div>
+      <div class="f"><label>Altura desde</label><select id="c-altura-min"><option value="">Sin mínimo</option></select></div>
+      <div class="f"><label>Altura hasta</label><select id="c-altura-max"><option value="">Sin máximo</option></select></div>
+      <div class="f"><label>Orden</label><select id="c-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option><option value="alt-asc">Altura ↑</option><option value="alt-desc">Altura ↓</option></select></div>
+      <div class="f" style="flex:1;min-width:240px;"><label>Composición</label><div class="chips" id="c-chips"></div></div>
+    </div>
+    <div class="grid" id="c-grid"></div>
+  </section>
+
+  <section id="s-canapes">
+    <div class="info">Magnum, Rox, Varadero (Terra/madera y Lady/metal) y Oslo. Extras facturados en puntos (tapa partida, apertura motorizada, anclaje de unión) sumados también a coste.</div>
+    <div class="bar">
+      <div class="f"><label>Ancho</label><select id="k-ancho"></select></div>
+      <div class="f"><label>Serie tejido</label><select id="k-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+      <div class="f"><label>Orden</label><select id="k-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
+    </div>
+    <div class="grid" id="k-grid"></div>
+  </section>
+
+  <section id="s-bases">
+    <div class="info">Lyon (estándar y acabado Milán), Gran Suite, Gran Suite Spring y Funda Sena.</div>
+    <div class="bar">
+      <div class="f"><label>Ancho</label><select id="b-ancho"></select></div>
+      <div class="f"><label>Serie tejido</label><select id="b-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+      <div class="f"><label>Orden</label><select id="b-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
+    </div>
+    <div class="grid" id="b-grid"></div>
+  </section>
+
+  <section id="s-cabezales">
+    <div class="info">22 cabezales (incluida la Funda Sena) verificados uno a uno contra el catálogo. Napoles y Ainhoa no tienen ancho 90/105 — el catálogo no los ofrece en esas medidas.</div>
+    <div class="bar">
+      <div class="f"><label>Ancho</label><select id="h-ancho"></select></div>
+      <div class="f"><label>Serie tejido</label><select id="h-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+      <div class="f"><label>Orden</label><select id="h-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
+    </div>
+    <div class="grid" id="h-grid"></div>
+  </section>
+
+  <section id="s-camas">
+    <div class="info">Royal y Royal Spring (camas articuladas eléctricas). Precios únicos para 180·190·200; extras en puntos. Si tienes otra cama eléctrica con tarifa propia, mándame la imagen de los precios y la añado igual que estas.</div>
+    <div class="bar">
+      <div class="f"><label>Ancho</label><select id="m-ancho"></select></div>
+      <div class="f"><label>Serie tejido</label><select id="m-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+    </div>
+    <div class="grid" id="m-grid"></div>
+  </section>
+
+  <section id="s-almohadas">
+    <div class="info">Cada almohada tiene su propia gama de tallas. Se incluye también el Protector Tencel (no es almohada, pero comparte tabla de tallas).</div>
+    <div class="grid" id="a-grid"></div>
+  </section>
+
+</main>
+
+<script>
+const PUNTO = 0.40;
+const ANCHOS = [90,105,135,150,160,180,200];
+
+/* ============ COLCHONES: catálogo oficial ============ */
+const colchonesRaw = {"Baltimore": {"categoria": "Natural", "firmeza": "DUAL", "180-190": [816, 934, 1140, 1273, 1395, 1582, 1819], "200": [873, 987, 1206, 1340, 1462, 1661, 1910], "altura": 32, "visco": false, "latex": false, "muelle": true}, "Harmony": {"categoria": "Natural", "firmeza": "MEDIUM", "180-190": [643, 733, 885, 980, 1067, 1217, 1400], "200": [685, 775, 924, 1025, 1147, 1283, 1475], "altura": 29, "visco": false, "latex": false, "muelle": true}, "Emperador": {"categoria": "Natural", "firmeza": "MEDIUM", "180-190": [675, 756, 947, 1047, 1146, 1305, 1501], "200": [720, 799, 989, 1095, 1232, 1376, 1582], "altura": 31, "visco": true, "latex": false, "muelle": true}, "Buckingham": {"categoria": "Natural", "firmeza": "FIRM", "180-190": [668, 753, 943, 1033, 1129, 1303, 1498], "200": [707, 799, 1004, 1098, 1199, 1357, 1561], "altura": 30, "visco": true, "latex": false, "muelle": true}, "Michelle": {"categoria": "Twin Spring", "firmeza": "MEDIUM", "180-190": [600, 686, 830, 930, 1016, 1159, 1333], "200": [640, 721, 874, 972, 1056, 1207, 1388], "altura": 28, "visco": true, "latex": false, "muelle": true}, "Advance": {"categoria": "Twin Spring", "firmeza": "MEDIUM", "180-190": [529, 603, 725, 790, 863, 991, 1140], "200": [572, 644, 762, 832, 941, 1054, 1212], "altura": 29, "visco": true, "latex": false, "muelle": true}, "Emotion": {"categoria": "Twin Spring", "firmeza": "MEDIUM", "180-190": [494, 558, 659, 722, 823, 932, 1072], "200": [531, 585, 710, 785, 861, 974, 1120], "altura": 28, "visco": true, "latex": false, "muelle": true}, "Prince": {"categoria": "Twin Spring", "firmeza": "SOFT", "180-190": [447, 504, 605, 651, 758, 859, 988], "200": [481, 530, 654, 712, 795, 899, 1034], "altura": 28, "visco": false, "latex": false, "muelle": true}, "Capri": {"categoria": "Spring One", "firmeza": "SOFT", "180-190": [599, 668, 813, 898, 995, 1136, 1306], "200": [646, 713, 855, 947, 1083, 1210, 1391], "altura": 28, "visco": true, "latex": false, "muelle": true}, "Celine": {"categoria": "Spring One", "firmeza": "MEDIUM", "180-190": [553, 633, 763, 855, 935, 1067, 1227], "200": [594, 668, 807, 898, 975, 1116, 1283], "altura": 28, "visco": true, "latex": false, "muelle": true}, "Harper": {"categoria": "Spring One", "firmeza": "MEDIUM", "180-190": [500, 568, 681, 740, 808, 928, 1067], "200": [543, 609, 718, 782, 885, 990, 1138], "altura": 28, "visco": true, "latex": false, "muelle": true}, "Nicolette": {"categoria": "Spring One", "firmeza": "MEDIUM", "180-190": [449, 507, 606, 662, 760, 861, 990], "200": [485, 534, 658, 727, 799, 904, 1040], "altura": 28, "visco": true, "latex": false, "muelle": true}, "Nuage": {"categoria": "Spring One", "firmeza": "FIRM", "180-190": [427, 482, 578, 622, 726, 823, 946], "200": [461, 508, 628, 683, 763, 865, 995], "altura": 28, "visco": false, "latex": false, "muelle": true}, "X-Vision": {"categoria": "Technology", "firmeza": "SOFT", "180-190": [725, 820, 1005, 1106, 1212, 1372, 1578], "200": [774, 869, 1052, 1161, 1304, 1450, 1667], "altura": 31, "visco": true, "latex": false, "muelle": true}, "Evolve": {"categoria": "Technology", "firmeza": "DUAL", "180-190": [819, 907, 1091, 1198, 1316, 1482, 1704], "200": [867, 970, 1155, 1271, 1428, 1583, 1820], "altura": 31, "visco": true, "latex": false, "muelle": true}, "Atlanta": {"categoria": "Technology", "firmeza": "DUAL", "180-190": [527, 598, 716, 790, 862, 989, 1137], "200": [575, 644, 758, 840, 949, 1061, 1220], "altura": 28, "visco": true, "latex": false, "muelle": true}, "X-Fusion": {"categoria": "Technology", "firmeza": "FIRM", "180-190": [672, 767, 936, 1035, 1120, 1250, 1437], "200": [700, 802, 979, 1081, 1170, 1306, 1502], "altura": 28, "visco": true, "latex": false, "muelle": true}, "X-Tonic": {"categoria": "Technology", "firmeza": "MEDIUM", "180-190": [619, 709, 869, 961, 1042, 1163, 1337], "200": [651, 747, 916, 1012, 1097, 1226, 1410], "altura": 28, "visco": true, "latex": false, "muelle": false}, "Re-Innova": {"categoria": "Reinforced", "firmeza": "FIRM", "180-190": [692, 793, 978, 1071, 1168, 1345, 1547], "200": [728, 838, 1035, 1133, 1235, 1397, 1607], "altura": 29, "visco": true, "latex": false, "muelle": true}, "Re-Vitalice": {"categoria": "Reinforced", "firmeza": "FIRM", "180-190": [578, 660, 812, 903, 988, 1143, 1314], "200": [611, 702, 865, 962, 1050, 1189, 1367], "altura": 29, "visco": true, "latex": false, "muelle": true}, "Re-Posse": {"categoria": "Reinforced", "firmeza": "FIRM", "180-190": [521, 596, 720, 801, 891, 1033, 1188], "200": [554, 636, 769, 856, 950, 1076, 1237], "altura": 29, "visco": true, "latex": false, "muelle": true}, "Sutile": {"categoria": "Slim Pro", "firmeza": "MEDIUM", "180-190": [612, 704, 866, 956, 1046, 1187, 1365], "200": [638, 736, 904, 997, 1105, 1251, 1439], "altura": 23, "visco": false, "latex": false, "muelle": true}, "Petit": {"categoria": "Slim Pro", "firmeza": "SOFT", "180-190": [483, 554, 679, 747, 819, 932, 1072], "200": [505, 581, 712, 782, 871, 989, 1137], "altura": 23, "visco": true, "latex": false, "muelle": true}, "Circadian": {"categoria": "Airmousse", "firmeza": "MEDIUM", "180-190": [600, 683, 835, 893, 990, 1131, 1301], "200": [647, 728, 877, 941, 1075, 1202, 1382], "altura": 28, "visco": false, "latex": false, "muelle": true}, "Abrazzo": {"categoria": "Airmousse", "firmeza": "SOFT", "180-190": [650, 741, 907, 987, 1076, 1227, 1411], "200": [693, 782, 945, 1032, 1156, 1293, 1487], "altura": 32, "visco": false, "latex": false, "muelle": true}, "Gentille": {"categoria": "Airmousse", "firmeza": "MEDIUM", "180-190": [576, 659, 807, 878, 951, 1062, 1221], "200": [603, 692, 849, 921, 998, 1116, 1283], "altura": 28, "visco": false, "latex": false, "muelle": false}, "Matisse": {"categoria": "Compact", "firmeza": "MEDIUM", "180-190": [484, 555, 669, 740, 802, 897, 1031], "200": [507, 583, 704, 777, 843, 942, 1084], "altura": 28, "visco": true, "latex": false, "muelle": false}, "Universe": {"categoria": "Compact", "firmeza": "MEDIUM", "180-190": [435, 498, 599, 661, 718, 801, 921], "200": [457, 524, 630, 695, 754, 843, 969], "altura": 28, "visco": true, "latex": false, "muelle": false}, "Urano": {"categoria": "Compact", "firmeza": "FIRM", "180-190": [408, 466, 559, 617, 669, 747, 859], "200": [426, 488, 587, 646, 701, 783, 901], "altura": 28, "visco": false, "latex": false, "muelle": false}, "Ondulatto": {"categoria": "Articulated", "firmeza": "MEDIUM", "180-190": [641, 719, 861, 940, 1018, 1121, 1289], "200": [659, 735, 881, 961, 1041, 1146, 1318], "altura": 22, "visco": true, "latex": false, "muelle": false}, "Harry": {"categoria": "Articulated", "firmeza": "FIRM", "180-190": [526, 591, 717, 768, 838, 925, 1063], "200": [552, 622, 753, 808, 881, 973, 1119], "altura": 22, "visco": false, "latex": false, "muelle": false}, "Sinergy": {"categoria": "Articulated", "firmeza": "SOFT", "180-190": [559, 645, 787, 863, 927, 1018, 1171], "200": [584, 672, 824, 907, 972, 1077, 1238], "altura": 22, "visco": true, "latex": false, "muelle": false}, "Foster": {"categoria": "Articulated", "firmeza": "FIRM", "180-190": [519, 581, 705, 762, 839, 963, 1107], "200": [552, 621, 755, 816, 897, 1004, 1155], "altura": 22, "visco": false, "latex": false, "muelle": true}, "Ideale": {"categoria": "Articulated", "firmeza": "SOFT", "180-190": [641, 728, 891, 960, 1056, 1187, 1365], "200": [667, 759, 928, 997, 1111, 1248, 1435], "altura": 22, "visco": false, "latex": false, "muelle": true}, "Birdie": {"categoria": "Juvenil", "firmeza": "—", "180-190": [466, 532, 640, 711, 778, 905, 1041], "200": [496, 568, 685, 761, 831, 942, 1083], "altura": 23, "visco": true, "latex": false, "muelle": true}};
+const catNombre = {
+  'Natural':'Muelle ensacado · Natural','Twin Spring':'Muelle ensacado · Twin Spring',
+  'Spring One':'Muelle ensacado · Spring One','Technology':'Muelle ensacado · Technology',
+  'Reinforced':'Muelle ensacado · Reinforced','Slim Pro':'Muelle ensacado · Slim Pro',
+  'Airmousse':'Airmousse','Compact':'Núcleo espumación','Articulated':'Núcleo articulado','Juvenil':'Juvenil'
+};
+const catTipo = {
+  'Natural':'Muelle ensacado','Twin Spring':'Muelle ensacado','Spring One':'Muelle ensacado',
+  'Technology':'Muelle ensacado','Reinforced':'Muelle ensacado','Slim Pro':'Muelle ensacado',
+  'Airmousse':'Airmousse','Compact':'Espumación','Articulated':'Articulado','Juvenil':'Juvenil'
+};
+const colchonesCatalogo = Object.entries(colchonesRaw).map(([nombre,d])=>{
+  const tags = [d.muelle ? 'Muelle ensacado' : 'Espumación'];
+  if(d.categoria==='Articulated') tags.push('Articulado');
+  if(d.categoria==='Airmousse') tags.push('Airmousse');
+  if(d.visco) tags.push('Viscoelástica');
+  if(d.latex) tags.push('Látex natural');
+  return {
+    nombre, tags, subfamilia: catNombre[d.categoria],
+    firmeza: d.firmeza, altura: d.altura, anchos: ANCHOS, fuera:false,
+    precios: {'180-190': d['180-190'], '200': d['200']}
+  };
+});
+
+/* ============ COLCHONES: fuera de catálogo (línea adicional) ============ */
+const colchonesFueraCatalogo = [
+  { nombre:'Select', tags:['Espumación','Viscoelástica'], subfamilia:'Viscoelástica + núcleo Compact Form · 24 cm · Firm', firmeza:'FIRM', altura:24, fuera:true,
+    anchos:[90,105,135,150,160,180,200],
+    precios:{'180-190':[310,359,446,493,536,602,722], '200':[326,377,469,518,563,633,760]} },
+  { nombre:'Spring·Cool Fibercloud', tags:['Muelle ensacado'], subfamilia:'Muelle ensacado + Fibercloud, doble cara · 29 cm · Firm', firmeza:'FIRM', altura:29, fuera:true,
+    anchos:[90,105,135,150,160,180,200],
+    precios:{'180-190':[464,524,638,693,785,874,1049], '200':[489,548,674,741,809,899,1079]} },
+  { nombre:'Caleta', tags:['Espumación','Viscoelástica'], subfamilia:'Viscoelástica + núcleo Compact Form · 21 cm · Firm', firmeza:'FIRM', altura:21, fuera:true,
+    anchos:[90,105,135,150,160,180,200],
+    precios:{'180-190':[285,330,409,451,492,552,662], '200':[299,346,429,474,516,579,695]} },
+  { nombre:'Pocket·Sac Fibercloud', tags:['Muelle ensacado'], subfamilia:'Muelle ensacado + Fibercloud, refuerzo perimetral 360º · 26 cm · Firm', firmeza:'FIRM', altura:26, fuera:true,
+    anchos:[90,105,135,150,160,180,200],
+    precios:{'180-190':[404,459,557,604,689,765,918], '200':[430,479,588,646,707,785,942]} },
+  { nombre:'SpringCool Visco 2.0', tags:['Muelle ensacado','Viscoelástica'], subfamilia:'Muelle ensacado + Soja·30K + Tencel · 28 cm · Adapt', firmeza:'ADAPT', altura:28, fuera:true,
+    anchos:[90,105,135,150,160,180],
+    precios:{'180-190':[485,549,672,732,827,922], '200':[509,572,707,778,850,947]} },
+  { nombre:'LATEX · The Natural Rest', tags:['Espumación','Látex natural'], subfamilia:'Látex natural Purelatex microperforado, anti-ácaros · 22 cm · Baja', firmeza:'LOW', altura:22, fuera:true,
+    anchos:[90,105,135,150,160,180,200],
+    precios:{'180-190':[810,927,1136,1250,1374,1535,1842], '200':[853,978,1198,1319,1449,1619,1943]} },
+  { nombre:'Trendy·Sac', tags:['Muelle ensacado'], subfamilia:'Doble cara reversible invierno/verano · 32 cm · Media', firmeza:'MEDIUM', altura:32, fuera:true,
+    anchos:[90,105,135,150,160,180,200],
+    precios:{'180-190':[527,610,732,807,908,1013,1164], '200':[567,638,764,857,953,1062,1221]} },
+];
+
+/* Swing (juveniles) — fuente: catálogo oficial, páginas 180-183 */
+const colchonesJuveniles = [
+  { nombre:'Swing Pocket Spring', tags:['Muelle ensacado','Viscoelástica','Juvenil'], subfamilia:'Muelle ensacado + Viscoelástica Ultra-50K · 19/22 cm', firmeza:'—', altura:19, fuera:false,
+    anchos:[90,105], precios:{'180-190':[407,459], '200':[432,481]} },
+  { nombre:'Swing Foam Core 14/17', tags:['Espumación','Viscoelástica','Juvenil'], subfamilia:'Núcleo Compact Form + Viscoelástica Ultra-50K · 14/17 cm', firmeza:'—', altura:14, fuera:false,
+    anchos:[90,105], precios:{'180-190':[352,404], '200':[369,423]} },
+  { nombre:'Swing Foam Core 19/22', tags:['Espumación','Viscoelástica','Juvenil'], subfamilia:'Núcleo Compact Form + Viscoelástica Ultra-50K · 19/22 cm', firmeza:'—', altura:19, fuera:false,
+    anchos:[90,105], precios:{'180-190':[387,445], '200':[406,467]} },
+];
+
+const colchones = [...colchonesCatalogo, ...colchonesFueraCatalogo, ...colchonesJuveniles];
+
+/* ============ CANAPÉS ============ */
+const canapes = [
+  { id:'magnum-terra', nombre:'Magnum Terra', material:'Madera 12 cm', A190:[662,672,769,820,846,1049,1344], A200:[675,685,785,836,862,1069,1370],
+    B190:[722,734,838,898,920,1131,1468], B200:[736,748,855,916,939,1154,1497], C190:[871,889,1010,1082,1107,1338,1778], C200:[888,907,1031,1103,1129,1365,1813],
+    extras:[{n:'Tapa partida',p:120},{n:'Apertura lateral',p:140},{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}] },
+  { id:'magnum-lady', nombre:'Magnum Lady', material:'Metal 12 cm', A190:[680,688,778,838,854,1060,1365], A200:[693,701,794,855,871,1081,1403],
+    B190:[729,739,836,899,910,1120,1479], B200:[744,754,853,916,929,1142,1508], C190:[853,869,971,1039,1051,1269,1737], C200:[870,886,990,1060,1072,1295,1772],
+    extras:[{n:'Tapa partida',p:120},{n:'Apertura lateral',p:140},{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}] },
+  { id:'rox-terra', nombre:'Rox Terra', material:'Madera 12 cm', A190:[662,672,769,820,846,1049,1344], A200:[675,685,785,836,862,1069,1370],
+    B190:[722,734,838,898,920,1131,1468], B200:[736,748,855,916,939,1154,1497], C190:[871,889,1010,1082,1107,1338,1778], C200:[888,907,1031,1103,1129,1365,1813],
+    extras:[{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}] },
+  { id:'rox-lady', nombre:'Rox Lady', material:'Metal 12 cm', A190:[680,688,778,838,854,1060,1365], A200:[693,701,794,855,871,1081,1403],
+    B190:[729,739,836,899,910,1120,1479], B200:[744,754,853,916,929,1142,1508], C190:[853,869,971,1039,1051,1269,1737], C200:[870,886,990,1060,1072,1295,1772],
+    extras:[{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}] },
+  { id:'varadero-terra', nombre:'Varadero Terra', material:'Madera 12 cm', A190:[734,743,840,904,922,1145,1485], A200:[749,757,857,922,941,1168,1515],
+    B190:[787,798,903,983,1020,1254,1597], B200:[803,814,921,1002,1040,1279,1629], C190:[941,960,1091,1167,1195,1445,1920], C200:[960,979,1113,1190,1219,1474,1958],
+    extras:[{n:'Tapa partida',p:120},{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}] },
+  { id:'varadero-lady', nombre:'Varadero Lady', material:'Metal 12 cm', A190:[734,743,840,904,922,1145,1485], A200:[749,757,857,922,941,1168,1515],
+    B190:[787,798,903,983,1020,1254,1597], B200:[803,814,921,1002,1040,1279,1629], C190:[941,960,1091,1167,1195,1445,1920], C200:[960,979,1113,1190,1219,1474,1958],
+    extras:[{n:'Tapa partida',p:120},{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}] },
+];
+const osloPrecio = { A190:[608,637,692,731,817,1409,1620], A200:[639,669,726,768,858,1479,1701] };
+
+/* ============ BASES ============ */
+const bases = [
+  { id:'lyon-standard', nombre:'Base Lyon (Artic/Nórdica/Madera Haya)', A:[400,421,474,491,536,563,647], B:[432,455,503,521,563,591,679], C:[484,505,558,573,620,644,741], anchos:[90,105,135,150,160,180,200] },
+  { id:'lyon-milan', nombre:'Base Lyon (acabado Milán)', A:[520,564,686,727,805,866,996], B:[561,609,727,770,845,909,1046], C:[629,677,807,847,930,991,1140], anchos:[90,105,135,150,160,180,200] },
+  { id:'gransuite', nombre:'Gran Suite', A:[393,460,547,574,639,673,774], B:[428,493,580,603,671,707,812], C:[470,547,632,657,725,756,886], anchos:[90,105,135,150,160,180,200] },
+  { id:'gransuite-spring', nombre:'Gran Suite Spring', A:[518,591,716,753,828,891,1025], B:[563,632,759,791,870,936,1076], C:[619,702,827,862,939,1001,1173], anchos:[90,105,135,150,160,180,200] },
+  { id:'funda-sena', nombre:'Funda Sena (exclusiva base Lyon)', A:[200,205,240,246,263,270], B:[243,248,282,288,305,312], C:[412,417,452,458,475,482], anchos:[90,105,135,150,160,180] },
+];
+
+/* ============ CABEZALES (22 items, verificados visualmente contra el PDF) ============ */
+const W7 = [90,105,135,150,160,180,200];
+const W5 = [135,150,160,180,200];
+const cabezales = [
+  { nombre:'Napoles', anchos:W5, A:[677,690,716,742,853], B:[758,772,802,831,913], C:[894,911,946,981,1023] },
+  { nombre:'Manchester', anchos:W7, A:[464,479,544,559,625,634,729], B:[511,526,609,627,700,710,780], C:[598,616,719,739,826,838,874] },
+  { nombre:'Liverpool', anchos:W7, A:[464,479,544,559,625,634,729], B:[511,526,609,627,700,710,780], C:[598,616,719,739,826,838,874] },
+  { nombre:'Ainhoa', anchos:W5, A:[545,553,614,629,724], B:[616,625,694,711,774], C:[739,749,833,853,867] },
+  { nombre:'Trend', anchos:W7, A:[569,574,659,665,744,761,875], B:[615,620,711,719,803,822,936], C:[689,694,804,819,907,937,1049] },
+  { nombre:'Silver', anchos:W7, A:[582,592,669,676,755,772,887], B:[623,634,716,724,808,826,950], C:[691,703,801,810,905,925,1063] },
+  { nombre:'Corinto', anchos:W7, A:[559,569,637,645,724,740,851], B:[598,608,682,690,774,792,911], C:[664,675,764,773,867,887,1020] },
+  { nombre:'Boston', anchos:W7, A:[373,385,458,471,507,524,602], B:[410,424,513,527,568,587,645], C:[484,500,616,633,682,704,722] },
+  { nombre:'Estambul', anchos:W7, A:[262,269,328,341,379,392,451], B:[281,288,351,365,406,419,482], C:[311,320,393,408,455,470,540] },
+  { nombre:'Opera', anchos:W7, A:[322,329,394,401,444,460,529], B:[348,356,426,434,480,497,566], C:[387,395,485,494,547,566,634] },
+  { nombre:'Cap.London', anchos:W7, A:[322,329,394,401,444,460,529], B:[348,356,426,434,480,497,566], C:[387,395,485,494,547,566,634] },
+  { nombre:'Venecia', anchos:W7, A:[271,279,339,350,389,401,461], B:[290,298,363,374,416,429,494], C:[322,331,406,419,466,481,553] },
+  { nombre:'Bristol', anchos:W7, A:[267,273,329,338,371,383,440], B:[288,295,358,369,405,417,471], C:[329,337,412,424,466,480,527] },
+  { nombre:'Dublin', anchos:W7, A:[267,273,329,338,371,383,440], B:[288,295,358,369,405,417,471], C:[329,337,412,424,466,480,527] },
+  { nombre:'London', anchos:W7, A:[267,273,329,338,371,383,440], B:[288,295,358,369,405,417,471], C:[329,337,412,424,466,480,527] },
+  { nombre:'Niza', anchos:W7, A:[254,260,327,338,374,389,447], B:[271,278,350,362,401,416,479], C:[301,309,392,405,449,466,536] },
+  { nombre:'Curve', anchos:W7, A:[281,289,358,369,417,429,493], B:[301,309,383,395,447,459,528], C:[334,343,429,442,500,514,591] },
+  { nombre:'Boreal', anchos:W7, A:[223,230,281,294,324,337,388], B:[239,246,306,320,354,367,415], C:[280,289,362,376,414,434,499] },
+  { nombre:'Urban', anchos:W7, A:[223,230,281,294,324,337,388], B:[239,246,306,320,354,367,415], C:[280,289,362,376,414,434,499] },
+  { nombre:'Romeo', anchos:W7, A:[223,230,281,294,324,337,388], B:[239,246,306,320,354,367,415], C:[280,289,362,376,414,434,499] },
+  { nombre:'Pretty', anchos:W7, A:[223,230,281,294,324,337,388], B:[239,246,306,320,354,367,415], C:[280,289,362,376,414,434,499] },
+  { nombre:'Sena', tipo:'Funda cabezal', anchos:W7, A:[116,118,139,144,155,159,213], B:[138,142,171,178,192,198,359], C:[215,223,280,297,317,330,554] },
+];
+
+/* ============ CAMAS ELÉCTRICAS ============ */
+const camas = [
+  { nombre:'Royal', anchos:[90,105,135,150], A:[1124,1199,1404,1757], B:[1237,1319,1573,1968], C:[1447,1543,1856,2323],
+    extras:[{n:'Cable sincronizador entre camas',p:75},{n:'USB lateral',p:85},{n:'Pata 10 cm (10 und.)',p:100}] },
+  { nombre:'Royal Spring', anchos:[90,105,135,150], A:[1248,1282,1868,1914], B:[1311,1346,1943,1971], C:[1547,1588,2293,2326],
+    extras:[{n:'Cable sincronizador entre camas',p:75},{n:'USB lateral',p:85},{n:'Pata 10 cm (10 und.)',p:100}] },
+];
+
+/* ============ ALMOHADAS + PROTECTOR ============ */
+const almohadas = [
+  { nombre:'Experience', detalle:'Almohada termoregulable Cooltech/Vigoré', firmeza:'SOFT · MEDIUM · FIRM', tallas:[90,105,135], precios:[108,109,123] },
+  { nombre:'Viscotermic', detalle:'Viscoelástica MDI·30, cara verano/invierno', firmeza:'ADAPT · FIRM · COMFORT', tallas:[75,80,90,105,135,150], precios:[64,66,72,80,97,106] },
+  { nombre:'Bahamas', detalle:'Triple firmeza, 3 zonas (todas Firm)', firmeza:'FIRM · FIRM · FIRM', tallas:[70,75,90], precios:[85,90,99] },
+  { nombre:'NaturalForm', detalle:'Fibras de lino natural, cara verano/invierno', firmeza:'ADAPT · FIRM · COMFORT', tallas:[70,75,90,105,135,150], precios:[80,83,94,102,121,135] },
+  { nombre:'MicroAir', detalle:'Fibra Fiber Down tipo plumón, microfibra AIR', firmeza:'ADAPT · FIRM · COMFORT', tallas:[75,80,90,105,135,150], precios:[44,45,48,53,60,64] },
+  { nombre:'Tacto Pluma', detalle:'Fibra HCS, doble funda desenfundable', firmeza:'ADAPT · FIRM · COMFORT', tallas:[75,80,90,105,135,150], precios:[26,28,31,33,39,41] },
+  { nombre:'Protector Tencel', detalle:'Funda protectora impermeable y transpirable · máx. altura colchón 31 cm', firmeza:'—', tallas:[90,105,135,150,160,180], precios:[37,44,47,49,53,55] },
+];
+
+/* ================= RENDER: COLCHONES ================= */
+const cAnchoSel = document.getElementById('c-ancho');
+ANCHOS.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; cAnchoSel.appendChild(o); });
+cAnchoSel.value = 150;
+const tiposColchon = [...new Set(colchones.flatMap(c=>c.tags))];
+const cChipsWrap = document.getElementById('c-chips');
+let activeTiposC = new Set(tiposColchon);
+tiposColchon.forEach(t=>{
+  const chip=document.createElement('div'); chip.className='chip active'; chip.textContent=t;
+  chip.onclick=()=>{ if(activeTiposC.has(t)){activeTiposC.delete(t); chip.classList.remove('active');} else{activeTiposC.add(t); chip.classList.add('active');} renderColchones(); };
+  cChipsWrap.appendChild(chip);
+});
+const cAlturaMinSel = document.getElementById('c-altura-min');
+const cAlturaMaxSel = document.getElementById('c-altura-max');
+[...new Set(colchones.map(c=>c.altura).filter(h=>h!=null))].sort((a,b)=>a-b).forEach(h=>{
+  const o1=document.createElement('option'); o1.value=h; o1.textContent=h+' cm'; cAlturaMinSel.appendChild(o1);
+  const o2=document.createElement('option'); o2.value=h; o2.textContent=h+' cm'; cAlturaMaxSel.appendChild(o2);
+});
+function renderColchones(){
+  const ancho = parseInt(cAnchoSel.value);
+  const largo = document.getElementById('c-largo').value;
+  const orden = document.getElementById('c-orden').value;
+  const alturaMin = cAlturaMinSel.value;
+  const alturaMax = cAlturaMaxSel.value;
+  const grid = document.getElementById('c-grid'); grid.innerHTML='';
+  let items = colchones.filter(c=>c.tags.some(t=>activeTiposC.has(t)))
+    .filter(c=> alturaMin==='' || (c.altura!=null && c.altura>=parseInt(alturaMin)))
+    .filter(c=> alturaMax==='' || (c.altura!=null && c.altura<=parseInt(alturaMax)))
+    .map(c=>{
+    const idx = c.anchos.indexOf(ancho);
+    const raw = idx>-1 ? c.precios[largo][idx] : null;
+    return {...c, raw, precio: raw==null?null:raw*PUNTO};
+  });
+  if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
+  else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
+  else if(orden==='alt-asc') items.sort((a,b)=>(a.altura??1e9)-(b.altura??1e9));
+  else if(orden==='alt-desc') items.sort((a,b)=>(b.altura??-1)-(a.altura??-1));
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
+  items.forEach(c=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${c.nombre}</h3><span class="tag${c.fuera?' alt':''}">${c.fuera?'Fuera catálogo':c.firmeza}</span></div>
+      <div class="sub">${c.subfamilia} · ${c.tags.join(' · ')}</div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho}×${largo.replace('-',' / ')} cm · ${c.altura??'—'} cm alto · ${c.raw??'—'} pts</div>
+        <div class="price">${c.precio!=null?c.precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['c-ancho','c-largo','c-orden','c-altura-min','c-altura-max'].forEach(id=>document.getElementById(id).addEventListener('change',renderColchones));
+
+/* ================= RENDER: CANAPÉS ================= */
+const kAnchoSel = document.getElementById('k-ancho');
+ANCHOS.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; kAnchoSel.appendChild(o); });
+kAnchoSel.value = '150';
+const extraState = {};
+function renderCanapes(){
+  const ancho = parseInt(kAnchoSel.value);
+  const idx = ANCHOS.indexOf(ancho);
+  const serie = document.getElementById('k-serie').value;
+  const orden = document.getElementById('k-orden').value;
+  const grid = document.getElementById('k-grid'); grid.innerHTML='';
+  let items = canapes.map(c=>{
+    const raw = c[serie+'190'][idx];
+    const base = raw*PUNTO;
+    if(!extraState[c.id]) extraState[c.id] = new Set();
+    let extraCost = 0;
+    extraState[c.id].forEach(n=>{ const e=c.extras.find(x=>x.n===n); if(e) extraCost += e.p*PUNTO; });
+    return {...c, precio: base+extraCost, base, raw};
+  });
+  if(!extraState['oslo']) extraState['oslo'] = new Set();
+  const osloExtras = [{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680}];
+  let osloExtraCost = 0; extraState['oslo'].forEach(n=>{ const e=osloExtras.find(x=>x.n===n); if(e) osloExtraCost += e.p*PUNTO; });
+  const osloRaw = osloPrecio.A190[idx], osloBase = osloRaw*PUNTO;
+  items.push({ id:'oslo', nombre:'Oslo', material:'Canapé madera', base:osloBase, raw:osloRaw, precio:osloBase+osloExtraCost, extras:osloExtras });
+
+  if(orden==='asc') items.sort((a,b)=>a.precio-b.precio);
+  else if(orden==='desc') items.sort((a,b)=>b.precio-a.precio);
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+
+  items.forEach(c=>{
+    const card=document.createElement('div'); card.className='card';
+    let extrasHtml = '';
+    if(c.extras && c.extras.length){
+      extrasHtml = '<div class="extras">' + c.extras.map(e=>{
+        const checked = extraState[c.id].has(e.n) ? 'checked' : '';
+        return `<label><input type="checkbox" data-id="${c.id}" data-name="${e.n}" ${checked}> ${e.n} <small>(${e.p} pts = ${(e.p*PUNTO).toFixed(2)} €)</small></label>`;
+      }).join('') + '</div>';
+    }
+    card.innerHTML=`
+      <div class="row"><h3>${c.nombre}</h3><span class="tag">${ancho} cm</span></div>
+      <div class="sub">${c.material||''}</div>
+      ${extrasHtml}
+      <div class="pricebox">
+        <div><div class="pricenote">${c.raw} pts × 0,40 € = ${c.base.toFixed(2)} €</div>
+        <div class="price">${c.precio.toFixed(2)} €</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', e=>{
+      const id=e.target.dataset.id, name=e.target.dataset.name;
+      if(e.target.checked) extraState[id].add(name); else extraState[id].delete(name);
+      renderCanapes();
+    });
+  });
+}
+['k-ancho','k-serie','k-orden'].forEach(id=>document.getElementById(id).addEventListener('change',renderCanapes));
+
+/* ================= RENDER: BASES ================= */
+const bAnchoSel = document.getElementById('b-ancho');
+ANCHOS.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; bAnchoSel.appendChild(o); });
+bAnchoSel.value = '150';
+function renderBases(){
+  const ancho = parseInt(bAnchoSel.value);
+  const serie = document.getElementById('b-serie').value;
+  const orden = document.getElementById('b-orden').value;
+  const grid = document.getElementById('b-grid'); grid.innerHTML='';
+  let items = bases.map(b=>{
+    const idx = b.anchos.indexOf(ancho);
+    const raw = idx>-1?b[serie][idx]:null;
+    return {...b, raw, precio: raw==null?null:raw*PUNTO};
+  });
+  if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
+  else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
+  items.forEach(b=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${b.nombre}</h3><span class="tag">Serie ${serie}</span></div>
+      <div class="sub">Precio único 180·190·200</div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho} cm · ${b.raw??'—'} pts</div>
+        <div class="price">${b.precio!=null?b.precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['b-ancho','b-serie','b-orden'].forEach(id=>document.getElementById(id).addEventListener('change',renderBases));
+
+/* ================= RENDER: CABEZALES ================= */
+const hAnchoSel = document.getElementById('h-ancho');
+ANCHOS.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; hAnchoSel.appendChild(o); });
+hAnchoSel.value = '150';
+function renderCabezales(){
+  const ancho = parseInt(hAnchoSel.value);
+  const serie = document.getElementById('h-serie').value;
+  const orden = document.getElementById('h-orden').value;
+  const grid = document.getElementById('h-grid'); grid.innerHTML='';
+  let items = cabezales.map(h=>{
+    const idx = h.anchos.indexOf(ancho);
+    const raw = idx>-1?h[serie][idx]:null;
+    return {...h, raw, precio: raw==null?null:raw*PUNTO};
+  });
+  if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
+  else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(items.length===0){ grid.innerHTML='<div class="empty">Este ancho no está disponible para los cabezales cargados.</div>'; return; }
+  items.forEach(h=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${h.nombre}</h3><span class="tag${h.tipo?' alt':''}">${h.tipo?h.tipo:'Serie '+serie}</span></div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho} cm · ${h.raw??'—'} pts</div>
+        <div class="price">${h.precio!=null?h.precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['h-ancho','h-serie','h-orden'].forEach(id=>document.getElementById(id).addEventListener('change',renderCabezales));
+
+/* ================= RENDER: CAMAS ELÉCTRICAS ================= */
+const mAnchoSel = document.getElementById('m-ancho');
+[90,105,135,150].forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; mAnchoSel.appendChild(o); });
+mAnchoSel.value = '150';
+const extraStateCamas = {};
+function renderCamas(){
+  const ancho = parseInt(mAnchoSel.value);
+  const serie = document.getElementById('m-serie').value;
+  const grid = document.getElementById('m-grid'); grid.innerHTML='';
+  camas.forEach(m=>{
+    const idx = m.anchos.indexOf(ancho);
+    const raw = idx>-1?m[serie][idx]:null;
+    const base = raw==null?null:raw*PUNTO;
+    if(!extraStateCamas[m.nombre]) extraStateCamas[m.nombre] = new Set();
+    let extraCost = 0;
+    extraStateCamas[m.nombre].forEach(n=>{ const e=m.extras.find(x=>x.n===n); if(e) extraCost += e.p*PUNTO; });
+    const precio = base==null?null:base+extraCost;
+    const card=document.createElement('div'); card.className='card';
+    const extrasHtml = '<div class="extras">' + m.extras.map(e=>{
+      const checked = extraStateCamas[m.nombre].has(e.n) ? 'checked' : '';
+      return `<label><input type="checkbox" data-id="${m.nombre}" data-name="${e.n}" ${checked}> ${e.n} <small>(${e.p} pts = ${(e.p*PUNTO).toFixed(2)} €)</small></label>`;
+    }).join('') + '</div>';
+    card.innerHTML=`
+      <div class="row"><h3>${m.nombre}</h3><span class="tag">Serie ${serie}</span></div>
+      <div class="sub">Cama articulada eléctrica · precio único 180·190·200</div>
+      ${extrasHtml}
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho} cm · ${raw??'—'} pts</div>
+        <div class="price">${precio!=null?precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', e=>{
+      const id=e.target.dataset.id, name=e.target.dataset.name;
+      if(e.target.checked) extraStateCamas[id].add(name); else extraStateCamas[id].delete(name);
+      renderCamas();
+    });
+  });
+}
+['m-ancho','m-serie'].forEach(id=>document.getElementById(id).addEventListener('change',renderCamas));
+
+/* ================= RENDER: ALMOHADAS ================= */
+function renderAlmohadas(){
+  const grid = document.getElementById('a-grid'); grid.innerHTML='';
+  almohadas.forEach(a=>{
+    const card=document.createElement('div'); card.className='card';
+    const rows = a.tallas.map((t,i)=>`<div class="r"><span>${t} cm</span><b>${(a.precios[i]*PUNTO).toFixed(2)} €</b></div>`).join('');
+    card.innerHTML=`
+      <div class="row"><h3>${a.nombre}</h3><span class="tag">${a.firmeza}</span></div>
+      <div class="sub">${a.detalle}</div>
+      <div class="sizelist">${rows}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ================= NAV ================= */
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('s-'+b.dataset.t).classList.add('active');
+  });
+});
+
+renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
+</script>
+</body>
+</html>
