@@ -1,0 +1,9 @@
+{
+  "name": "mcsrepresentaciones-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio MCS Representaciones + backend serverless para MCS Inteligencia Comercial (CRM interno)",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
