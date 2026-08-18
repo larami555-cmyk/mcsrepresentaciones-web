@@ -26,7 +26,7 @@ exports.handler = async (event) => {
   const store = getStore({
     name: 'crm-data',
     siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4',
-    token: process.env.NETLIFY_BLOBS_TOKEN
+    token: process.env.BLOBS_ACCESS_TOKEN
   });
   let clientes = (await store.get('clientes', { type: 'json' })) || [];
 
