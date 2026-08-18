@@ -97,3 +97,6 @@ Todas en `/images/` dentro del repo: logos de marca (`logo-*.png/jpeg`), fotos d
 ## Credenciales
 
 El token de GitHub para hacer push **no se guarda en este archivo por seguridad**. MCarmen lo tiene guardado aparte; si Claude necesita hacer push y no lo tiene en el contexto de la conversación, hay que pedírselo.
+
+## Fix Blobs (18 agosto 2026)
+Se añadió NETLIFY_BLOBS_TOKEN (personal access token) como variable de entorno, y las funciones `crm-clientes.js`/`crm-investigar.js` pasan `siteID` + `token` explícitos a `getStore()` para evitar el `MissingBlobsEnvironmentError` que Netlify Blobs presentaba al no inyectar el contexto automáticamente en producción.
