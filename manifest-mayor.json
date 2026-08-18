@@ -1,0 +1,12 @@
+{
+  "name": "Tarifas Mayor - MCS",
+  "short_name": "Tarifas Mayor",
+  "start_url": "./tarifas-mayor.html",
+  "display": "standalone",
+  "background_color": "#F5F2EC",
+  "theme_color": "#2B2620",
+  "icons": [
+    { "src": "images/icon-mayor-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/icon-mayor-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
