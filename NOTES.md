@@ -54,6 +54,14 @@ Casos ya resueltos así: `.mcs-logo`, `.mcs-brandname`, `.mcs-brandsub`, `.mcs-p
 - Quitado el estilo "destacado" (borde dorado) de la tarjeta de Essenzia Dormire — las 6 tarjetas de marca ahora son visualmente idénticas (`featured:!1` en las 6)
 - Generado QR de la web con el logo MCS incrustado en el centro, verificado que escanea correctamente a mcsrepresentaciones.es (entregado como PNG, no vive en el repo)
 
+## ⚠️ Lección: iconos de "Añadir a pantalla de inicio" (PWA) — usar archivos reales, no incrustados
+
+Si una página suelta (ej. `tarifas-mayor.html`, `tarifas-kingsofa.html`) necesita favicon/apple-touch-icon/manifest para poder instalarse como app en el móvil con su propio icono, **usar siempre archivos reales** (`images/icon-X.png`, `manifest-X.json`, enlazados con rutas relativas tipo `./images/...`), **nunca** incrustarlos como `data:image/png;base64,...` o `data:application/manifest+json;base64,...` dentro del propio HTML.
+
+Motivo: un manifest con `"start_url": "."` incrustado como data-URI no tiene una "ubicación" real desde la que resolver la ruta relativa, así que el navegador cae al dominio raíz al instalar — parece que la app instalada "no hace nada" o abre la portada en vez de la página correcta. Con archivo real y `"start_url": "./nombre-pagina.html"` esto no pasa.
+
+Caso ya resuelto así: `tarifas-mayor.html` (manifest-mayor.json + images/icon-mayor-*.png), `tarifas-kingsofa.html` (manifest-kingsofa.json + images/icon-kingsofa-*.png).
+
 ## Pendiente
 
 - Confirmar que el enlace de Facebook corregido (`facebook.com/MCarmen.Sanchez.792`) abre correctamente. Si no, pedirle a MCarmen que copie el enlace directo desde su perfil de Facebook ("Copiar enlace al perfil").
