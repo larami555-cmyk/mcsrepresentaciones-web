@@ -53,7 +53,11 @@ exports.handler = async (event) => {
     return jsonResponse(500, { error: 'Falta configurar ANTHROPIC_API_KEY en Netlify (Site settings → Environment variables)' });
   }
 
-  const store = getStore('crm-data');
+  const store = getStore({
+    name: 'crm-data',
+    siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4',
+    token: process.env.NETLIFY_BLOBS_TOKEN
+  });
   let clientes = (await store.get('clientes', { type: 'json' })) || [];
   const idx = clientes.findIndex(x => x.id === id);
   if (idx === -1) return jsonResponse(404, { error: 'Cliente no encontrado' });

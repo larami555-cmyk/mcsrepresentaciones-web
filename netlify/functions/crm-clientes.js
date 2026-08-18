@@ -23,7 +23,11 @@ exports.handler = async (event) => {
     return jsonResponse(401, { error: 'No autorizado' });
   }
 
-  const store = getStore('crm-data');
+  const store = getStore({
+    name: 'crm-data',
+    siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4',
+    token: process.env.NETLIFY_BLOBS_TOKEN
+  });
   let clientes = (await store.get('clientes', { type: 'json' })) || [];
 
   try {
