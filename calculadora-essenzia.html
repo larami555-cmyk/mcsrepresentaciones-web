@@ -2,13 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Essenzia Dormire · Calculadora de precio de coste</title>
 <meta name="google" content="notranslate">
 <meta name="robots" content="noindex, nofollow">
-<title>Essenzia Dormire · Calculadora de precio de coste</title>
 <link rel="manifest" href="./manifest-essenzia.json">
 <link rel="icon" type="image/png" sizes="32x32" href="./images/icon-essenzia-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./images/icon-essenzia-180.png">
+
 <style>
   :root{
     --navy:#16305e; --ink:#232323; --muted:#767469; --line:#e4e2da;
@@ -21,6 +25,19 @@
   .brand{font-size:21px;font-weight:600;letter-spacing:.3px;}
   .brand span{color:var(--accent);}
   .subtitle{margin-top:5px;font-size:13px;color:#cfd6e8;max-width:680px;line-height:1.4;}
+  .header-row{display:flex;justify-content:space-between;align-items:center;}
+  .gear-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
+    width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;flex-shrink:0;}
+  .gear-btn:hover{background:rgba(255,255,255,.22);}
+  .settings-panel{margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+    border-radius:10px;padding:12px 14px;max-width:320px;}
+  .settings-panel.hidden{display:none;}
+  .settings-panel label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#cfd6e8;font-weight:600;}
+  .settings-row{display:flex;gap:8px;margin-top:6px;}
+  .settings-row input{width:90px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:13px;}
+  .settings-row button{background:var(--accent);border:none;color:#fff;border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-weight:600;}
+  .settings-row button:hover{opacity:.9;}
+  .settings-note{font-size:11px;color:#cfd6e8;margin-top:8px;line-height:1.4;}
   nav{display:flex;gap:2px;background:#0e2148;padding:0 24px;flex-wrap:wrap;}
   nav button{padding:11px 16px;font-size:12.5px;font-weight:600;color:#a9b3d1;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
   nav button.active{color:#fff;border-bottom-color:var(--accent);}
@@ -28,6 +45,9 @@
   section{display:none;} section.active{display:block;}
   .bar{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-bottom:16px;
     display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .search-row{margin-bottom:10px;}
+  .search-row input{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;background:#fff;color:var(--ink);}
+  .search-row input:focus{outline:2px solid var(--accent);outline-offset:-1px;}
   .f{display:flex;flex-direction:column;gap:4px;}
   .f label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600;}
   select{border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:13px;background:#fff;color:var(--ink);}
@@ -57,8 +77,18 @@
 <body>
 
 <header>
-  <div class="brand">Essenzia <span>Dormire</span></div>
-  <div class="subtitle">Calculadora de precio de coste — colchones, canapés, bases, cabezales, camas eléctricas y almohadas. Precio de coste = tarifa en puntos × 0,40 €/punto, aplicado en toda la app.</div>
+  <div class="header-row">
+    <div class="brand">Essenzia <span>Dormire</span></div>
+    <button id="gear-btn" class="gear-btn" title="Ajustes" aria-label="Ajustes">⚙</button>
+  </div>
+  <div id="settings-panel" class="settings-panel hidden">
+    <label for="punto-input">Valor del punto (€)</label>
+    <div class="settings-row">
+      <input type="number" id="punto-input" step="0.01" min="0.01">
+      <button id="punto-save">Guardar</button>
+    </div>
+    <div class="settings-note">Este valor se usa para calcular todos los precios de la app y queda guardado en este navegador, incluso si cierras y vuelves a abrir el archivo.</div>
+  </div>
 </header>
 
 <nav>
@@ -74,6 +104,7 @@
 
   <section class="active" id="s-colchones">
     <div class="info">35 modelos del catálogo oficial + 7 modelos de línea adicional fuera de catálogo (marcados como tal). Todos a precio de coste.</div>
+    <div class="search-row"><input type="text" id="c-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="c-ancho"></select></div>
       <div class="f"><label>Largo</label><select id="c-largo"><option value="180-190">180 · 190 cm</option><option value="200">200 cm</option></select></div>
@@ -87,6 +118,7 @@
 
   <section id="s-canapes">
     <div class="info">Magnum, Rox, Varadero (Terra/madera y Lady/metal) y Oslo. Extras facturados en puntos (tapa partida, apertura motorizada, anclaje de unión) sumados también a coste.</div>
+    <div class="search-row"><input type="text" id="k-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="k-ancho"></select></div>
       <div class="f"><label>Serie tejido</label><select id="k-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
@@ -97,6 +129,7 @@
 
   <section id="s-bases">
     <div class="info">Lyon (estándar y acabado Milán), Gran Suite, Gran Suite Spring y Funda Sena.</div>
+    <div class="search-row"><input type="text" id="b-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="b-ancho"></select></div>
       <div class="f"><label>Serie tejido</label><select id="b-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
@@ -107,6 +140,7 @@
 
   <section id="s-cabezales">
     <div class="info">22 cabezales (incluida la Funda Sena) verificados uno a uno contra el catálogo. Napoles y Ainhoa no tienen ancho 90/105 — el catálogo no los ofrece en esas medidas.</div>
+    <div class="search-row"><input type="text" id="h-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="h-ancho"></select></div>
       <div class="f"><label>Serie tejido</label><select id="h-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
@@ -117,6 +151,7 @@
 
   <section id="s-camas">
     <div class="info">Royal y Royal Spring (camas articuladas eléctricas). Precios únicos para 180·190·200; extras en puntos. Si tienes otra cama eléctrica con tarifa propia, mándame la imagen de los precios y la añado igual que estas.</div>
+    <div class="search-row"><input type="text" id="m-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="m-ancho"></select></div>
       <div class="f"><label>Serie tejido</label><select id="m-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
@@ -126,13 +161,18 @@
 
   <section id="s-almohadas">
     <div class="info">Cada almohada tiene su propia gama de tallas. Se incluye también el Protector Tencel (no es almohada, pero comparte tabla de tallas).</div>
+    <div class="search-row"><input type="text" id="a-search" placeholder="Buscar modelo…"></div>
     <div class="grid" id="a-grid"></div>
   </section>
 
 </main>
 
 <script>
-const PUNTO = 0.40;
+let PUNTO = 0.40;
+try {
+  const guardado = localStorage.getItem('essenzia_punto');
+  if(guardado != null && !isNaN(parseFloat(guardado))) PUNTO = parseFloat(guardado);
+} catch(e) { /* localStorage no disponible, se queda en 0,40 por defecto */ }
 const ANCHOS = [90,105,135,150,160,180,200];
 
 /* ============ COLCHONES: catálogo oficial ============ */
@@ -283,9 +323,9 @@ ANCHOS.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textC
 cAnchoSel.value = 150;
 const tiposColchon = [...new Set(colchones.flatMap(c=>c.tags))];
 const cChipsWrap = document.getElementById('c-chips');
-let activeTiposC = new Set(tiposColchon);
+let activeTiposC = new Set();
 tiposColchon.forEach(t=>{
-  const chip=document.createElement('div'); chip.className='chip active'; chip.textContent=t;
+  const chip=document.createElement('div'); chip.className='chip'; chip.textContent=t;
   chip.onclick=()=>{ if(activeTiposC.has(t)){activeTiposC.delete(t); chip.classList.remove('active');} else{activeTiposC.add(t); chip.classList.add('active');} renderColchones(); };
   cChipsWrap.appendChild(chip);
 });
@@ -301,10 +341,12 @@ function renderColchones(){
   const orden = document.getElementById('c-orden').value;
   const alturaMin = cAlturaMinSel.value;
   const alturaMax = cAlturaMaxSel.value;
+  const query = document.getElementById('c-search').value.trim().toLowerCase();
   const grid = document.getElementById('c-grid'); grid.innerHTML='';
-  let items = colchones.filter(c=>c.tags.some(t=>activeTiposC.has(t)))
+  let items = colchones.filter(c=>activeTiposC.size===0 || c.tags.some(t=>activeTiposC.has(t)))
     .filter(c=> alturaMin==='' || (c.altura!=null && c.altura>=parseInt(alturaMin)))
     .filter(c=> alturaMax==='' || (c.altura!=null && c.altura<=parseInt(alturaMax)))
+    .filter(c=> query==='' || c.nombre.toLowerCase().includes(query))
     .map(c=>{
     const idx = c.anchos.indexOf(ancho);
     const raw = idx>-1 ? c.precios[largo][idx] : null;
@@ -328,7 +370,7 @@ function renderColchones(){
     grid.appendChild(card);
   });
 }
-['c-ancho','c-largo','c-orden','c-altura-min','c-altura-max'].forEach(id=>document.getElementById(id).addEventListener('change',renderColchones));
+['c-ancho','c-largo','c-orden','c-altura-min','c-altura-max','c-search'].forEach(id=>document.getElementById(id).addEventListener(id==='c-search'?'input':'change',renderColchones));
 
 /* ================= RENDER: CANAPÉS ================= */
 const kAnchoSel = document.getElementById('k-ancho');
@@ -340,8 +382,9 @@ function renderCanapes(){
   const idx = ANCHOS.indexOf(ancho);
   const serie = document.getElementById('k-serie').value;
   const orden = document.getElementById('k-orden').value;
+  const query = document.getElementById('k-search').value.trim().toLowerCase();
   const grid = document.getElementById('k-grid'); grid.innerHTML='';
-  let items = canapes.map(c=>{
+  let items = canapes.filter(c=> query==='' || c.nombre.toLowerCase().includes(query)).map(c=>{
     const raw = c[serie+'190'][idx];
     const base = raw*PUNTO;
     if(!extraState[c.id]) extraState[c.id] = new Set();
@@ -353,7 +396,7 @@ function renderCanapes(){
   const osloExtras = [{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680}];
   let osloExtraCost = 0; extraState['oslo'].forEach(n=>{ const e=osloExtras.find(x=>x.n===n); if(e) osloExtraCost += e.p*PUNTO; });
   const osloRaw = osloPrecio.A190[idx], osloBase = osloRaw*PUNTO;
-  items.push({ id:'oslo', nombre:'Oslo', material:'Canapé madera', base:osloBase, raw:osloRaw, precio:osloBase+osloExtraCost, extras:osloExtras });
+  if(query==='' || 'oslo'.includes(query)) items.push({ id:'oslo', nombre:'Oslo', material:'Canapé madera', base:osloBase, raw:osloRaw, precio:osloBase+osloExtraCost, extras:osloExtras });
 
   if(orden==='asc') items.sort((a,b)=>a.precio-b.precio);
   else if(orden==='desc') items.sort((a,b)=>b.precio-a.precio);
@@ -386,7 +429,7 @@ function renderCanapes(){
     });
   });
 }
-['k-ancho','k-serie','k-orden'].forEach(id=>document.getElementById(id).addEventListener('change',renderCanapes));
+['k-ancho','k-serie','k-orden','k-search'].forEach(id=>document.getElementById(id).addEventListener(id==='k-search'?'input':'change',renderCanapes));
 
 /* ================= RENDER: BASES ================= */
 const bAnchoSel = document.getElementById('b-ancho');
@@ -396,8 +439,9 @@ function renderBases(){
   const ancho = parseInt(bAnchoSel.value);
   const serie = document.getElementById('b-serie').value;
   const orden = document.getElementById('b-orden').value;
+  const query = document.getElementById('b-search').value.trim().toLowerCase();
   const grid = document.getElementById('b-grid'); grid.innerHTML='';
-  let items = bases.map(b=>{
+  let items = bases.filter(b=> query==='' || b.nombre.toLowerCase().includes(query)).map(b=>{
     const idx = b.anchos.indexOf(ancho);
     const raw = idx>-1?b[serie][idx]:null;
     return {...b, raw, precio: raw==null?null:raw*PUNTO};
@@ -418,7 +462,7 @@ function renderBases(){
     grid.appendChild(card);
   });
 }
-['b-ancho','b-serie','b-orden'].forEach(id=>document.getElementById(id).addEventListener('change',renderBases));
+['b-ancho','b-serie','b-orden','b-search'].forEach(id=>document.getElementById(id).addEventListener(id==='b-search'?'input':'change',renderBases));
 
 /* ================= RENDER: CABEZALES ================= */
 const hAnchoSel = document.getElementById('h-ancho');
@@ -428,8 +472,9 @@ function renderCabezales(){
   const ancho = parseInt(hAnchoSel.value);
   const serie = document.getElementById('h-serie').value;
   const orden = document.getElementById('h-orden').value;
+  const query = document.getElementById('h-search').value.trim().toLowerCase();
   const grid = document.getElementById('h-grid'); grid.innerHTML='';
-  let items = cabezales.map(h=>{
+  let items = cabezales.filter(h=> query==='' || h.nombre.toLowerCase().includes(query)).map(h=>{
     const idx = h.anchos.indexOf(ancho);
     const raw = idx>-1?h[serie][idx]:null;
     return {...h, raw, precio: raw==null?null:raw*PUNTO};
@@ -449,7 +494,7 @@ function renderCabezales(){
     grid.appendChild(card);
   });
 }
-['h-ancho','h-serie','h-orden'].forEach(id=>document.getElementById(id).addEventListener('change',renderCabezales));
+['h-ancho','h-serie','h-orden','h-search'].forEach(id=>document.getElementById(id).addEventListener(id==='h-search'?'input':'change',renderCabezales));
 
 /* ================= RENDER: CAMAS ELÉCTRICAS ================= */
 const mAnchoSel = document.getElementById('m-ancho');
@@ -459,8 +504,9 @@ const extraStateCamas = {};
 function renderCamas(){
   const ancho = parseInt(mAnchoSel.value);
   const serie = document.getElementById('m-serie').value;
+  const query = document.getElementById('m-search').value.trim().toLowerCase();
   const grid = document.getElementById('m-grid'); grid.innerHTML='';
-  camas.forEach(m=>{
+  camas.filter(m=> query==='' || m.nombre.toLowerCase().includes(query)).forEach(m=>{
     const idx = m.anchos.indexOf(ancho);
     const raw = idx>-1?m[serie][idx]:null;
     const base = raw==null?null:raw*PUNTO;
@@ -491,12 +537,13 @@ function renderCamas(){
     });
   });
 }
-['m-ancho','m-serie'].forEach(id=>document.getElementById(id).addEventListener('change',renderCamas));
+['m-ancho','m-serie','m-search'].forEach(id=>document.getElementById(id).addEventListener(id==='m-search'?'input':'change',renderCamas));
 
 /* ================= RENDER: ALMOHADAS ================= */
 function renderAlmohadas(){
+  const query = document.getElementById('a-search').value.trim().toLowerCase();
   const grid = document.getElementById('a-grid'); grid.innerHTML='';
-  almohadas.forEach(a=>{
+  almohadas.filter(a=> query==='' || a.nombre.toLowerCase().includes(query)).forEach(a=>{
     const card=document.createElement('div'); card.className='card';
     const rows = a.tallas.map((t,i)=>`<div class="r"><span>${t} cm</span><b>${(a.precios[i]*PUNTO).toFixed(2)} €</b></div>`).join('');
     card.innerHTML=`
@@ -506,6 +553,7 @@ function renderAlmohadas(){
     grid.appendChild(card);
   });
 }
+document.getElementById('a-search').addEventListener('input', renderAlmohadas);
 
 /* ================= NAV ================= */
 document.querySelectorAll('nav button').forEach(b=>{
@@ -517,7 +565,27 @@ document.querySelectorAll('nav button').forEach(b=>{
   });
 });
 
+/* ================= AJUSTES (valor del punto) ================= */
+const gearBtn = document.getElementById('gear-btn');
+const settingsPanel = document.getElementById('settings-panel');
+const puntoInput = document.getElementById('punto-input');
+puntoInput.value = PUNTO.toFixed(2);
+gearBtn.addEventListener('click', ()=>{
+  settingsPanel.classList.toggle('hidden');
+  puntoInput.value = PUNTO.toFixed(2);
+});
+document.getElementById('punto-save').addEventListener('click', ()=>{
+  const v = parseFloat(puntoInput.value.replace(',','.'));
+  if(!isNaN(v) && v>0){
+    PUNTO = v;
+    try { localStorage.setItem('essenzia_punto', v); } catch(e) { /* no disponible */ }
+    renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
+    settingsPanel.classList.add('hidden');
+  }
+});
+
 renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
 </script>
+<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-08-19 · 19:45</div>
 </body>
 </html>

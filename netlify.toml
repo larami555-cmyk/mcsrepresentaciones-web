@@ -10,3 +10,8 @@
   for = "/crm/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/calculadora-essenzia.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
