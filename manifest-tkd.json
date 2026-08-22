@@ -1,0 +1,15 @@
+{
+  "name": "Monitor Taekwondo",
+  "short_name": "Taekwondo",
+  "description": "Estado de las 9 fuentes vigiladas de competiciones de Taekwondo",
+  "start_url": "./monitor-taekwondo-dashboard.html",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "icons": [
+    { "src": "images/icon-tkd-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "images/icon-tkd-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "images/icon-tkd-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/icon-tkd-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
