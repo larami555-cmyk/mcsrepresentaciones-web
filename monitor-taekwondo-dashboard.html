@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor Taekwondo — Dashboard</title>
+<style>
+  :root {
+    --verde: #2e7d32;
+    --naranja: #e65100;
+    --rojo: #c62828;
+    --gris: #757575;
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --texto: #eaeaea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--texto);
+    padding: 20px;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  .sub { color: #999; font-size: 0.85rem; margin-bottom: 20px; }
+  .config {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .config input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #0f1115;
+    color: var(--texto);
+  }
+  .config button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    background: #3b82f6;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .item {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px;
+    border-left: 5px solid var(--gris);
+  }
+  .item.verde { border-left-color: var(--verde); }
+  .item.naranja { border-left-color: var(--naranja); }
+  .item.rojo { border-left-color: var(--rojo); }
+  .item h3 { margin: 0 0 6px; font-size: 0.95rem; }
+  .item a { color: #7ab8ff; font-size: 0.8rem; word-break: break-all; }
+  .item .meta { font-size: 0.75rem; color: #999; margin-top: 8px; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .badge.verde { background: var(--verde); }
+  .badge.naranja { background: var(--naranja); }
+  .badge.rojo { background: var(--rojo); }
+  #status { font-size: 0.85rem; color: #999; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<h1>🥋 Monitor Taekwondo</h1>
+<div class="sub">Estado de las 9 fuentes vigiladas — revisión automática cada lunes 8:00</div>
+
+<div class="config">
+  <input type="text" id="csvUrl" placeholder="Pega aquí la URL CSV publicada del Google Sheet...">
+  <button onclick="guardarYCargar()">Guardar y cargar</button>
+  <button onclick="cargar()">Refrescar</button>
+</div>
+
+<div id="status"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+function guardarYCargar() {
+  const url = document.getElementById('csvUrl').value.trim();
+  if (url) {
+    localStorage.setItem('monitorTaekwondoCsvUrl', url);
+    cargar();
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+  return lines.slice(1).map(line => {
+    const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = values[i] || '');
+    return obj;
+  });
+}
+
+function claseEstado(estado, ultimoCambio) {
+  if (estado && estado.startsWith('ERROR')) return 'rojo';
+  if (ultimoCambio) {
+    const dias = (Date.now() - new Date(ultimoCambio).getTime()) / 86400000;
+    if (dias < 7) return 'naranja';
+  }
+  return 'verde';
+}
+
+function render(items) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  items.forEach(item => {
+    const clase = claseEstado(item['Estado'], item['Último cambio detectado']);
+    const div = document.createElement('div');
+    div.className = 'item ' + clase;
+    div.innerHTML = `
+      <span class="badge ${clase}">${clase === 'verde' ? 'SIN CAMBIOS' : clase === 'naranja' ? 'CAMBIO RECIENTE' : 'ERROR'}</span>
+      <h3>${item['Nombre'] || '(sin nombre)'}</h3>
+      <a href="${item['URL']}" target="_blank">${item['URL']}</a>
+      <div class="meta">Última revisión: ${item['Última revisión'] || '—'}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+const URL_CSV_POR_DEFECTO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQSAiRxIZnqUmt3ARuLNyOYTO9a0XuB500kOOI1Qn26ocrh0Gti4G-q7IEvH6xarsvh4uwTpP-IM8dW/pub?gid=677155133&single=true&output=csv";
+
+function cargar() {
+  let url = localStorage.getItem('monitorTaekwondoCsvUrl');
+  if (!url) {
+    url = URL_CSV_POR_DEFECTO;
+    localStorage.setItem('monitorTaekwondoCsvUrl', url);
+  }
+  const status = document.getElementById('status');
+  if (!url) {
+    status.textContent = 'Pega la URL CSV publicada del Google Sheet arriba para empezar.';
+    return;
+  }
+  document.getElementById('csvUrl').value = url;
+  status.textContent = 'Cargando...';
+  fetch(url)
+    .then(r => r.text())
+    .then(text => {
+      const items = parseCSV(text);
+      render(items);
+      status.textContent = 'Actualizado: ' + new Date().toLocaleString('es-ES');
+    })
+    .catch(err => {
+      status.textContent = 'Error al cargar el CSV: ' + err.message;
+    });
+}
+
+cargar();
+</script>
+
+</body>
+</html>
