@@ -100,3 +100,42 @@ El token de GitHub para hacer push **no se guarda en este archivo por seguridad*
 
 ## Fix Blobs (18 agosto 2026)
 Se añadió NETLIFY_BLOBS_TOKEN (personal access token) como variable de entorno, y las funciones `crm-clientes.js`/`crm-investigar.js` pasan `siteID` + `token` explícitos a `getStore()` para evitar el `MissingBlobsEnvironmentError` que Netlify Blobs presentaba al no inyectar el contexto automáticamente en producción.
+
+## Resumen gran sesión (24 agosto 2026) — Traducción bilingüe, Quién soy, argumentarios de venta
+
+### 1. Web 100% bilingüe CASTELLANO / GALEGO
+- Selector visible en el header (desktop y menú móvil), botones "Castellano" / "Galego", el idioma elegido se guarda en `localStorage` (`mcsLang`) y persiste entre visitas.
+- **Diccionario central:** `var mcsI18n={es:{...},gl:{...}}`, declarado justo antes de `function Su()`. Contiene todos los textos fijos del sitio (nav, hero, marcas, servicios, novedades, footer, "Quién soy"). Dentro del componente: `const tx=mcsI18n[lg]` y se usa `tx.nombreCampo` en vez de texto literal en todo el JSX.
+- **Contenido dinámico bilingüe:** los arrays de datos (`ql` marcas, `mcsNovedades`, `mcsDocumentos`) llevan campos `xxxGl` en paralelo a los `xxx` en castellano (ej. `desc`/`descGl`, `titulo`/`tituloGl`, `linkUrl`/`linkUrlGl`). Patrón de fallback usado en todo el código: `lg==="gl"?(x.campoGl||x.campo):x.campo` — si falta la traducción gallega, cae automáticamente a la versión en castellano sin romper nada.
+- **Para añadir contenido nuevo (marca, novedad, documento):** siempre rellenar el campo en castellano; el `Gl` es opcional (recomendado, pero el sitio no se rompe si falta).
+- **Ojo con `state.desc` con saltos de línea:** si un campo de texto necesita varias líneas (ej. listas numeradas), usar la secuencia `\n` (dos caracteres, backslash+n) dentro del string, NUNCA un salto de línea real dentro de las comillas — un salto de línea real rompe la sintaxis JS con "Invalid or unexpected token". Para que el `\n` se vea como salto de línea real en pantalla, el `<p>` que renderiza ese campo lleva `style:{whiteSpace:"pre-line"}` en vez de depender de clases Tailwind.
+
+### 2. Nueva sección "Quién soy"
+- Pestaña de menú "Quién soy" (antes de Marcas), sección `id="quien-soy"` con foto de MCarmen (`images/mcarmen-quiensoy.jpg`, formato 4:5, sustituida por versión en alta resolución el 24/08) + biografía en 4 párrafos + tarjeta con nombre/cargo superpuesta en la esquina de la foto.
+- Textos en `tx.quienSoyTitulo`, `tx.quienSoyEyebrow`, `tx.quienSoyP1-P4` (ES y GL).
+- La pestaña "Inicio" que se añadió en un primer momento se quitó del menú (a petición de MCarmen, para dejar más aire al logo); se mantiene en su lugar un **botón flotante fijo** (ver punto 4).
+
+### 3. Documentos por marca — Argumentario de venta (PDF) por solicitud
+- 6 PDFs "Argumentario de venta" (uno por marca, en `documentos/argumentario-{marca}-es.pdf` y `-gl.pdf`), generados a partir de las hojas que MCarmen fue pasando (imagen → PDF de una página con Pillow). **Tobisa en gallego** fue corregido tras un primer envío duplicado en castellano.
+- **Importante:** estos documentos NUNCA se descargan directamente. El botón dice "Solicitar por WhatsApp" y abre `wa.me/34619620363` con un mensaje prellenado (distinto en ES/GL) pidiendo el argumentario de esa marca. Esto es así a propósito — MCarmen quiere control sobre quién recibe este contenido.
+- Se probó primero añadir una ficha gratuita "Cinco razones para recomendar esta marca" (visible sin pedir nada) pero **se eliminó** (24 agosto) porque ese contenido ya está dentro del argumentario que hay que solicitar — tenerlo también gratis anulaba el sentido del "por solicitud". Si en el futuro se pide algo similar, recordar este criterio.
+- El modal de Documentos ahora también soporta traducir `tipo`/`titulo`/`desc`/`linkUrl`/`linkLabel` con el mismo patrón `xxxGl` de fallback.
+
+### 4. Botones flotantes fijos (arriba a la derecha, bajo el header)
+- WhatsApp (verde, `wa.me/34619620363`) y debajo un botón "Inicio" (negro, icono de casa, `href="#inicio"`, el `id="inicio"` vive en la sección hero). Clases `.mcs-wa-float` / `.mcs-home-float`, con variante más pequeña en móvil vía `@media (max-width:1023px)`.
+
+### 5. Mapa interactivo de Galicia
+- SVG de las 4 provincias insertado inline vía `dangerouslySetInnerHTML` dentro de `p("div",{className:"mcs-galicia-map"...})`, **colocado en la misma fila que el texto "+230 tiendas..."** (no debajo, a petición de MCarmen). Clases del hover en el `<style>` inline: `.mcs-galicia-map path.mcs-province`.
+- **Segunda versión (24 agosto):** se sustituyó el SVG por uno con una capa adicional `path.mcs-outline` (contorno negro fijo de toda Galicia) para que la silueta se vea siempre, no solo al hacer hover.
+
+### 6. Otros ajustes de esta sesión
+- Avatares del hero (`+230 tiendas...`) sustituidos por fotos reales: retrato de un cliente + 2 fachadas de tienda (antes eran fotos aleatorias de pravatar.cc).
+- Header: subtítulo ampliado a "Mobiliario · Tapicería · Descanso" + línea "Solo para profesionales en Galicia" (antes solo decía "Mobiliario").
+- Barra negra final: "Mobiliario" → "Producto Nacional Premium", texto en blanco y `font-semibold` (antes gris tenue, poco legible), altura aumentada de 40px a 56px (`.mcs-footer-bar`).
+- Sección Servicios: la tarjeta "Síguenos" pasó a llamarse "Material para publicar en tu tienda" (mismos iconos de redes sociales debajo), y se añadió una 6ª tarjeta "Recursos para Distribuidores" cuyo botón "Herramientas de Venta" abre el modal Área Profesional.
+
+### ⚠️ Bugs de esta sesión para recordar
+- **Saltos de línea reales dentro de strings JS** (ver punto 1) rompen la sintaxis — usar siempre `\n` escapado.
+- **Al insertar varios objetos seguidos en un array con un script Python**, comprobar que no falte la coma `,` entre `}` y `{` del siguiente objeto — un `"}{id:"` sin coma de por medio es sintácticamente inválido y da un error de "Unexpected token" difícil de localizar a simple vista. Revisar siempre con `grep -c '"}{id:"' index.html` tras una inserción masiva.
+- **Colores/clases Tailwind inventados sin comprobar el bundle:** se usó `text-[#D8D2C5]` para la barra negra y no existía en el bundle precompilado (quedó sin aplicar). Siempre comprobar con `grep -c '\.text-\\\[\\#RRGGBB\\\]{' index.html` (con las barras invertidas exactas) antes de dar por hecho que un color arbitrario está disponible; si no lo está, usar uno de los ya confirmados en el proyecto (`text-white`, `text-[#8A7F74]`, `text-[#C5A880]`, etc.) o crear una clase CSS propia.
+
