@@ -23,6 +23,7 @@ Devuelve JSON con este esquema exacto (usa "" o [] si no encuentras dato, nunca 
   "nombre_correcto": "",
   "direccion": "",
   "telefono": "",
+  "email": "",
   "web": "",
   "redes": "",
   "tipo_producto": "",
@@ -105,6 +106,7 @@ Busca en internet información real y actual. Devuelve solo el JSON.`;
     if (result.nombre_correcto) c.nombre = result.nombre_correcto;
     if (result.direccion) c.direccion = result.direccion;
     if (result.telefono) c.telefono = result.telefono;
+    if (result.email) c.email = result.email;
     if (result.web) c.web = result.web;
     if (result.redes) c.redes = result.redes;
     if (result.tipo_producto) c.tipoProducto = result.tipo_producto;
