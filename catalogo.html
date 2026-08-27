@@ -1,1 +1,61 @@
+backend:
+  name: git-gateway
+  branch: main
 
+media_folder: "images/catalogo"
+public_folder: "/images/catalogo"
+
+collections:
+  - name: "treku"
+    label: "TREKU"
+    folder: "content/catalogo/treku"
+    create: true
+    slug: "{{fields.slug}}"
+    fields:
+      - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
+      - { label: "Fotografía", name: "imagen", widget: "image" }
+
+  - name: "baixmoduls"
+    label: "BAIXMODULS"
+    folder: "content/catalogo/baixmoduls"
+    create: true
+    slug: "{{fields.slug}}"
+    fields:
+      - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
+      - { label: "Fotografía", name: "imagen", widget: "image" }
+
+  - name: "tobisa"
+    label: "Tobisa"
+    folder: "content/catalogo/tobisa"
+    create: true
+    slug: "{{fields.slug}}"
+    fields:
+      - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
+      - { label: "Fotografía", name: "imagen", widget: "image" }
+
+  - name: "kingsofa"
+    label: "KingSofá"
+    folder: "content/catalogo/kingsofa"
+    create: true
+    slug: "{{fields.slug}}"
+    fields:
+      - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
+      - { label: "Fotografía", name: "imagen", widget: "image" }
+
+  - name: "tapizadosmayor"
+    label: "Tapizados Mayor"
+    folder: "content/catalogo/tapizadosmayor"
+    create: true
+    slug: "{{fields.slug}}"
+    fields:
+      - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
+      - { label: "Fotografía", name: "imagen", widget: "image" }
+
+  - name: "essenzia"
+    label: "Essenzia Dormire"
+    folder: "content/catalogo/essenzia"
+    create: true
+    slug: "{{fields.slug}}"
+    fields:
+      - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
+      - { label: "Fotografía", name: "imagen", widget: "image" }
