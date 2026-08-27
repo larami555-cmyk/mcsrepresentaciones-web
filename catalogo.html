@@ -73,4 +73,120 @@
     padding: 60px 0;
     font-size: 14px;
   }
-<
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="filters" id="filters"></div>
+  <div id="grid" class="grid"></div>
+</div>
+
+<script>
+const REPO = "larami555-cmyk/mcsrepresentaciones-web";
+const BRANCH = "main";
+
+const BRANDS = [
+  { key: "treku", label: "TREKU" },
+  { key: "baixmoduls", label: "BAIXMODULS" },
+  { key: "tobisa", label: "Tobisa" },
+  { key: "kingsofa", label: "KingSofá" },
+  { key: "tapizadosmayor", label: "Tapizados Mayor" },
+  { key: "essenzia", label: "Essenzia Dormire" }
+];
+
+const filtersEl = document.getElementById("filters");
+const gridEl = document.getElementById("grid");
+const cache = {};
+let currentFilter = "all";
+
+function renderFilters() {
+  const all = document.createElement("button");
+  all.className = "filter-btn active";
+  all.textContent = "Todas";
+  all.onclick = () => selectFilter("all", all);
+  filtersEl.appendChild(all);
+
+  BRANDS.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn";
+    btn.textContent = b.label;
+    btn.onclick = () => selectFilter(b.key, btn);
+    filtersEl.appendChild(btn);
+  });
+}
+
+function selectFilter(key, btn) {
+  currentFilter = key;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderGrid();
+}
+
+function parseFrontmatter(text) {
+  const match = text.match(/^---\s*([\s\S]*?)\s*---/);
+  if (!match) return {};
+  const data = {};
+  match[1].split("\n").forEach(line => {
+    const idx = line.indexOf(":");
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    let value = line.slice(idx + 1).trim();
+    value = value.replace(/^["']|["']$/g, "");
+    data[key] = value;
+  });
+  return data;
+}
+
+async function loadBrand(brandKey) {
+  if (cache[brandKey]) return cache[brandKey];
+  try {
+    const listRes = await fetch(`https://api.github.com/repos/${REPO}/contents/content/catalogo/${brandKey}?ref=${BRANCH}`);
+    if (!listRes.ok) { cache[brandKey] = []; return []; }
+    const files = await listRes.json();
+    const mdFiles = Array.isArray(files) ? files.filter(f => f.name.endsWith(".md")) : [];
+
+    const items = await Promise.all(mdFiles.map(async f => {
+      const rawRes = await fetch(`https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/content/catalogo/${brandKey}/${f.name}`);
+      const rawText = await rawRes.text();
+      const data = parseFrontmatter(rawText);
+      return { brandKey, imagen: data.imagen, slug: data.slug || "" };
+    }));
+
+    cache[brandKey] = items.filter(i => i.imagen);
+    return cache[brandKey];
+  } catch (e) {
+    cache[brandKey] = [];
+    return [];
+  }
+}
+
+async function renderGrid() {
+  gridEl.innerHTML = '<div class="loading">Cargando…</div>';
+
+  const brandKeys = currentFilter === "all" ? BRANDS.map(b => b.key) : [currentFilter];
+  const results = await Promise.all(brandKeys.map(loadBrand));
+  const items = results.flat();
+
+  if (items.length === 0) {
+    gridEl.innerHTML = '<div class="empty">Todavía no hay fotografías en esta sección.</div>';
+    return;
+  }
+
+  gridEl.innerHTML = "";
+  items.forEach(item => {
+    const brandLabel = BRANDS.find(b => b.key === item.brandKey)?.label || "";
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${item.imagen}" alt="${brandLabel}" loading="lazy" />
+      <div class="label">${brandLabel}</div>
+    `;
+    gridEl.appendChild(card);
+  });
+}
+
+renderFilters();
+renderGrid();
+</script>
+</body>
+</html>
