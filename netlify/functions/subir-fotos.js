@@ -1,3 +1,4 @@
+// v2 - forzar redeploy de la función
 const GITHUB_API = 'https://api.github.com';
 const OWNER = 'larami555-cmyk';
 const REPO = 'mcsrepresentaciones-web';
