@@ -13,7 +13,7 @@ collections:
     slug: "{{fields.slug}}"
     fields:
       - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
-      - { label: "Fotografía", name: "imagen", widget: "image" }
+      - { label: "Fotografías", name: "imagenes", widget: "list", field: { label: "Imagen", name: "imagen", widget: "image" } }
 
   - name: "baixmoduls"
     label: "BAIXMODULS"
@@ -22,7 +22,7 @@ collections:
     slug: "{{fields.slug}}"
     fields:
       - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
-      - { label: "Fotografía", name: "imagen", widget: "image" }
+      - { label: "Fotografías", name: "imagenes", widget: "list", field: { label: "Imagen", name: "imagen", widget: "image" } }
 
   - name: "tobisa"
     label: "Tobisa"
@@ -31,7 +31,7 @@ collections:
     slug: "{{fields.slug}}"
     fields:
       - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
-      - { label: "Fotografía", name: "imagen", widget: "image" }
+      - { label: "Fotografías", name: "imagenes", widget: "list", field: { label: "Imagen", name: "imagen", widget: "image" } }
 
   - name: "kingsofa"
     label: "KingSofá"
@@ -40,7 +40,7 @@ collections:
     slug: "{{fields.slug}}"
     fields:
       - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
-      - { label: "Fotografía", name: "imagen", widget: "image" }
+      - { label: "Fotografías", name: "imagenes", widget: "list", field: { label: "Imagen", name: "imagen", widget: "image" } }
 
   - name: "tapizadosmayor"
     label: "Tapizados Mayor"
@@ -49,7 +49,7 @@ collections:
     slug: "{{fields.slug}}"
     fields:
       - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
-      - { label: "Fotografía", name: "imagen", widget: "image" }
+      - { label: "Fotografías", name: "imagenes", widget: "list", field: { label: "Imagen", name: "imagen", widget: "image" } }
 
   - name: "essenzia"
     label: "Essenzia Dormire"
@@ -58,4 +58,5 @@ collections:
     slug: "{{fields.slug}}"
     fields:
       - { label: "Nombre interno (opcional)", name: "slug", widget: "string", required: false, default: "producto" }
-      - { label: "Fotografía", name: "imagen", widget: "image" }
+      - { label: "Fotografías", name: "imagenes", widget: "list", field: { label: "Imagen", name: "imagen", widget: "image" } }
+
