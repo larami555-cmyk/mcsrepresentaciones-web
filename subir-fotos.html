@@ -148,7 +148,7 @@ function resizeImage(file, maxDim = 1600, quality = 0.82) {
   });
 }
 
-const BATCH_SIZE = 6;
+const BATCH_SIZE = 3;
 
 uploadBtn.addEventListener('click', async () => {
   const password = document.getElementById('password').value;
@@ -178,13 +178,22 @@ uploadBtn.addEventListener('click', async () => {
         base64: await resizeImage(f)
       })));
 
-      const res = await fetch('/.netlify/functions/subir-fotos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, marca, files })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error subiendo fotos');
+      let res, data;
+      try {
+        res = await fetch('/.netlify/functions/subir-fotos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, marca, files })
+        });
+        data = await res.json().catch(() => ({}));
+      } catch (netErr) {
+        throw new Error(`Fallo de red en la tanda ${b + 1} (foto ${subidas + 1} a ${subidas + batch.length}). Ya se subieron ${subidas} fotos correctamente. Vuelve a intentarlo con las fotos restantes.`);
+      }
+
+      if (!res.ok) {
+        const detalle = data.error || `código ${res.status} (probablemente tardó demasiado)`;
+        throw new Error(`Error en la tanda ${b + 1} (foto ${subidas + 1} a ${subidas + batch.length}): ${detalle}. Ya se subieron ${subidas} fotos correctamente. Quita las fotos ya subidas y reintenta con el resto.`);
+      }
 
       subidas += data.subidas;
       barFill.style.width = Math.round((subidas / selectedFiles.length) * 100) + '%';
