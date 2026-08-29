@@ -18,10 +18,7 @@ exports.handler = async (event) => {
     try { body = JSON.parse(event.body); } catch (e) { /* body vacío o no-JSON, ok para GET */ }
   }
 
-  const password = event.headers['x-crm-password'] || body.password;
-  if (!process.env.CRM_PASSWORD || password !== process.env.CRM_PASSWORD) {
-    return jsonResponse(401, { error: 'No autorizado' });
-  }
+  // Sin contraseña de acceso: uso estrictamente personal, a petición de MCarmen.
 
   const store = getStore({
     name: 'crm-data',

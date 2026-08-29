@@ -46,10 +46,8 @@ exports.handler = async (event) => {
   let body = {};
   try { body = JSON.parse(event.body || '{}'); } catch (e) { return jsonResponse(400, { error: 'JSON inválido' }); }
 
-  const { password, id } = body;
-  if (!process.env.CRM_PASSWORD || password !== process.env.CRM_PASSWORD) {
-    return jsonResponse(401, { error: 'No autorizado' });
-  }
+  const { id } = body;
+  // Sin contraseña de acceso: uso estrictamente personal, a petición de MCarmen.
   if (!process.env.ANTHROPIC_API_KEY) {
     return jsonResponse(500, { error: 'Falta configurar ANTHROPIC_API_KEY en Netlify (Site settings → Environment variables)' });
   }
