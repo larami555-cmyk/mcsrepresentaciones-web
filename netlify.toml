@@ -15,3 +15,8 @@
   for = "/calculadora-essenzia.html"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/drapsaten-corte.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
