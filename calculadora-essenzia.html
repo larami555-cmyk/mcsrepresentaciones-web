@@ -446,7 +446,7 @@ function renderColchones(){
   const alturaMax = cAlturaMaxSel.value;
   const query = document.getElementById('c-search').value.trim().toLowerCase();
   const grid = document.getElementById('c-grid'); grid.innerHTML='';
-  let items = colchones.filter(c=>activeTiposC.size===0 || c.tags.some(t=>activeTiposC.has(t)))
+  let items = colchones.filter(c=>activeTiposC.size===0 || [...activeTiposC].every(t=>c.tags.includes(t)))
     .filter(c=> alturaMin==='' || (c.altura!=null && c.altura>=parseInt(alturaMin)))
     .filter(c=> alturaMax==='' || (c.altura!=null && c.altura<=parseInt(alturaMax)))
     .filter(c=> query==='' || c.nombre.toLowerCase().includes(query))
@@ -679,7 +679,7 @@ function renderMagnifiqueColchones(){
   const orden = document.getElementById('g-orden').value;
   const query = document.getElementById('g-search').value.trim().toLowerCase();
   const grid = document.getElementById('g-grid'); grid.innerHTML='';
-  let items = magnifiqueColchones.filter(c=>activeTiposG.size===0 || c.tags.some(t=>activeTiposG.has(t)))
+  let items = magnifiqueColchones.filter(c=>activeTiposG.size===0 || [...activeTiposG].every(t=>c.tags.includes(t)))
     .filter(c=> query==='' || c.nombre.toLowerCase().includes(query))
     .map(c=>{
       const idx = c.anchos.indexOf(ancho);
