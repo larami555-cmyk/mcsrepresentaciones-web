@@ -319,6 +319,30 @@
     color:var(--ink-soft);
     margin-top:2px;
   }
+  .model-card{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .model-medidas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+  }
+  .medida-tag{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:14px;
+    padding:3px 8px;
+    font-size:10.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .medida-tag:active{
+    background:var(--accent-soft);
+    color:var(--accent-dark);
+    border-color:var(--accent);
+  }
   .back-row{
     display:flex;
     align-items:center;
@@ -528,22 +552,42 @@ PRODUCTOS.forEach(p=>{
 // --- Paso 1: selección de modelo ---
 function buildModelGrid(){
   const counts = {};
-  PRODUCTOS.forEach(p=>{ counts[p._modelKey] = (counts[p._modelKey]||0) + 1; });
+  const medidasByModel = {};
+  PRODUCTOS.forEach(p=>{
+    counts[p._modelKey] = (counts[p._modelKey]||0) + 1;
+    if(!medidasByModel[p._modelKey]) medidasByModel[p._modelKey] = new Set();
+    p._medidas.forEach(m=>medidasByModel[p._modelKey].add(m));
+  });
   const keys = Object.keys(counts).sort((a,b)=>a.localeCompare(b,'es'));
-  modelGridEl.innerHTML = keys.map(k=>
-    `<button class="model-btn" data-model="${escapeHtml(k)}">${escapeHtml(k.replace(/\s*\(.*\)$/,''))}<span class="count">${counts[k]} artículos</span></button>`
-  ).join('');
+  modelGridEl.innerHTML = keys.map(k=>{
+    const medidas = [...medidasByModel[k]].sort((a,b)=>a-b);
+    const medidasHtml = medidas.length
+      ? `<div class="model-medidas">${medidas.map(m=>`<span class="medida-tag" data-model="${escapeHtml(k)}" data-medida="${m}">${m} cm</span>`).join('')}</div>`
+      : '';
+    return `<div class="model-card">
+      <button class="model-btn" data-model="${escapeHtml(k)}">${escapeHtml(k.replace(/\s*\(.*\)$/,''))}<span class="count">${counts[k]} artículos</span></button>
+      ${medidasHtml}
+    </div>`;
+  }).join('');
   modelGridEl.querySelectorAll('.model-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> selectModel(btn.dataset.model));
+  });
+  modelGridEl.querySelectorAll('.medida-tag').forEach(tag=>{
+    tag.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const modelKey = tag.dataset.model;
+      const medida = parseInt(tag.dataset.medida, 10);
+      selectModel(modelKey, medida);
+    });
   });
 }
 
 let currentModel = null;
 let facetState = { tipo:null, cabezal:null, chaise:null, medida:null };
 
-function selectModel(modelKey){
+function showModelView(modelKey, presetMedida){
   currentModel = modelKey;
-  facetState = { tipo:null, cabezal:null, chaise:null, medida:null };
+  facetState = { tipo:null, cabezal:null, chaise:null, medida: presetMedida || null };
   modelStepEl.style.display = 'none';
   backRowEl.style.display = 'flex';
   modelNameEl.textContent = modelKey.replace(/\s*\(.*\)$/,'');
@@ -552,13 +596,25 @@ function selectModel(modelKey){
   renderFacetsAndList();
 }
 
-document.getElementById('backBtn').addEventListener('click', ()=>{
+function selectModel(modelKey, presetMedida){
+  showModelView(modelKey, presetMedida);
+  pushHistory({view:'model', model: modelKey, medida: presetMedida || null});
+}
+
+function goHome(){
   currentModel = null;
   modelStepEl.style.display = 'block';
   backRowEl.style.display = 'none';
   facetsEl.style.display = 'none';
   listEl.innerHTML = '';
   resultCountEl.textContent = '';
+  searchEl.value = '';
+}
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  // Deja que el manejador de historial (popstate) sea quien decida la vista,
+  // así el botón "Cambiar modelo" y el botón atrás del móvil quedan sincronizados.
+  history.back();
 });
 
 function itemsForModel(){
@@ -674,18 +730,29 @@ function renderFreeSearch(filterText){
   if(items.length>0) resultCountEl.textContent = `${items.length}${items.length===200?'+':''} resultado(s)`;
 }
 
+let inSearchView = false;
+
+function showSearchView(query){
+  currentModel = null;
+  modelStepEl.style.display = 'none';
+  backRowEl.style.display = 'none';
+  facetsEl.style.display = 'none';
+  renderFreeSearch(query);
+}
+
 let debounceT=null;
 searchEl.addEventListener('input', ()=>{
   clearTimeout(debounceT);
   debounceT = setTimeout(()=>{
     if(searchEl.value.trim()){
-      // La búsqueda libre siempre opera sobre todo el catálogo, sale del modo modelo
-      currentModel = null;
-      modelStepEl.style.display = 'none';
-      backRowEl.style.display = 'none';
-      facetsEl.style.display = 'none';
-      renderFreeSearch(searchEl.value);
+      const wasAtHome = !inSearchView && !currentModel;
+      showSearchView(searchEl.value);
+      if(wasAtHome){
+        inSearchView = true;
+        pushHistory({view:'search'});
+      }
     } else if(!currentModel){
+      inSearchView = false;
       modelStepEl.style.display = 'block';
       listEl.innerHTML = '';
       resultCountEl.textContent = '';
@@ -723,13 +790,14 @@ function openModal(id){
   currentModalId = id;
   renderModal(id);
   overlay.classList.add('open');
+  pushHistory({view:'modal', id});
 }
 function closeModal(){
   overlay.classList.remove('open');
   currentModalId = null;
 }
-document.getElementById('closeBtn').addEventListener('click', closeModal);
-overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+document.getElementById('closeBtn').addEventListener('click', ()=> history.back());
+overlay.addEventListener('click', (e)=>{ if(e.target===overlay) history.back(); });
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{
   const p = findProduct(currentModalId);
@@ -754,7 +822,44 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 1600);
 }
 
-loadConfig().then(()=> buildModelGrid());
+// --- Historial de navegación (atrás del móvil / navegador) ---
+// Sin esto, pulsar "atrás" en la primera pantalla con contenido cierra la app.
+// Empujamos un estado por cada paso hacia delante (modelo, búsqueda, modal)
+// para que "atrás" siempre tenga una pantalla anterior a la que volver,
+// y que el último "atrás" lleve siempre al inicio en vez de salir.
+function pushHistory(state){
+  try{ history.pushState(state, ''); }catch(e){ /* noop */ }
+}
+
+window.addEventListener('popstate', (e)=>{
+  // Si solo había un modal abierto encima, basta con cerrarlo:
+  // la vista de fondo (modelo o búsqueda, con sus filtros) no ha cambiado.
+  if(overlay.classList.contains('open')){
+    closeModal();
+    return;
+  }
+  const state = e.state;
+  if(!state || state.view === 'home'){
+    goHome();
+    inSearchView = false;
+    return;
+  }
+  if(state.view === 'model'){
+    showModelView(state.model, state.medida);
+    inSearchView = false;
+    return;
+  }
+  if(state.view === 'search'){
+    inSearchView = true;
+    showSearchView(searchEl.value);
+    return;
+  }
+});
+
+loadConfig().then(()=>{
+  buildModelGrid();
+  history.replaceState({view:'home'}, '');
+});
 </script>
 
 </body>
