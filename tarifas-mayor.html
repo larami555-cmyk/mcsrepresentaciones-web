@@ -396,7 +396,7 @@
   <div class="hint" id="resultCount"></div>
 
   <div id="modelStep">
-    <div class="hint" style="margin-top:10px;">Elige un modelo para filtrar por cabezal, cheslón y medida</div>
+    <div class="hint" style="margin-top:10px;">Elige un modelo para filtrar por cabezal, cheslong y medida</div>
     <div class="model-grid" id="modelGrid" style="margin:8px 16px;"></div>
   </div>
 
@@ -508,10 +508,10 @@ PRODUCTOS.forEach(p=>{
              : (/CABEZ/.test(t) && t.includes('MANUAL')) ? 'Cabezal manual'
              : null;
   p._chaise = /CHAI/.test(t) ? (
-                t.includes('RINCON') || t.includes('RINCÓN') ? 'Cheslón rinconera'
-              : t.includes('ARCÓN') || t.includes('ARCON') ? 'Cheslón con arcón'
-              : 'Cheslón fija'
-              ) : 'Sin cheslón';
+                t.includes('RINCON') || t.includes('RINCÓN') ? 'Cheslong rinconera'
+              : t.includes('ARCÓN') || t.includes('ARCON') ? 'Cheslong con arcón'
+              : 'Cheslong fija'
+              ) : 'Sin cheslong';
   p._orientacion = t.includes('V/F.IZQ') || t.includes('V/F IZQ') ? 'Izquierda'
                   : t.includes('V/F.DCHA') || t.includes('V/F DCHA') ? 'Derecha'
                   : null;
@@ -596,18 +596,40 @@ function applyFacets(items){
 function renderFacetsAndList(){
   const base = itemsForModel();
 
-  function distinctValues(key, getter){
+  // Para cada faceta, calculamos sus opciones disponibles filtrando por las
+  // DEMÁS facetas ya seleccionadas (pero no por ella misma). Así, si eliges
+  // "Cheslong rinconera", en "Medida asiento" solo aparecen las medidas que
+  // existen realmente dentro de esa cheslong, no todas las del modelo.
+  function itemsExcept(exceptKey){
+    return base.filter(p=>{
+      if(exceptKey!=='tipo' && facetState.tipo && p._tipo !== facetState.tipo) return false;
+      if(exceptKey!=='cabezal' && facetState.cabezal && p._cabezal !== facetState.cabezal) return false;
+      if(exceptKey!=='chaise' && facetState.chaise && p._chaise !== facetState.chaise) return false;
+      if(exceptKey!=='medida' && facetState.medida && !p._medidas.includes(facetState.medida)) return false;
+      return true;
+    });
+  }
+
+  function distinctValues(items, getter){
     const vals = new Set();
-    base.forEach(p=>{ const v = getter(p); if(v!==null && v!==undefined) vals.add(v); });
+    items.forEach(p=>{ const v = getter(p); if(v!==null && v!==undefined) vals.add(v); });
     return [...vals];
   }
 
-  const tipos = distinctValues('tipo', p=>p._tipo);
-  const cabezales = distinctValues('cabezal', p=>p._cabezal);
-  const chaises = distinctValues('chaise', p=>p._chaise);
+  const tipos = distinctValues(itemsExcept('tipo'), p=>p._tipo);
+  const cabezales = distinctValues(itemsExcept('cabezal'), p=>p._cabezal);
+  const chaises = distinctValues(itemsExcept('chaise'), p=>p._chaise);
   const medidasAll = new Set();
-  base.forEach(p=>p._medidas.forEach(m=>medidasAll.add(m)));
+  itemsExcept('medida').forEach(p=>p._medidas.forEach(m=>medidasAll.add(m)));
   const medidas = [...medidasAll].sort((a,b)=>a-b);
+
+  // Si una selección activa ha dejado de ser compatible con el resto de
+  // filtros (p.ej. no queda ninguna composición con esa medida), la
+  // quitamos en vez de dejar el filtro "roto" en un estado invisible.
+  if(facetState.tipo && !tipos.includes(facetState.tipo)) facetState.tipo = null;
+  if(facetState.cabezal && !cabezales.includes(facetState.cabezal)) facetState.cabezal = null;
+  if(facetState.chaise && !chaises.includes(facetState.chaise)) facetState.chaise = null;
+  if(facetState.medida && !medidas.includes(facetState.medida)) facetState.medida = null;
 
   let html = '';
   function chipGroup(label, values, current, onKey){
@@ -622,7 +644,7 @@ function renderFacetsAndList(){
 
   chipGroup('Tipo', tipos, facetState.tipo, 'tipo');
   chipGroup('Cabezal', cabezales, facetState.cabezal, 'cabezal');
-  chipGroup('Cheslón', chaises, facetState.chaise, 'chaise');
+  chipGroup('Cheslong', chaises, facetState.chaise, 'chaise');
   chipGroup('Medida asiento', medidas, facetState.medida, 'medida');
 
   facetsEl.innerHTML = html;
