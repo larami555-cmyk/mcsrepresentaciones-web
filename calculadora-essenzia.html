@@ -15,31 +15,31 @@
 
 <style>
   :root{
-    --navy:#16305e; --ink:#232323; --muted:#767469; --line:#e4e2da;
+    --navy:#171717; --ink:#232323; --muted:#767469; --line:#e4e2da;
     --cream:#faf9f6; --paper:#ffffff; --accent:#b1893f;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--ink);
     font-family:'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;}
-  header{background:var(--navy);color:#fff;padding:20px 24px;}
-  .brand{font-size:21px;font-weight:600;letter-spacing:.3px;}
+  header{background:#141414;color:#fff;padding:22px 24px;}
+  .brand{font-size:22px;font-weight:700;letter-spacing:.2px;}
   .brand span{color:var(--accent);}
-  .subtitle{margin-top:5px;font-size:13px;color:#cfd6e8;max-width:680px;line-height:1.4;}
+  .subtitle{margin-top:4px;font-size:12px;color:#9a9890;letter-spacing:.8px;text-transform:uppercase;font-weight:600;max-width:680px;line-height:1.4;}
   .header-row{display:flex;justify-content:space-between;align-items:center;}
-  .gear-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
-    width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;flex-shrink:0;}
-  .gear-btn:hover{background:rgba(255,255,255,.22);}
-  .settings-panel{margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+  .gear-btn{background:#2a2a2a;border:1px solid #3a3a3a;color:#fff;
+    width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;}
+  .gear-btn:hover{background:#333;}
+  .settings-panel{margin-top:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
     border-radius:10px;padding:12px 14px;max-width:320px;}
   .settings-panel.hidden{display:none;}
-  .settings-panel label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#cfd6e8;font-weight:600;}
+  .settings-panel label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#b8b6ac;font-weight:600;}
   .settings-row{display:flex;gap:8px;margin-top:6px;}
   .settings-row input{width:90px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:13px;}
   .settings-row button{background:var(--accent);border:none;color:#fff;border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-weight:600;}
   .settings-row button:hover{opacity:.9;}
-  .settings-note{font-size:11px;color:#cfd6e8;margin-top:8px;line-height:1.4;}
-  nav{display:flex;gap:2px;background:#0e2148;padding:0 24px;flex-wrap:wrap;}
-  nav button{padding:11px 16px;font-size:12.5px;font-weight:600;color:#a9b3d1;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
+  .settings-note{font-size:11px;color:#b8b6ac;margin-top:8px;line-height:1.4;}
+  nav{display:flex;gap:2px;background:#0c0c0c;padding:0 24px;flex-wrap:wrap;}
+  nav button{padding:11px 16px;font-size:12.5px;font-weight:600;color:#8a8a8a;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
   nav button.active{color:#fff;border-bottom-color:var(--accent);}
   nav button.mg-nav{color:#d9b45c;letter-spacing:1px;font-weight:700;}
   nav button.mg-nav.active{color:#f0cd7a;border-bottom-color:#d9b45c;}
@@ -85,7 +85,10 @@
 
 <header>
   <div class="header-row">
-    <div class="brand">Essenzia <span>Dormire</span></div>
+    <div>
+      <div class="brand">Tarifas Essenzia <span>Dormire</span></div>
+      <div class="subtitle">MCS Representaciones</div>
+    </div>
     <button id="gear-btn" class="gear-btn" title="Ajustes" aria-label="Ajustes">⚙</button>
   </div>
   <div id="settings-panel" class="settings-panel hidden">
