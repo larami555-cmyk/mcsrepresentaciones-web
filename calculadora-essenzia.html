@@ -6,7 +6,6 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="robots" content="noindex, nofollow"> 
 <title>Essenzia Dormire · Calculadora de precio de coste</title>
 <meta name="google" content="notranslate">
 <meta name="robots" content="noindex, nofollow">
@@ -16,32 +15,38 @@
 
 <style>
   :root{
-    --navy:#16305e; --ink:#232323; --muted:#767469; --line:#e4e2da;
+    --navy:#171717; --ink:#232323; --muted:#767469; --line:#e4e2da;
     --cream:#faf9f6; --paper:#ffffff; --accent:#b1893f;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--ink);
     font-family:'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;}
-  header{background:var(--navy);color:#fff;padding:20px 24px;}
-  .brand{font-size:21px;font-weight:600;letter-spacing:.3px;}
+  header{background:#141414;color:#fff;padding:22px 24px;}
+  .brand{font-size:22px;font-weight:700;letter-spacing:.2px;}
   .brand span{color:var(--accent);}
-  .subtitle{margin-top:5px;font-size:13px;color:#cfd6e8;max-width:680px;line-height:1.4;}
+  .subtitle{margin-top:4px;font-size:12px;color:#9a9890;letter-spacing:.8px;text-transform:uppercase;font-weight:600;max-width:680px;line-height:1.4;}
   .header-row{display:flex;justify-content:space-between;align-items:center;}
-  .gear-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
-    width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;flex-shrink:0;}
-  .gear-btn:hover{background:rgba(255,255,255,.22);}
-  .settings-panel{margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+  .gear-btn{background:#2a2a2a;border:1px solid #3a3a3a;color:#fff;
+    width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;}
+  .gear-btn:hover{background:#333;}
+  .settings-panel{margin-top:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
     border-radius:10px;padding:12px 14px;max-width:320px;}
   .settings-panel.hidden{display:none;}
-  .settings-panel label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#cfd6e8;font-weight:600;}
+  .settings-panel label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#b8b6ac;font-weight:600;}
   .settings-row{display:flex;gap:8px;margin-top:6px;}
   .settings-row input{width:90px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:13px;}
   .settings-row button{background:var(--accent);border:none;color:#fff;border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-weight:600;}
   .settings-row button:hover{opacity:.9;}
-  .settings-note{font-size:11px;color:#cfd6e8;margin-top:8px;line-height:1.4;}
-  nav{display:flex;gap:2px;background:#0e2148;padding:0 24px;flex-wrap:wrap;}
-  nav button{padding:11px 16px;font-size:12.5px;font-weight:600;color:#a9b3d1;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
+  .settings-note{font-size:11px;color:#b8b6ac;margin-top:8px;line-height:1.4;}
+  nav{display:flex;gap:2px;background:#0c0c0c;padding:0 24px;flex-wrap:wrap;}
+  nav button{padding:11px 16px;font-size:12.5px;font-weight:600;color:#8a8a8a;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
   nav button.active{color:#fff;border-bottom-color:var(--accent);}
+  nav button.mg-nav{color:#d9b45c;letter-spacing:1px;font-weight:700;}
+  nav button.mg-nav.active{color:#f0cd7a;border-bottom-color:#d9b45c;}
+  .subnav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+  .subtab{padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--navy);font-size:12.5px;font-weight:600;cursor:pointer;}
+  .subtab.active{background:#2b2118;color:#d9b45c;border-color:#2b2118;}
+  .gpanel{display:none;} .gpanel.active{display:block;}
   main{max-width:1180px;margin:0 auto;padding:22px 20px 60px;}
   section{display:none;} section.active{display:block;}
   .bar{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-bottom:16px;
@@ -63,6 +68,7 @@
   .row{display:flex;justify-content:space-between;align-items:center;gap:8px;}
   .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:3px 7px;border-radius:5px;background:#eef1f8;color:var(--navy);white-space:nowrap;}
   .tag.alt{background:#f6ece0;color:var(--accent);}
+  .tag.mg{background:#2b2118;color:#d9b45c;}
   .extras{font-size:11.5px;border-top:1px solid var(--line);padding-top:7px;display:flex;flex-direction:column;gap:4px;}
   .extras label{display:flex;gap:6px;align-items:center;cursor:pointer;}
   .extras small{color:var(--muted);}
@@ -79,7 +85,10 @@
 
 <header>
   <div class="header-row">
-    <div class="brand">Essenzia <span>Dormire</span></div>
+    <div>
+      <div class="brand">Tarifas Essenzia <span>Dormire</span></div>
+      <div class="subtitle">MCS Representaciones</div>
+    </div>
     <button id="gear-btn" class="gear-btn" title="Ajustes" aria-label="Ajustes">⚙</button>
   </div>
   <div id="settings-panel" class="settings-panel hidden">
@@ -99,6 +108,7 @@
   <button data-t="cabezales">Cabezales</button>
   <button data-t="camas">Camas eléctricas</button>
   <button data-t="almohadas">Almohadas</button>
+  <button class="mg-nav" data-t="magnifique">MAGNIFIQUE</button>
 </nav>
 
 <main>
@@ -164,6 +174,56 @@
     <div class="info">Cada almohada tiene su propia gama de tallas. Se incluye también el Protector Tencel (no es almohada, pero comparte tabla de tallas).</div>
     <div class="search-row"><input type="text" id="a-search" placeholder="Buscar modelo…"></div>
     <div class="grid" id="a-grid"></div>
+  </section>
+
+  <section id="s-magnifique">
+    <div class="info">Colección de lujo Magnifique, como producto aparte y más exclusivo (también aparece mezclada, con etiqueta dorada, dentro de las pestañas generales). Mismas opciones de búsqueda, filtro y orden.</div>
+    <div class="subnav">
+      <button class="subtab active" data-g="mg-colchones">Colchones</button>
+      <button class="subtab" data-g="mg-cabezales">Cabezales</button>
+      <button class="subtab" data-g="mg-bases">Bases</button>
+      <button class="subtab" data-g="mg-camas">Camas eléctricas</button>
+    </div>
+
+    <div class="gpanel active" id="mg-colchones">
+      <div class="search-row"><input type="text" id="g-search" placeholder="Buscar modelo…"></div>
+      <div class="bar">
+        <div class="f"><label>Ancho</label><select id="g-ancho"></select></div>
+        <div class="f"><label>Largo</label><select id="g-largo"><option value="180-190">180 · 190 cm</option><option value="200">200 cm</option></select></div>
+        <div class="f"><label>Orden</label><select id="g-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
+        <div class="f" style="flex:1;min-width:240px;"><label>Composición</label><div class="chips" id="g-chips"></div></div>
+      </div>
+      <div class="grid" id="g-grid"></div>
+    </div>
+
+    <div class="gpanel" id="mg-cabezales">
+      <div class="search-row"><input type="text" id="gh-search" placeholder="Buscar modelo…"></div>
+      <div class="bar">
+        <div class="f"><label>Ancho</label><select id="gh-ancho"></select></div>
+        <div class="f"><label>Serie tejido</label><select id="gh-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+        <div class="f"><label>Orden</label><select id="gh-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
+      </div>
+      <div class="grid" id="gh-grid"></div>
+    </div>
+
+    <div class="gpanel" id="mg-bases">
+      <div class="search-row"><input type="text" id="gb-search" placeholder="Buscar modelo…"></div>
+      <div class="bar">
+        <div class="f"><label>Ancho</label><select id="gb-ancho"></select></div>
+        <div class="f"><label>Serie tejido</label><select id="gb-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+        <div class="f"><label>Orden</label><select id="gb-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
+      </div>
+      <div class="grid" id="gb-grid"></div>
+    </div>
+
+    <div class="gpanel" id="mg-camas">
+      <div class="search-row"><input type="text" id="gm-search" placeholder="Buscar modelo…"></div>
+      <div class="bar">
+        <div class="f"><label>Ancho</label><select id="gm-ancho"></select></div>
+        <div class="f"><label>Serie tejido</label><select id="gm-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
+      </div>
+      <div class="grid" id="gm-grid"></div>
+    </div>
   </section>
 
 </main>
@@ -237,7 +297,44 @@ const colchonesJuveniles = [
     anchos:[90,105], precios:{'180-190':[387,445], '200':[406,467]} },
 ];
 
-const colchones = [...colchonesCatalogo, ...colchonesFueraCatalogo, ...colchonesJuveniles];
+/* ============ COLECCIÓN MAGNIFIQUE (catálogo aparte, 43 págs) — fusionada en cada pestaña, marcada con etiqueta "Magnifique" ============ */
+const ANCHOS7 = [90,105,135,150,160,180,200];
+
+const magnifiqueColchones = [
+  { nombre:'Gran Duque de Baviera', tags:['Muelle ensacado','Látex natural'], subfamilia:'Coco + muelle 1600 titanio 7 zonas + látex microperforado', firmeza:'—', altura:33, anchos:ANCHOS7, fuera:false, origen:'magnifique',
+    precios:{'180-190':[2380,2645,3259,3556,4044,4448,5116], '200':[2495,2760,3404,3706,4204,4631,5325]} },
+  { nombre:'Magnifique', tags:['Muelle ensacado'], subfamilia:'Micro-muelle + carcasa 1600 muelles 7 zonas titanio, lino/lana/algodón/seda', firmeza:'—', altura:33, anchos:ANCHOS7, fuera:false, origen:'magnifique',
+    precios:{'180-190':[1613,1827,2253,2494,2739,3071,3532], '200':[1703,1913,2361,2604,2852,3202,3682]} },
+  { nombre:'Prodigy', tags:['Muelle ensacado','Látex natural'], subfamilia:'Látex microperforado + micro-muelle + 1600 muelles 7 zonas titanio', firmeza:'—', altura:30, anchos:ANCHOS7, fuera:false, origen:'magnifique',
+    precios:{'180-190':[1210,1383,1713,1910,2096,2373,2729], '200':[1290,1458,1808,2006,2194,2487,2860]} },
+  { nombre:'Privilege', tags:['Muelle ensacado','Látex natural'], subfamilia:'Látex perforado + 1600 muelles 7 zonas titanio + refuerzo perimetral', firmeza:'—', altura:32, anchos:ANCHOS7, fuera:false, origen:'magnifique',
+    precios:{'180-190':[1133,1288,1583,1759,1926,2175,2502], '200':[1213,1362,1676,1854,2022,2287,2630]} },
+  { nombre:'Varsovia', tags:['Muelle ensacado','Látex natural'], subfamilia:'Doble capa de látex microperforado + 1600 muelles 7 zonas, doble cara', firmeza:'—', altura:32, anchos:ANCHOS7, fuera:false, origen:'magnifique',
+    precios:{'180-190':[1103,1259,1558,1736,1905,2156,2480], '200':[1176,1328,1645,1825,1933,2260,2599]} },
+  { nombre:'Sovereign (Topper+Colchón)', tags:['Muelle ensacado','Viscoelástica'], subfamilia:'Topper independiente + colchón, 1600 muelles 7 zonas titanio, memory foam', firmeza:'—', altura:22, anchos:ANCHOS7, fuera:false, origen:'magnifique',
+    precios:{'180-190':[1283,1453,1795,1989,2190,2461,2833], '200':[1362,1529,1892,2088,2289,2577,2964]} },
+];
+
+const magnifiqueCabezales = [
+  { nombre:'Royal', origen:'magnifique', anchos:[150,160,180,200], A:[1703,1884,2044,2453], B:[1805,1978,2146,2575], C:[2004,2235,2425,2910] },
+  { nombre:'Sovereign', origen:'magnifique', anchos:[150,160,180,200], A:[1289,1452,1626,1951], B:[1367,1525,1707,2048], C:[1476,1662,1844,2213] },
+  { nombre:'Nature', origen:'magnifique', anchos:ANCHOS7, A:[641,654,753,766,850,882,1015], B:[693,706,813,828,918,953,1065], C:[776,791,919,944,1037,1086,1161] },
+];
+
+const magnifiqueBases = [
+  { nombre:'Paradise', origen:'magnifique', anchos:ANCHOS7, A:[691,734,850,884,979,1012,1164], B:[751,785,901,929,1028,1063,1223], C:[826,871,983,1012,1111,1138,1333] },
+  { nombre:'Paradise Spring', origen:'magnifique', anchos:ANCHOS7, A:[803,867,1047,1104,1229,1294,1489], B:[871,928,1109,1161,1290,1359,1564], C:[961,1031,1219,1267,1399,1461,1704] },
+  { nombre:'Loira', origen:'magnifique', anchos:ANCHOS7, A:[489,513,576,596,648,679,781], B:[528,554,610,631,680,713,820], C:[592,615,677,694,748,777,893] },
+  { nombre:'Loira Springs', origen:'magnifique', anchos:ANCHOS7, A:[601,646,773,816,898,961,1106], B:[648,697,818,863,942,1009,1161], C:[727,775,909,949,1036,1100,1264] },
+  { nombre:'Provenza', origen:'magnifique', anchos:ANCHOS7, A:[498,542,638,673,752,795,914], B:[541,580,676,707,789,835,960], C:[595,643,737,770,852,893,1047] },
+  { nombre:'Provenza Spring', origen:'magnifique', anchos:ANCHOS7, A:[610,675,835,893,1002,1077,1239], B:[661,723,884,939,1051,1131,1301], C:[730,803,973,1025,1140,1216,1418] },
+];
+
+const magnifiqueCamas = [
+  { nombre:'Sovereign (cama articulada)', origen:'magnifique', anchos:[90,105,135,150], A:[2977,3001,3348,3668], B:[3037,3061,3415,3741], C:[3097,3122,3484,3816], extras:[] },
+];
+
+const colchones = [...colchonesCatalogo, ...colchonesFueraCatalogo, ...colchonesJuveniles, ...magnifiqueColchones];
 
 /* ============ CANAPÉS ============ */
 const canapes = [
@@ -269,6 +366,7 @@ const bases = [
   { id:'gransuite', nombre:'Gran Suite', A:[393,460,547,574,639,673,774], B:[428,493,580,603,671,707,812], C:[470,547,632,657,725,756,886], anchos:[90,105,135,150,160,180,200] },
   { id:'gransuite-spring', nombre:'Gran Suite Spring', A:[518,591,716,753,828,891,1025], B:[563,632,759,791,870,936,1076], C:[619,702,827,862,939,1001,1173], anchos:[90,105,135,150,160,180,200] },
   { id:'funda-sena', nombre:'Funda Sena (exclusiva base Lyon)', A:[200,205,240,246,263,270], B:[243,248,282,288,305,312], C:[412,417,452,458,475,482], anchos:[90,105,135,150,160,180] },
+  ...magnifiqueBases,
 ];
 
 /* ============ CABEZALES (22 items, verificados visualmente contra el PDF) ============ */
@@ -297,6 +395,7 @@ const cabezales = [
   { nombre:'Romeo', anchos:W7, A:[223,230,281,294,324,337,388], B:[239,246,306,320,354,367,415], C:[280,289,362,376,414,434,499] },
   { nombre:'Pretty', anchos:W7, A:[223,230,281,294,324,337,388], B:[239,246,306,320,354,367,415], C:[280,289,362,376,414,434,499] },
   { nombre:'Sena', tipo:'Funda cabezal', anchos:W7, A:[116,118,139,144,155,159,213], B:[138,142,171,178,192,198,359], C:[215,223,280,297,317,330,554] },
+  ...magnifiqueCabezales,
 ];
 
 /* ============ CAMAS ELÉCTRICAS ============ */
@@ -305,6 +404,7 @@ const camas = [
     extras:[{n:'Cable sincronizador entre camas',p:75},{n:'USB lateral',p:85},{n:'Pata 10 cm (10 und.)',p:100}] },
   { nombre:'Royal Spring', anchos:[90,105,135,150], A:[1248,1282,1868,1914], B:[1311,1346,1943,1971], C:[1547,1588,2293,2326],
     extras:[{n:'Cable sincronizador entre camas',p:75},{n:'USB lateral',p:85},{n:'Pata 10 cm (10 und.)',p:100}] },
+  ...magnifiqueCamas,
 ];
 
 /* ============ ALMOHADAS + PROTECTOR ============ */
@@ -317,6 +417,8 @@ const almohadas = [
   { nombre:'Tacto Pluma', detalle:'Fibra HCS, doble funda desenfundable', firmeza:'ADAPT · FIRM · COMFORT', tallas:[75,80,90,105,135,150], precios:[26,28,31,33,39,41] },
   { nombre:'Protector Tencel', detalle:'Funda protectora impermeable y transpirable · máx. altura colchón 31 cm', firmeza:'—', tallas:[90,105,135,150,160,180], precios:[37,44,47,49,53,55] },
 ];
+
+
 
 /* ================= RENDER: COLCHONES ================= */
 const cAnchoSel = document.getElementById('c-ancho');
@@ -344,7 +446,7 @@ function renderColchones(){
   const alturaMax = cAlturaMaxSel.value;
   const query = document.getElementById('c-search').value.trim().toLowerCase();
   const grid = document.getElementById('c-grid'); grid.innerHTML='';
-  let items = colchones.filter(c=>activeTiposC.size===0 || c.tags.some(t=>activeTiposC.has(t)))
+  let items = colchones.filter(c=>activeTiposC.size===0 || [...activeTiposC].every(t=>c.tags.includes(t)))
     .filter(c=> alturaMin==='' || (c.altura!=null && c.altura>=parseInt(alturaMin)))
     .filter(c=> alturaMax==='' || (c.altura!=null && c.altura<=parseInt(alturaMax)))
     .filter(c=> query==='' || c.nombre.toLowerCase().includes(query))
@@ -361,8 +463,9 @@ function renderColchones(){
   if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
   items.forEach(c=>{
     const card=document.createElement('div'); card.className='card';
+    const badge = c.origen==='magnifique' ? '<span class="tag mg">Magnifique</span>' : `<span class="tag${c.fuera?' alt':''}">${c.fuera?'Fuera catálogo':c.firmeza}</span>`;
     card.innerHTML=`
-      <div class="row"><h3>${c.nombre}</h3><span class="tag${c.fuera?' alt':''}">${c.fuera?'Fuera catálogo':c.firmeza}</span></div>
+      <div class="row"><h3>${c.nombre}</h3>${badge}</div>
       <div class="sub">${c.subfamilia} · ${c.tags.join(' · ')}</div>
       <div class="pricebox">
         <div><div class="pricenote">${ancho}×${largo.replace('-',' / ')} cm · ${c.altura??'—'} cm alto · ${c.raw??'—'} pts</div>
@@ -453,9 +556,10 @@ function renderBases(){
   if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
   items.forEach(b=>{
     const card=document.createElement('div'); card.className='card';
+    const badgeB = b.origen==='magnifique' ? '<span class="tag mg">Magnifique</span>' : `<span class="tag">Serie ${serie}</span>`;
     card.innerHTML=`
-      <div class="row"><h3>${b.nombre}</h3><span class="tag">Serie ${serie}</span></div>
-      <div class="sub">Precio único 180·190·200</div>
+      <div class="row"><h3>${b.nombre}</h3>${badgeB}</div>
+      <div class="sub">Precio único 180·190·200${b.origen==='magnifique'?' · Serie '+serie:''}</div>
       <div class="pricebox">
         <div><div class="pricenote">${ancho} cm · ${b.raw??'—'} pts</div>
         <div class="price">${b.precio!=null?b.precio.toFixed(2)+' €':'—'}</div></div>
@@ -486,10 +590,11 @@ function renderCabezales(){
   if(items.length===0){ grid.innerHTML='<div class="empty">Este ancho no está disponible para los cabezales cargados.</div>'; return; }
   items.forEach(h=>{
     const card=document.createElement('div'); card.className='card';
+    const badgeH = h.origen==='magnifique' ? '<span class="tag mg">Magnifique</span>' : `<span class="tag${h.tipo?' alt':''}">${h.tipo?h.tipo:'Serie '+serie}</span>`;
     card.innerHTML=`
-      <div class="row"><h3>${h.nombre}</h3><span class="tag${h.tipo?' alt':''}">${h.tipo?h.tipo:'Serie '+serie}</span></div>
+      <div class="row"><h3>${h.nombre}</h3>${badgeH}</div>
       <div class="pricebox">
-        <div><div class="pricenote">${ancho} cm · ${h.raw??'—'} pts</div>
+        <div><div class="pricenote">${ancho} cm ${h.origen==='magnifique'?'· Serie '+serie+' ':''}· ${h.raw??'—'} pts</div>
         <div class="price">${h.precio!=null?h.precio.toFixed(2)+' €':'—'}</div></div>
       </div>`;
     grid.appendChild(card);
@@ -521,8 +626,8 @@ function renderCamas(){
       return `<label><input type="checkbox" data-id="${m.nombre}" data-name="${e.n}" ${checked}> ${e.n} <small>(${e.p} pts = ${(e.p*PUNTO).toFixed(2)} €)</small></label>`;
     }).join('') + '</div>';
     card.innerHTML=`
-      <div class="row"><h3>${m.nombre}</h3><span class="tag">Serie ${serie}</span></div>
-      <div class="sub">Cama articulada eléctrica · precio único 180·190·200</div>
+      <div class="row"><h3>${m.nombre}</h3>${m.origen==='magnifique'?'<span class="tag mg">Magnifique</span>':'<span class="tag">Serie '+serie+'</span>'}</div>
+      <div class="sub">Cama articulada eléctrica · precio único 180·190·200${m.origen==='magnifique'?' · Serie '+serie:''}</div>
       ${extrasHtml}
       <div class="pricebox">
         <div><div class="pricenote">${ancho} cm · ${raw??'—'} pts</div>
@@ -556,6 +661,150 @@ function renderAlmohadas(){
 }
 document.getElementById('a-search').addEventListener('input', renderAlmohadas);
 
+/* ================= RENDER: MAGNIFIQUE (pestaña aparte) — COLCHONES ================= */
+const gAnchoSel = document.getElementById('g-ancho');
+ANCHOS7.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; gAnchoSel.appendChild(o); });
+gAnchoSel.value = 150;
+const tiposMg = [...new Set(magnifiqueColchones.flatMap(c=>c.tags))];
+const gChipsWrap = document.getElementById('g-chips');
+let activeTiposG = new Set();
+tiposMg.forEach(t=>{
+  const chip=document.createElement('div'); chip.className='chip'; chip.textContent=t;
+  chip.onclick=()=>{ if(activeTiposG.has(t)){activeTiposG.delete(t); chip.classList.remove('active');} else{activeTiposG.add(t); chip.classList.add('active');} renderMagnifiqueColchones(); };
+  gChipsWrap.appendChild(chip);
+});
+function renderMagnifiqueColchones(){
+  const ancho = parseInt(gAnchoSel.value);
+  const largo = document.getElementById('g-largo').value;
+  const orden = document.getElementById('g-orden').value;
+  const query = document.getElementById('g-search').value.trim().toLowerCase();
+  const grid = document.getElementById('g-grid'); grid.innerHTML='';
+  let items = magnifiqueColchones.filter(c=>activeTiposG.size===0 || [...activeTiposG].every(t=>c.tags.includes(t)))
+    .filter(c=> query==='' || c.nombre.toLowerCase().includes(query))
+    .map(c=>{
+      const idx = c.anchos.indexOf(ancho);
+      const raw = idx>-1 ? c.precios[largo][idx] : null;
+      return {...c, raw, precio: raw==null?null:raw*PUNTO};
+    });
+  if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
+  else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
+  items.forEach(c=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${c.nombre}</h3><span class="tag mg">Magnifique</span></div>
+      <div class="sub">${c.subfamilia}</div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho}×${largo.replace('-',' / ')} cm · ${c.altura} cm alto · ${c.raw??'—'} pts</div>
+        <div class="price">${c.precio!=null?c.precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['g-ancho','g-largo','g-orden','g-search'].forEach(id=>document.getElementById(id).addEventListener(id==='g-search'?'input':'change',renderMagnifiqueColchones));
+
+/* ================= RENDER: MAGNIFIQUE — CABEZALES ================= */
+const ghAnchoSel = document.getElementById('gh-ancho');
+ANCHOS7.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; ghAnchoSel.appendChild(o); });
+ghAnchoSel.value = 150;
+function renderMagnifiqueCabezales(){
+  const ancho = parseInt(ghAnchoSel.value);
+  const serie = document.getElementById('gh-serie').value;
+  const orden = document.getElementById('gh-orden').value;
+  const query = document.getElementById('gh-search').value.trim().toLowerCase();
+  const grid = document.getElementById('gh-grid'); grid.innerHTML='';
+  let items = magnifiqueCabezales.filter(h=> query==='' || h.nombre.toLowerCase().includes(query)).map(h=>{
+    const idx = h.anchos.indexOf(ancho);
+    const raw = idx>-1 ? h[serie][idx] : null;
+    return {...h, raw, precio: raw==null?null:raw*PUNTO};
+  });
+  if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
+  else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(items.length===0){ grid.innerHTML='<div class="empty">Este ancho no está disponible.</div>'; return; }
+  items.forEach(h=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${h.nombre}</h3><span class="tag mg">Magnifique</span></div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho} cm · Serie ${serie} · ${h.raw??'—'} pts</div>
+        <div class="price">${h.precio!=null?h.precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['gh-ancho','gh-serie','gh-orden','gh-search'].forEach(id=>document.getElementById(id).addEventListener(id==='gh-search'?'input':'change',renderMagnifiqueCabezales));
+
+/* ================= RENDER: MAGNIFIQUE — BASES ================= */
+const gbAnchoSel = document.getElementById('gb-ancho');
+ANCHOS7.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; gbAnchoSel.appendChild(o); });
+gbAnchoSel.value = 150;
+function renderMagnifiqueBases(){
+  const ancho = parseInt(gbAnchoSel.value);
+  const serie = document.getElementById('gb-serie').value;
+  const orden = document.getElementById('gb-orden').value;
+  const query = document.getElementById('gb-search').value.trim().toLowerCase();
+  const grid = document.getElementById('gb-grid'); grid.innerHTML='';
+  let items = magnifiqueBases.filter(b=> query==='' || b.nombre.toLowerCase().includes(query)).map(b=>{
+    const idx = b.anchos.indexOf(ancho);
+    const raw = idx>-1 ? b[serie][idx] : null;
+    return {...b, raw, precio: raw==null?null:raw*PUNTO};
+  });
+  if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
+  else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
+  else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
+  items.forEach(b=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${b.nombre}</h3><span class="tag mg">Magnifique</span></div>
+      <div class="sub">Precio único 180·190·200 · Serie ${serie}</div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho} cm · ${b.raw??'—'} pts</div>
+        <div class="price">${b.precio!=null?b.precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['gb-ancho','gb-serie','gb-orden','gb-search'].forEach(id=>document.getElementById(id).addEventListener(id==='gb-search'?'input':'change',renderMagnifiqueBases));
+
+/* ================= RENDER: MAGNIFIQUE — CAMAS ELÉCTRICAS ================= */
+const gmAnchoSel = document.getElementById('gm-ancho');
+[90,105,135,150].forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; gmAnchoSel.appendChild(o); });
+gmAnchoSel.value = 150;
+function renderMagnifiqueCamas(){
+  const ancho = parseInt(gmAnchoSel.value);
+  const serie = document.getElementById('gm-serie').value;
+  const query = document.getElementById('gm-search').value.trim().toLowerCase();
+  const grid = document.getElementById('gm-grid'); grid.innerHTML='';
+  magnifiqueCamas.filter(m=> query==='' || m.nombre.toLowerCase().includes(query)).forEach(m=>{
+    const idx = m.anchos.indexOf(ancho);
+    const raw = idx>-1 ? m[serie][idx] : null;
+    const precio = raw==null?null:raw*PUNTO;
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="row"><h3>${m.nombre}</h3><span class="tag mg">Magnifique</span></div>
+      <div class="sub">Cama articulada eléctrica · precio único 180·190·200 · Serie ${serie}</div>
+      <div class="pricebox">
+        <div><div class="pricenote">${ancho} cm · ${raw??'—'} pts</div>
+        <div class="price">${precio!=null?precio.toFixed(2)+' €':'—'}</div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+['gm-ancho','gm-serie','gm-search'].forEach(id=>document.getElementById(id).addEventListener(id==='gm-search'?'input':'change',renderMagnifiqueCamas));
+
+/* ================= SUB-NAV MAGNIFIQUE ================= */
+document.querySelectorAll('.subtab').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.subtab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.gpanel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.g).classList.add('active');
+  });
+});
+
 /* ================= NAV ================= */
 document.querySelectorAll('nav button').forEach(b=>{
   b.addEventListener('click', ()=>{
@@ -581,12 +830,22 @@ document.getElementById('punto-save').addEventListener('click', ()=>{
     PUNTO = v;
     try { localStorage.setItem('essenzia_punto', v); } catch(e) { /* no disponible */ }
     renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
+    renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
     settingsPanel.classList.add('hidden');
   }
 });
 
 renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
+renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
+
+/* ================= SERVICE WORKER (necesario en algunos navegadores para que aparezca "Instalar app") ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw-essenzia.js').catch(()=>{});
+  });
+}
 </script>
-<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-08-19 · 19:45</div>
+<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-09-05 · 12:10</div>
 </body>
 </html>
+

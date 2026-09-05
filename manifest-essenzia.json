@@ -4,7 +4,7 @@
   "start_url": "./calculadora-essenzia.html",
   "display": "standalone",
   "background_color": "#faf9f6",
-  "theme_color": "#16305e",
+  "theme_color": "#141414",
   "icons": [
     { "src": "images/icon-essenzia-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "images/icon-essenzia-512.png", "sizes": "512x512", "type": "image/png" }

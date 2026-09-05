@@ -1,0 +1,12 @@
+{
+  "name": "DRAPSATEN CORTE",
+  "short_name": "DRAPSATEN CORTE",
+  "start_url": "./drapsaten-corte.html",
+  "display": "standalone",
+  "background_color": "#f4f0e8",
+  "theme_color": "#14151b",
+  "icons": [
+    { "src": "./images/icon-drapsaten-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./images/icon-drapsaten-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
