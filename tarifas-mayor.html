@@ -296,6 +296,62 @@
   .toast.show{opacity:1;}
 
   /* Guided selector */
+  .cat-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:12px 16px 0;
+  }
+  .cat-tab{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .cat-tab.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .quick-size{
+    margin:10px 16px 0;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 12px;
+  }
+  .quick-size-row{
+    display:flex;
+    gap:6px;
+  }
+  .quick-size-row select{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    font-size:13px;
+    padding:6px 4px;
+  }
+  .quick-size-row input{
+    flex:1;
+    min-width:0;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    font-size:13px;
+    padding:6px 8px;
+  }
+  .quick-size-row button{
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    border-radius:8px;
+    padding:6px 14px;
+    font-size:13px;
+    font-weight:600;
+  }
   .model-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -396,6 +452,19 @@
   <div class="hint" id="resultCount"></div>
 
   <div id="modelStep">
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="quick-size" id="quickSize">
+      <div class="facet-label">Buscar por medida en toda la categoría</div>
+      <div class="quick-size-row">
+        <select id="quickOp">
+          <option value="lt">menos de</option>
+          <option value="eq">igual a</option>
+          <option value="gt">más de</option>
+        </select>
+        <input id="quickVal" type="number" inputmode="numeric" placeholder="cm">
+        <button id="quickBtn">Buscar</button>
+      </div>
+    </div>
     <div class="hint" style="margin-top:10px;">Elige un modelo para filtrar por cabezal, cheslong y medida</div>
     <div class="model-grid" id="modelGrid" style="margin:8px 16px;"></div>
   </div>
@@ -500,6 +569,11 @@ function escapeHtml(s){
 PRODUCTOS.forEach(p=>{
   const t = p.titulo.toUpperCase();
   p._modelKey = p.subcol || p.coleccion || 'OTROS';
+  p._categoria = p.coleccion === 'AUXILIAR' ? 'Auxiliar'
+               : (p.coleccion === 'SOFÁS CAMA' || /mecanismo|colchón/i.test(p._modelKey)) ? 'Sofá cama'
+               : /deslizante/i.test(p._modelKey) ? 'Deslizante'
+               : p._modelKey === 'MARTINA (fijo)' ? 'Fijo'
+               : 'Relax';
   p._tipo = t.includes('SILLÓN') || t.includes('SILLON') ? 'Sillón'
           : t.includes('MÓDULO') || t.includes('MODULO') ? 'Módulo'
           : t.includes('POUFF') ? 'Pouff'
@@ -531,10 +605,35 @@ PRODUCTOS.forEach(p=>{
   p._medidas = [...new Set(medidas)];
 });
 
+const catTabsEl = document.getElementById('catTabs');
+const quickOpEl = document.getElementById('quickOp');
+const quickValEl = document.getElementById('quickVal');
+
+const CATEGORIA_ORDER = ['Relax','Deslizante','Fijo','Sofá cama','Auxiliar'];
+let selectedCategoria = null; // null = Todos
+
+function buildCatTabs(){
+  const presentes = new Set(PRODUCTOS.map(p=>p._categoria));
+  const cats = CATEGORIA_ORDER.filter(c=>presentes.has(c));
+  let html = `<button class="cat-tab ${selectedCategoria===null?'active':''}" data-cat="">Todos</button>`;
+  cats.forEach(c=>{
+    html += `<button class="cat-tab ${selectedCategoria===c?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`;
+  });
+  catTabsEl.innerHTML = html;
+  catTabsEl.querySelectorAll('.cat-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      selectedCategoria = btn.dataset.cat || null;
+      buildCatTabs();
+      buildModelGrid();
+    });
+  });
+}
+
 // --- Paso 1: selección de modelo ---
 function buildModelGrid(){
+  const items = selectedCategoria ? PRODUCTOS.filter(p=>p._categoria===selectedCategoria) : PRODUCTOS;
   const counts = {};
-  PRODUCTOS.forEach(p=>{ counts[p._modelKey] = (counts[p._modelKey]||0) + 1; });
+  items.forEach(p=>{ counts[p._modelKey] = (counts[p._modelKey]||0) + 1; });
   const keys = Object.keys(counts).sort((a,b)=>a.localeCompare(b,'es'));
   modelGridEl.innerHTML = keys.map(k=>
     `<button class="model-btn" data-model="${escapeHtml(k)}">${escapeHtml(k.replace(/\s*\(.*\)$/,''))}<span class="count">${counts[k]} artículos</span></button>`
@@ -552,6 +651,7 @@ function showModelView(modelKey, presetMedida){
   facetState = { tipo:null, cabezal:null, chaise:null, medida: presetMedida || null };
   modelStepEl.style.display = 'none';
   backRowEl.style.display = 'flex';
+  backBtnEl.textContent = '‹ Cambiar modelo';
   modelNameEl.textContent = modelKey.replace(/\s*\(.*\)$/,'');
   facetsEl.style.display = 'block';
   searchEl.value = '';
@@ -578,6 +678,42 @@ document.getElementById('backBtn').addEventListener('click', ()=>{
   // así el botón "Cambiar modelo" y el botón atrás del móvil quedan sincronizados.
   history.back();
 });
+
+const backBtnEl = document.getElementById('backBtn');
+
+function opLabel(op){
+  return op==='lt' ? 'menos de' : op==='gt' ? 'más de' : 'igual a';
+}
+
+function showQuickSizeView(categoria, op, val){
+  currentModel = null;
+  inSearchView = false;
+  searchEl.value = '';
+  modelStepEl.style.display = 'none';
+  backRowEl.style.display = 'flex';
+  backBtnEl.textContent = '‹ Nueva búsqueda';
+  modelNameEl.textContent = `${categoria || 'Todas las categorías'} · ${opLabel(op)} ${val} cm`;
+  facetsEl.style.display = 'none';
+  const items = PRODUCTOS.filter(p=>{
+    if(categoria && p._categoria !== categoria) return false;
+    return p._medidas.some(m=> op==='lt' ? m < val : op==='gt' ? m > val : m === val);
+  });
+  renderList(items);
+}
+
+function runQuickSizeSearch(){
+  const op = quickOpEl.value;
+  const val = parseInt(quickValEl.value, 10);
+  if(isNaN(val)){
+    showToast('Escribe una medida en cm');
+    return;
+  }
+  showQuickSizeView(selectedCategoria, op, val);
+  pushHistory({view:'quicksize', categoria: selectedCategoria, op, val});
+}
+
+document.getElementById('quickBtn').addEventListener('click', runQuickSizeSearch);
+quickValEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') runQuickSizeSearch(); });
 
 function itemsForModel(){
   return PRODUCTOS.filter(p=>p._modelKey === currentModel);
@@ -838,9 +974,15 @@ window.addEventListener('popstate', (e)=>{
     showSearchView(searchEl.value);
     return;
   }
+  if(state.view === 'quicksize'){
+    inSearchView = false;
+    showQuickSizeView(state.categoria, state.op, state.val);
+    return;
+  }
 });
 
 loadConfig().then(()=>{
+  buildCatTabs();
   buildModelGrid();
   history.replaceState({view:'home'}, '');
 });
