@@ -837,8 +837,15 @@ document.getElementById('punto-save').addEventListener('click', ()=>{
 
 renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
 renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
+
+/* ================= SERVICE WORKER (necesario en algunos navegadores para que aparezca "Instalar app") ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw-essenzia.js').catch(()=>{});
+  });
+}
 </script>
-<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-08-19 · 20:50</div>
+<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-09-05 · 12:10</div>
 </body>
 </html>
 
