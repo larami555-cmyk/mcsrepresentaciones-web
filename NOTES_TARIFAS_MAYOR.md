@@ -144,20 +144,42 @@ corregido el subcol para no romper el histórico de facetas guardadas; si se qui
 arreglar el nombre visible, cambiar el `subcol` de todos sus productos y verificar que
 no rompe nada más.
 
+## Filtro "con/sin cheslong" en el buscador rápido
+
+El buscador rápido por medida (home) tiene 3 chips: Todos / Con cheslong / Sin cheslong.
+
+- `p._chaiseComposicionAsientos`: true solo si el título tiene "CHAI" Y un "+" (sofá con
+  asientos combinado con la pieza de chaise). Los módulos de chaise SUELTOS (auxiliares,
+  sin "+" en el título, ej. "GIO MODULO CHAISE.RINCONERA...", "STELA MOD.CHAISELONGUE...")
+  no cuentan como "con cheslong" porque no son un sofá completo.
+- `_medidaTotal` **nunca** se calcula combinando el ancho del asiento con el ancho de la
+  cheslong a mano: si no hay `(XXXCM)` verificado en el título Y la pieza es una
+  composición con chaise, `_medidaTotal` se deja en `null` (no aparece en el buscador por
+  medida) en vez de mostrar un número inventado.
+
+## `_medidaTotal`: qué formatos de paréntesis reconoce
+
+El regex acepta `(226CM)`, `(226 CM.)` y también pares `(370 x 225 CM.)` (composiciones en
+L con módulo rincón + terminal: ahí se usa el mayor de los dos números, el lado largo).
+Esto se descubrió porque el modelo **TOMMY** usa el formato "370 CM." (con espacio y
+punto) en vez de "370CM", y el regex antiguo no lo reconocía.
+
 ## Qué falta / pendiente de verificar
 
-- **BIANCA y VEGA Y VIGO** (sofá cama): no se ha tocado su medida total porque no ha
-  aparecido su ficha técnica en ningún documento revisado hasta ahora. Si aparece un PDF/
-  doc con sus dimensiones, aplicar el mismo proceso (ver "Cómo añadir medida total" abajo).
-- **AKUA**: los combos con RINCÓN+TERMINAL, CHESLONG RINCONERA y CHESLONG TERMINAL
-  PARTIDO no tienen medida total confirmada por ficha técnica — se les puso solo lo que
-  ya estaba escrito en el propio título (ancho del módulo), no un total verificado.
-- **LOTUS (mecanismo...15cm)**: nunca se le ha pasado el proceso de verificación de
-  medida total; sus 9 artículos no tienen "(XXXCM)".
-- El "Buscador rápido por medida" (categoría + menos/igual/más de X cm) usa
-  `_medidaTotal`, que para los modelos de la lista de arriba sin verificar cae al
-  fallback (mayor número de un patrón NxN, o primer número con CM) — es una aproximación
-  razonable, no el dato exacto de fábrica.
+- **BIANCA y VEGA** (sofá cama): no se ha tocado su medida total porque no ha
+  aparecido su ficha técnica en ningún documento revisado hasta ahora.
+- **VIGO** (sofá cama + chaiselongue 160cm): sin ficha técnica con el total verificado.
+- **LOTUS (mecanismo...15cm)**: sus composiciones con chaiselongue (80X160/80X185/
+  160X70/185X70) siguen sin medida total verificada; no aparece en el catálogo
+  `MAYOR_CAT_ESP_2026_A.pdf` revisado.
+- **AKUA SOFA 2FIIJOS 62CMS + CHAISE. FIJA 165CM** (nótese el typo "FIIJOS" en el título
+  real): no coincide con el patrón de detección por typo; sigue sin medida total aunque
+  el resto de la familia AKUA sí la tiene (249CM, mismo valor que sus hermanos de 62cm).
+- **POLO 2PL + CHAISELONGUE FIJA 170CMS**: la tabla del catálogo solo da totales para
+  3,5PL/3PL/2,5PL + chaise; el combo 2PL + chaise no aparece con total en la tabla.
+- El resto de familias con cheslong (AKUA, TICO, SENSE, MAGNUM, NINA, NOA, POLO 3,5/3/2,5PL)
+  ya tienen medida total verificada, sacada de `MAYOR_CAT_ESP_2026_A.pdf` (tablas de
+  composición con el total entre paréntesis).
 
 ## Cómo añadir/verificar una medida total (proceso seguido en esta sesión)
 
