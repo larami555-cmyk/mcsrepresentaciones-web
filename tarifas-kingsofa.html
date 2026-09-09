@@ -531,15 +531,20 @@ function selectModel(coleccion, subcol){
   facetsEl.style.display = 'block';
   searchEl.value = '';
   renderFacetsAndList();
+  history.pushState({kingsofaStep:'list'}, '');
 }
 
-document.getElementById('backBtn').onclick = () => {
+function resetToModels(){
   currentModel = null;
   modelStepEl.style.display = 'block';
   backRowEl.style.display = 'none';
   facetsEl.style.display = 'none';
   listEl.innerHTML = '';
   resultCountEl.textContent = '';
+}
+
+document.getElementById('backBtn').onclick = () => {
+  history.back();
 };
 
 function itemsForModel(){
@@ -680,10 +685,13 @@ function openModal(p, keepOpen){
     tr.innerHTML = '<td>Serie ' + s + '</td><td>' + fmtPts(p.precios[s]) + '</td><td>' + fmt(p.precios[s]) + '</td>';
     modalBody.appendChild(tr);
   });
-  if (!keepOpen) overlay.classList.add('open');
+  if (!keepOpen) {
+    overlay.classList.add('open');
+    history.pushState({kingsofaStep:'modal'}, '');
+  }
 }
-document.getElementById('closeBtn').onclick = () => overlay.classList.remove('open');
-overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+document.getElementById('closeBtn').onclick = () => history.back();
+overlay.addEventListener('click', (e) => { if (e.target === overlay) history.back(); });
 
 document.getElementById('copyBtn').onclick = () => {
   if (!currentProduct) return;
@@ -700,6 +708,18 @@ function showToast(msg){
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1400);
 }
+
+// ---------- Navegación atrás (evita salir de la app) ----------
+history.replaceState({kingsofaStep:'models'}, '');
+window.addEventListener('popstate', (e) => {
+  const step = (e.state && e.state.kingsofaStep) || 'models';
+  if (overlay.classList.contains('open') && step !== 'modal') {
+    overlay.classList.remove('open');
+  }
+  if (step === 'models') {
+    resetToModels();
+  }
+});
 
 buildModelGrid();
 </script>
