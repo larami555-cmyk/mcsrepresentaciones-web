@@ -650,13 +650,21 @@ PRODUCTOS.forEach(p=>{
   }
   p._medidas = [...new Set(medidas)];
 
-  // Medida TOTAL (para saber si la pieza cabe en la habitación): preferimos el
-  // número entre paréntesis "(226CM)", que siempre representa el largo/ancho
-  // final de la composición, y NO el del asiento o el mecanismo (140 en un
-  // "140X200" es el ancho del colchón, no el largo total del sofá cerrado).
+  // Medida TOTAL (para saber si la pieza cabe en la habitación): SOLO usamos
+  // el número entre paréntesis "(226CM)", que es el único que el fabricante
+  // confirma como largo/ancho final de la composición ya montada.
+  // NUNCA usamos como total la medida del asiento suelto (p.ej. "88CM") ni la
+  // medida propia de la cheslong (p.ej. "165CM" o el "165" de "80X165"): esos
+  // números describen solo esa pieza, no el sofá completo ya unido.
   const parenMatches = [...t.matchAll(/\((\d{2,3})\s?CMS?\)/g)];
   if(parenMatches.length){
     p._medidaTotal = parseInt(parenMatches[parenMatches.length-1][1]);
+  } else if(p._chaiseComposicionAsientos){
+    // Composición sofá+cheslong sin medida total verificada en el título:
+    // no la inventamos combinando asiento + cheslong, la dejamos sin medida
+    // total para que no aparezca en la búsqueda por medida (mejor no mostrarla
+    // que mostrar una medida incorrecta).
+    p._medidaTotal = null;
   } else {
     const xMatch = t.match(/(\d{2,3})\s?X\s?(\d{2,3})/);
     if(xMatch){
