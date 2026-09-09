@@ -365,6 +365,27 @@
     font-size:13px;
     font-weight:600;
   }
+  .quick-chaise-row{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+  }
+  .quick-chaise-chip{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 4px;
+    text-align:center;
+  }
+  .quick-chaise-chip.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
   .model-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -476,6 +497,11 @@
         </select>
         <input id="quickVal" type="number" inputmode="numeric" placeholder="cm">
         <button id="quickBtn">Buscar</button>
+      </div>
+      <div class="quick-chaise-row" id="quickChaiseRow">
+        <button class="quick-chaise-chip active" data-chaise="">Todos</button>
+        <button class="quick-chaise-chip" data-chaise="con">Con cheslong</button>
+        <button class="quick-chaise-chip" data-chaise="sin">Sin cheslong</button>
       </div>
     </div>
     <div class="hint" style="margin-top:10px;">Elige un modelo para filtrar por cabezal, cheslong y medida</div>
@@ -638,6 +664,27 @@ PRODUCTOS.forEach(p=>{
 const catTabsEl = document.getElementById('catTabs');
 const quickOpEl = document.getElementById('quickOp');
 const quickValEl = document.getElementById('quickVal');
+const quickChaiseRowEl = document.getElementById('quickChaiseRow');
+let selectedChaise = ''; // '' = Todos, 'con' = con cheslong, 'sin' = sin cheslong
+
+quickChaiseRowEl.querySelectorAll('.quick-chaise-chip').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    selectedChaise = btn.dataset.chaise;
+    quickChaiseRowEl.querySelectorAll('.quick-chaise-chip').forEach(b=>{
+      b.classList.toggle('active', b === btn);
+    });
+  });
+});
+
+function chaiseLabel(chaise){
+  return chaise==='con' ? ' · con cheslong' : chaise==='sin' ? ' · sin cheslong' : '';
+}
+
+function matchesChaise(p, chaise){
+  if(!chaise) return true;
+  const tieneChaise = p._chaise !== 'Sin cheslong';
+  return chaise==='con' ? tieneChaise : !tieneChaise;
+}
 
 const CATEGORIA_ORDER = ['Relax','Deslizante','Fijo','Sofá cama','Auxiliar'];
 let selectedCategoria = null; // null = Todos
@@ -701,6 +748,10 @@ function goHome(){
   listEl.innerHTML = '';
   resultCountEl.textContent = '';
   searchEl.value = '';
+  selectedChaise = '';
+  quickChaiseRowEl.querySelectorAll('.quick-chaise-chip').forEach(b=>{
+    b.classList.toggle('active', b.dataset.chaise === '');
+  });
 }
 
 document.getElementById('backBtn').addEventListener('click', ()=>{
@@ -715,18 +766,19 @@ function opLabel(op){
   return op==='lt' ? 'menos de' : op==='gt' ? 'más de' : 'igual a';
 }
 
-function showQuickSizeView(categoria, op, val){
+function showQuickSizeView(categoria, op, val, chaise){
   currentModel = null;
   inSearchView = false;
   searchEl.value = '';
   modelStepEl.style.display = 'none';
   backRowEl.style.display = 'flex';
   backBtnEl.textContent = '‹ Nueva búsqueda';
-  modelNameEl.textContent = `${categoria || 'Todas las categorías'} · ${opLabel(op)} ${val} cm`;
+  modelNameEl.textContent = `${categoria || 'Todas las categorías'} · ${opLabel(op)} ${val} cm${chaiseLabel(chaise)}`;
   facetsEl.style.display = 'none';
   const items = PRODUCTOS.filter(p=>{
     if(categoria && p._categoria !== categoria) return false;
     if(p._medidaTotal == null) return false;
+    if(!matchesChaise(p, chaise)) return false;
     return op==='lt' ? p._medidaTotal < val : op==='gt' ? p._medidaTotal > val : p._medidaTotal === val;
   });
   renderList(items);
@@ -739,8 +791,9 @@ function runQuickSizeSearch(){
     showToast('Escribe una medida en cm');
     return;
   }
-  showQuickSizeView(selectedCategoria, op, val);
-  pushHistory({view:'quicksize', categoria: selectedCategoria, op, val});
+  const chaise = selectedChaise;
+  showQuickSizeView(selectedCategoria, op, val, chaise);
+  pushHistory({view:'quicksize', categoria: selectedCategoria, op, val, chaise});
 }
 
 document.getElementById('quickBtn').addEventListener('click', runQuickSizeSearch);
@@ -1017,7 +1070,11 @@ window.addEventListener('popstate', (e)=>{
   }
   if(state.view === 'quicksize'){
     inSearchView = false;
-    showQuickSizeView(state.categoria, state.op, state.val);
+    selectedChaise = state.chaise || '';
+    quickChaiseRowEl.querySelectorAll('.quick-chaise-chip').forEach(b=>{
+      b.classList.toggle('active', b.dataset.chaise === selectedChaise);
+    });
+    showQuickSizeView(state.categoria, state.op, state.val, state.chaise);
     return;
   }
 });
