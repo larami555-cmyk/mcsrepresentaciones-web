@@ -55,6 +55,40 @@ PRODUCTOS=[...]`). Cada producto:
   el modal del artículo con un aviso destacado (`#modalExpress`). Lista de telas en la
   constante `TELAS_EXPRESS` del JS.
 
+## Colección AURUM (fijos de alta gama, catálogo `AURUM_ESP.pdf`)
+
+Añadida el 10-sep-2026. Es una colección de sofás fijos (Amelie, Colette, Nadine,
+Sophie) con estructura modular (sofás base, sofá+chaiselongue, módulos 1 brazo,
+central, central doble, chaiselongue suelta, rincón, terminal, pouff). Encaja en
+el mismo `PRODUCTOS` y usa el mismo motor de filtros/buscador que el resto, con
+estas diferencias respecto al resto del catálogo:
+
+- **`coleccion`**: siempre `"AURUM"`. Esto le da su propia pestaña de categoría
+  (`"Aurum"`, añadida a `CATEGORIA_ORDER` y a la función que calcula
+  `p._categoria`) en vez de caer en Relax/Fijo/Sofá cama por defecto.
+- **`subcol`**: `"<MODELO> (aurum fijo)"` (AMELIE, COLETTE, NADINE, SOPHIE).
+- **Series de precio distintas**: AURUM va de **S/A a S/E** (no tiene S/O). Por
+  eso `SERIE_ORDER` se amplió a `['O','A','B','C','D','E']`; los productos del
+  resto del catálogo simplemente no tienen la clave `E` y esa fila no se pinta.
+- **Sin `puntosExpress`** (no aplica a esta colección) y **sin `_cabezal`** (no
+  hay variantes con cabezal motorizado/manual, por lo que ese filtro no aparece
+  para estos modelos).
+- **Cheslong**: solo existe la variante "fija" (no hay rinconera ni arcón en
+  AURUM), y solo cuenta como "con cheslong" cuando el título combina cuerpo +
+  chaiselongue con "+" (mismo criterio que el resto del catálogo).
+- **IDs**: rango propio **91001–91091** (91 artículos: 20 Amelie + 18 Colette +
+  26 Nadine + 27 Sophie), para no colisionar con los IDs de fábrica ni con los
+  90001+ ya usados en otras adiciones manuales.
+- **Medida total**: los sofás base y sillones llevan la medida total como
+  primer número del título (antes de "ASIENTOS"), así el cálculo automático de
+  `_medidaTotal` la coge bien sin necesidad de paréntesis. Las composiciones
+  sofá+chaiselongue sí llevan el total explícito entre paréntesis al final
+  (igual que en el resto del catálogo), porque ahí no se puede inferir sumando.
+- Los precios están tomados directamente de las tablas de tarifa por módulo
+  (páginas 28–31 de `AURUM_ESP.pdf`), no de las composiciones de ejemplo del
+  catálogo fotográfico (esas solo muestran combinaciones de tela/medida a
+  título ilustrativo, no son artículos individuales facturables).
+
 ## Convención "(XXXCM)" en el título — medida TOTAL
 
 Cuando un título lleva un número entre paréntesis seguido de CM, ese número es **la
@@ -129,6 +163,10 @@ No hace falta mantener una lista a mano: cualquier `subcol` nuevo que contenga
 | Sofá cama | LOTUS (mecanismo...15cm) | 9 | Sin verificar (solo se quitó la variante chaiselongue, descatalogada) |
 | Sofá cama | BIANCA (mecanismo...15cm) | 4 | **Sin verificar** |
 | Sofá cama | VEGA Y VIGO (mecanismo...12cm) | 2 | **Sin verificar** |
+| Aurum | AMELIE (aurum fijo) | 20 | Completo — nuevo, catálogo AURUM_ESP.pdf |
+| Aurum | COLETTE (aurum fijo) | 18 | Completo — nuevo |
+| Aurum | NADINE (aurum fijo) | 26 | Completo — nuevo |
+| Aurum | SOPHIE (aurum fijo) | 27 | Completo — nuevo |
 | Auxiliar | AUXILIAR (cojines, butacas, pouffs) | 24 | No aplica medida total (se usa el ancho/alto de la pieza tal cual) |
 
 **Modelos eliminados por descatalogación** (según aviso de fábrica, sesión de
