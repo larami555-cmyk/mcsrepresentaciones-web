@@ -181,6 +181,20 @@ punto) en vez de "370CM", y el regex antiguo no lo reconocía.
   ya tienen medida total verificada, sacada de `MAYOR_CAT_ESP_2026_A.pdf` (tablas de
   composición con el total entre paréntesis).
 
+## Modelos discontinuados eliminados del catálogo (septiembre 2026)
+
+- **LOTUS (deslizante de bandeja)**: la versión sofá/relax de LOTUS (con o sin
+  chaiselongue, módulos sueltos, sillones, etc. — 56 artículos) se ha eliminado. LOTUS
+  ahora **solo se fabrica como sofá cama** (subcol `LOTUS (mecanismo italiano - colchón
+  15cm)` y `LOTUS 5 MAX (mecanismo italiano - colchón 15cm)`), que sí se mantiene.
+- **BIANCA** (sofá cama, subcol `BIANCA (mecanismo original italiano - colchón 15cm)`):
+  modelo eliminado, 4 artículos borrados.
+- **VEGA y VIGO** (subcol `VEGA Y VIGO (mecanismo italiano - colchón 12cm)`): modelo
+  eliminado, 2 artículos borrados (los únicos que había, ambos titulados VIGO).
+
+Si en el futuro se recupera alguno de estos modelos, hay que volver a añadir sus
+productos siguiendo el mismo proceso descrito abajo y el flujo de edición del JSON con Python.
+
 ## Cómo añadir/verificar una medida total (proceso seguido en esta sesión)
 
 1. Conseguir la ficha técnica del modelo (PDF o doc de fábrica) con la tabla
