@@ -626,6 +626,12 @@ PRODUCTOS.forEach(p=>{
               : t.includes('ARCÓN') || t.includes('ARCON') ? 'Cheslong con arcón'
               : 'Cheslong fija'
               ) : 'Sin cheslong';
+  // Una pieza "con cheslong" solo cuenta como composición de asiento (sofá + cheslong)
+  // si el título combina un cuerpo de asientos con el chaise mediante "+"
+  // (ej. "STELA 2RELAX...+ CHAIS..."). Los módulos de chaise sueltos
+  // (ej. "GIO MODULO CHAISE.RINCONERA...", "STELA MOD.CHAISELONGUE...")
+  // no llevan "+" y son solo la pieza auxiliar, no un sofá completo.
+  p._chaiseComposicionAsientos = p._chaise !== 'Sin cheslong' && t.includes('+');
   p._orientacion = t.includes('V/F.IZQ') || t.includes('V/F IZQ') ? 'Izquierda'
                   : t.includes('V/F.DCHA') || t.includes('V/F DCHA') ? 'Derecha'
                   : null;
@@ -682,8 +688,7 @@ function chaiseLabel(chaise){
 
 function matchesChaise(p, chaise){
   if(!chaise) return true;
-  const tieneChaise = p._chaise !== 'Sin cheslong';
-  return chaise==='con' ? tieneChaise : !tieneChaise;
+  return chaise==='con' ? p._chaiseComposicionAsientos : !p._chaiseComposicionAsientos;
 }
 
 const CATEGORIA_ORDER = ['Relax','Deslizante','Fijo','Sofá cama','Auxiliar'];
