@@ -74,10 +74,10 @@
 
   #detail{max-width:880px;margin:0 auto;padding:36px 40px 80px;}
   .backMobile{display:none;}
-  #detailHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--line);}
-  #detailHeader h2{font-size:28px;font-weight:600;margin:0 0 4px;color:var(--paper);}
-  #detailHeader .loc{font-size:13.5px;color:var(--paper-dim);}
-  #detailHeader .loc .dot{margin:0 8px;color:var(--line);}
+  #detailHeader, .detailHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  #detailHeader h2, .detailHeader h2{font-size:28px;font-weight:600;margin:0 0 4px;color:var(--paper);}
+  #detailHeader .loc, .detailHeader .loc{font-size:13.5px;color:var(--paper-dim);}
+  #detailHeader .loc .dot, .detailHeader .loc .dot{margin:0 8px;color:var(--line);}
 
   .btnRow{display:flex;gap:8px;flex-wrap:wrap;}
   button.action{font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;border-radius:3px;padding:9px 13px;cursor:pointer;border:1px solid var(--line);
@@ -147,6 +147,16 @@
     padding:11px 18px;border-radius:4px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;z-index:100;}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+  .viewTabs{display:flex;gap:6px;padding:0 20px 14px;}
+  .viewTab{flex:1;background:var(--graphite-850);border:1px solid var(--line);color:var(--paper-dim);font-family:'Inter',sans-serif;font-weight:600;
+    font-size:12px;padding:8px 6px;border-radius:3px;cursor:pointer;text-align:center;transition:background .15s ease,border-color .15s ease,color .15s ease;}
+  .viewTab:hover{border-color:var(--oak-dim);}
+  .viewTab.active{background:var(--oak);color:#1a1510;border-color:var(--oak);}
+  #backupSidebarBody{padding:0 20px 20px;color:var(--paper-dim);font-size:12.5px;line-height:1.6;}
+  #importFileInput{width:100%;background:var(--graphite-900);border:1px solid var(--line);border-radius:4px;padding:9px 11px;color:var(--paper);font-size:12.5px;}
+  #backupDetail{max-width:880px;margin:0 auto;padding:36px 40px 80px;}
+  @media (max-width: 820px){ #backupDetail{padding:20px 18px 60px;} }
+
   @media (max-width: 820px){
     #sidebar{position:fixed;inset:0;width:100%;min-width:0;z-index:20;transform:translateX(0);}
     #sidebar.hideMobile{display:none;}
@@ -209,10 +219,18 @@
       <h1>Inteligencia Comercial</h1>
       <div class="sub">Fichas de cliente con investigación automática</div>
     </div>
-    <button id="newClientBtn"><span class="plus">+</span> Nuevo cliente</button>
-    <button id="exportBtn" style="margin:0 20px 12px;padding:9px 12px;background:transparent;border:1px solid var(--line);border-radius:3px;color:var(--paper-dim);font-size:12.5px;cursor:pointer;">⬇ Exportar copia de clientes</button>
-    <div id="searchWrap"><input id="searchInput" placeholder="Buscar cliente o localidad..."></div>
-    <div id="clientList"></div>
+    <div class="viewTabs">
+      <button class="viewTab active" id="tabClientes" onclick="switchView('clientes')">Clientes</button>
+      <button class="viewTab" id="tabBackup" onclick="switchView('backup')">Copia de seguridad</button>
+    </div>
+    <div id="clientesSidebarBody">
+      <button id="newClientBtn"><span class="plus">+</span> Nuevo cliente</button>
+      <div id="searchWrap"><input id="searchInput" placeholder="Buscar cliente o localidad..."></div>
+      <div id="clientList"></div>
+    </div>
+    <div id="backupSidebarBody" style="display:none;">
+      Exporta todas las fichas a un archivo, o restaura una copia anterior. Útil antes de cambios importantes o como respaldo periódico.
+    </div>
   </aside>
 
   <main id="main">
@@ -222,6 +240,7 @@
       <p>Crea un nuevo cliente o selecciona uno de la lista para ver su ficha de inteligencia comercial.</p>
     </div>
     <div id="detail" style="display:none"></div>
+    <div id="backupView" style="display:none"></div>
   </main>
 </div>
 
@@ -252,6 +271,17 @@
   </div>
 </div>
 
+<div class="overlay" id="importConfirmOverlay">
+  <div class="modal">
+    <h3>Restaurar copia de seguridad</h3>
+    <div class="modalSub" id="importConfirmText"></div>
+    <div class="modalBtns">
+      <button class="action" onclick="closeImportConfirm()">Cancelar</button>
+      <button class="action danger" id="importConfirmBtn" onclick="confirmarImportar()">Sí, reemplazar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -262,6 +292,8 @@ const FN_INVESTIGAR = '/.netlify/functions/crm-investigar';
 let clients = [];
 let activeId = null;
 let editingField = null;
+let currentView = 'clientes';
+let pendingImport = null;
 
 // ---------- CARGA DIRECTA (sin contraseña, uso personal) ----------
 async function attemptLoad(){
@@ -666,7 +698,63 @@ async function descargarPDF(clientId){
   }
 }
 
-// ---------- INIT ----------
+// ---------- COPIA DE SEGURIDAD ----------
+function switchView(view){
+  currentView = view;
+  document.getElementById('tabClientes').classList.toggle('active', view==='clientes');
+  document.getElementById('tabBackup').classList.toggle('active', view==='backup');
+  document.getElementById('clientesSidebarBody').style.display = view==='clientes' ? '' : 'none';
+  document.getElementById('backupSidebarBody').style.display = view==='backup' ? '' : 'none';
+
+  if(view==='backup'){
+    document.getElementById('emptyMain').style.display='none';
+    document.getElementById('detail').style.display='none';
+    document.getElementById('backupView').style.display='block';
+    document.getElementById('sidebar').classList.add('hideMobile');
+    renderBackupView();
+  } else {
+    document.getElementById('backupView').style.display='none';
+    if(activeId && getClient(activeId)){
+      document.getElementById('detail').style.display='block';
+    } else {
+      document.getElementById('emptyMain').style.display='flex';
+    }
+    renderList();
+  }
+}
+
+function renderBackupView(){
+  const n = clients.length;
+  document.getElementById('backupView').innerHTML = `
+    <div id="backupDetail">
+    <button class="action backMobile" onclick="backToList()" style="margin-bottom:16px;">← Clientes</button>
+    <div class="detailHeader">
+      <div>
+        <h2>Copia de seguridad</h2>
+        <div class="loc">${n} cliente${n===1?'':'s'} guardado${n===1?'':'s'} ahora mismo</div>
+      </div>
+    </div>
+
+    <div class="sectionLabel">Exportar</div>
+    <div class="field" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="max-width:440px;">
+        <div class="val">Descarga un archivo .json con todas las fichas actuales, tal cual están ahora.</div>
+      </div>
+      <button class="action primary" onclick="exportarClientes()">⬇ Descargar copia</button>
+    </div>
+
+    <div class="sectionLabel">Restaurar</div>
+    <div class="field wide">
+      <div class="val" style="margin-bottom:12px;">Sube un archivo .json exportado desde aquí. <strong>Sustituirá todos los clientes actuales</strong> por los del archivo.</div>
+      <input type="file" id="importFileInput" accept="application/json,.json">
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="action danger" onclick="handleImportFile()">Restaurar desde copia</button>
+      </div>
+    </div>
+    </div>
+  `;
+}
+
 function exportarClientes(){
   const backup = {
     exportado: new Date().toISOString(),
@@ -685,11 +773,57 @@ function exportarClientes(){
   showToast('Copia de clientes descargada.');
 }
 
+function handleImportFile(){
+  const input = document.getElementById('importFileInput');
+  const file = input && input.files && input.files[0];
+  if(!file){ showToast('Selecciona primero un archivo .json'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed;
+    try{ parsed = JSON.parse(reader.result); }
+    catch(e){ showToast('El archivo no es un JSON válido.'); return; }
+    const nuevos = Array.isArray(parsed) ? parsed : Array.isArray(parsed.clientes) ? parsed.clientes : null;
+    if(!nuevos){ showToast('El archivo no tiene el formato esperado (falta "clientes").'); return; }
+    pendingImport = nuevos;
+    document.getElementById('importConfirmText').textContent =
+      `Vas a reemplazar los ${clients.length} clientes actuales por los ${nuevos.length} del archivo. Esta acción no se puede deshacer. ¿Continuar?`;
+    document.getElementById('importConfirmOverlay').classList.add('show');
+  };
+  reader.onerror = () => showToast('No se pudo leer el archivo.');
+  reader.readAsText(file);
+}
+function closeImportConfirm(){
+  document.getElementById('importConfirmOverlay').classList.remove('show');
+  pendingImport = null;
+}
+async function confirmarImportar(){
+  if(!pendingImport) return;
+  const btn = document.getElementById('importConfirmBtn');
+  btn.disabled = true;
+  btn.textContent = 'Restaurando...';
+  try{
+    const data = await apiCall(FN_CLIENTES, 'POST', { accion: 'importar', clientes: pendingImport });
+    clients = data.clientes || [];
+    activeId = null;
+    document.getElementById('importConfirmOverlay').classList.remove('show');
+    pendingImport = null;
+    renderList();
+    renderBackupView();
+    showToast('Copia restaurada correctamente.');
+  }catch(err){
+    showToast('No se pudo restaurar: ' + err.message);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Sí, reemplazar';
+  }
+}
+
+// ---------- INIT ----------
 document.getElementById('newClientBtn').addEventListener('click', openModal);
-document.getElementById('exportBtn').addEventListener('click', exportarClientes);
 document.getElementById('searchInput').addEventListener('input', renderList);
 document.getElementById('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') closeModal(); });
 document.getElementById('pdfPreviewOverlay').addEventListener('click', e=>{ if(e.target.id==='pdfPreviewOverlay') closePdfPreview(); });
+document.getElementById('importConfirmOverlay').addEventListener('click', e=>{ if(e.target.id==='importConfirmOverlay') closeImportConfirm(); });
 </script>
 </body>
 </html>
