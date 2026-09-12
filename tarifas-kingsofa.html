@@ -125,6 +125,14 @@
     transition:opacity .25s;
   }
   .config .saved.show{opacity:1;}
+  .backup-divider{height:1px;background:var(--line);margin:12px 0 10px;}
+  .backup-row{display:flex;justify-content:space-between;align-items:center;}
+  .backup-label{font-size:12.5px;color:var(--ink-soft);}
+  .backup-actions{display:flex;gap:16px;}
+  .backup-actions button{
+    border:none;background:none;color:var(--accent);
+    font-size:12.5px;font-weight:600;padding:2px 4px;
+  }
 
   .search-wrap{
     margin:14px 16px 6px;
@@ -371,6 +379,16 @@
       <input id="valorPunto" type="number" step="0.01" inputmode="decimal">
     </div>
     <div class="saved" id="savedMsg">Guardado</div>
+    <div class="backup-divider"></div>
+    <div class="backup-row">
+      <span class="backup-label">Copia de seguridad</span>
+      <div class="backup-actions">
+        <button type="button" id="exportBtn">Exportar</button>
+        <button type="button" id="importBtn">Importar</button>
+      </div>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+    <div class="saved" id="backupMsg"></div>
   </div>
 
   <div class="search-wrap">
@@ -452,6 +470,52 @@ valorPuntoInput.addEventListener('input', (e) => {
 });
 
 const fmt = n => fmtEUR(n * valorPunto);
+
+// ---------- Copia de seguridad ----------
+function ksBackupData(){
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if (key && key.indexOf('ks_') === 0) data[key] = localStorage.getItem(key);
+  }
+  return data;
+}
+
+document.getElementById('exportBtn').onclick = () => {
+  const data = ksBackupData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'backup-kingsofa-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Copia exportada');
+};
+
+const importFileInput = document.getElementById('importFile');
+document.getElementById('importBtn').onclick = () => importFileInput.click();
+importFileInput.onchange = () => {
+  const file = importFileInput.files[0];
+  importFileInput.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      Object.keys(data).forEach(key => {
+        if (key.indexOf('ks_') === 0) localStorage.setItem(key, data[key]);
+      });
+      showToast('Copia restaurada');
+      setTimeout(() => location.reload(), 700);
+    } catch (err) {
+      showToast('Archivo no válido');
+    }
+  };
+  reader.readAsText(file);
+};
 
 // ---------- helpers de escape ----------
 function escapeHtml(s){
