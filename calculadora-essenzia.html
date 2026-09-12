@@ -79,6 +79,23 @@
   .sizelist .r{display:flex;justify-content:space-between;font-size:12.5px;padding:1px 0;}
   h2.h{font-size:16px;color:var(--navy);margin:22px 0 10px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:6px;}
   .empty{color:var(--muted);font-size:13px;padding:24px;text-align:center;}
+  .toolgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;max-width:760px;margin:10px auto 0;}
+  .toolcard{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:26px 22px;text-align:center;}
+  .toolicon{font-size:30px;margin-bottom:6px;}
+  .toolcard h3{margin:0 0 6px;font-size:15px;letter-spacing:.6px;color:var(--ink);}
+  .toolcard p{margin:0 0 18px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .toolbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .toolbtn{border:none;border-radius:10px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;}
+  .toolbtn.dark{background:var(--navy);color:#fff;}
+  .toolbtn.dark:hover{opacity:.88;}
+  .toolbtn.gold{background:var(--accent);color:#fff;}
+  .toolbtn.gold:hover{opacity:.88;}
+  @media print{
+    header, nav, .info, .bar, .search-row, .subnav{display:none!important;}
+    body{background:#fff;}
+    .card{break-inside:avoid;}
+    #s-herramientas{display:none!important;}
+  }
 </style>
 </head>
 <body>
@@ -109,6 +126,7 @@
   <button data-t="camas">Camas eléctricas</button>
   <button data-t="almohadas">Almohadas</button>
   <button class="mg-nav" data-t="magnifique">MAGNIFIQUE</button>
+  <button data-t="herramientas">Herramientas</button>
 </nav>
 
 <main>
@@ -224,6 +242,30 @@
       </div>
       <div class="grid" id="gm-grid"></div>
     </div>
+  </section>
+
+  <section id="s-herramientas">
+    <div class="toolgrid">
+      <div class="toolcard">
+        <div class="toolicon">🖨️</div>
+        <h3>EXPORTAR PDF</h3>
+        <p>Descarga en PDF el listado que estés viendo ahora mismo (la pestaña activa, con los filtros aplicados)</p>
+        <div class="toolbtns">
+          <button id="btn-export-pdf" class="toolbtn dark">Exportar PDF</button>
+        </div>
+      </div>
+      <div class="toolcard">
+        <div class="toolicon">💾</div>
+        <h3>COPIA DE SEGURIDAD</h3>
+        <p>Descarga una copia completa de la app tal como está ahora mismo (todos los productos, precios y el valor del punto actual). Si algún día hay algún problema con la web, abre este archivo directamente en el navegador — funciona igual, sin necesidad de internet ni de Netlify.</p>
+        <div class="toolbtns">
+          <button id="btn-export-backup" class="toolbtn dark">Descargar copia</button>
+          <button id="btn-restore-backup" class="toolbtn gold">Restaurar</button>
+        </div>
+        <input type="file" id="file-restore-backup" accept=".html,text/html" style="display:none;">
+      </div>
+    </div>
+    <div class="info" style="max-width:760px;margin:14px auto 0;">"Restaurar" lee un archivo de copia de seguridad ya descargado y recupera de él el valor del punto que tenías en ese momento. Para recuperar toda la app (todos los productos), simplemente abre el archivo descargado directamente en el navegador, o súbelo de nuevo a Netlify/GitHub.</div>
   </section>
 
 </main>
@@ -838,6 +880,51 @@ document.getElementById('punto-save').addEventListener('click', ()=>{
 renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
 renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
 
+/* ================= HERRAMIENTAS: Exportar PDF + Copia de seguridad ================= */
+document.getElementById('btn-export-pdf').addEventListener('click', ()=>{
+  window.print();
+});
+
+document.getElementById('btn-export-backup').addEventListener('click', ()=>{
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  // Incrusta el valor del punto actual como valor por defecto, para que la copia
+  // funcione correctamente aunque se abra en otro navegador/dispositivo sin ese localStorage.
+  html = html.replace('let PUNTO = 0.40;', 'let PUNTO = ' + PUNTO + ';');
+  const hoy = new Date();
+  const fechaStr = hoy.toISOString().slice(0,10);
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'essenzia-backup-' + fechaStr + '.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-restore-backup').addEventListener('click', ()=>{
+  document.getElementById('file-restore-backup').click();
+});
+document.getElementById('file-restore-backup').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    const contenido = ev.target.result;
+    const match = contenido.match(/let PUNTO = ([\d.]+);/);
+    if(match && !isNaN(parseFloat(match[1])) && parseFloat(match[1])>0){
+      PUNTO = parseFloat(match[1]);
+      try { localStorage.setItem('essenzia_punto', PUNTO); } catch(err){}
+      puntoInput.value = PUNTO.toFixed(2);
+      renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
+      renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
+      alert('Copia de seguridad leída: valor del punto restaurado a ' + PUNTO.toFixed(2) + ' €');
+    } else {
+      alert('No se ha podido leer el valor del punto de este archivo. Asegúrate de que es una copia de seguridad descargada desde esta misma app.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
 /* ================= SERVICE WORKER (necesario en algunos navegadores para que aparezca "Instalar app") ================= */
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
@@ -845,7 +932,7 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-09-05 · 12:10</div>
+<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-09-12 · 21:10</div>
 </body>
 </html>
 
