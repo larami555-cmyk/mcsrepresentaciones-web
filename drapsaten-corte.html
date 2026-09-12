@@ -307,6 +307,38 @@ main{padding:16px 16px 0; max-width:520px; margin:0 auto;}
 footer.credit{
   text-align:center; font-size:11px; color:#a79f8c; padding:26px 16px 6px;
 }
+
+/* ---------- settings / backup ---------- */
+.brand-row{position:relative;}
+.settings-btn{
+  margin-left:auto; width:38px; height:38px; border-radius:50%;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
+  color:#f4f0e8; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; position:relative; z-index:1;
+}
+.settings-btn svg{width:19px; height:19px;}
+
+.backup-content{padding:20px 20px 60px; max-width:520px; margin:0 auto;}
+.backup-content h2{font-size:22px; margin:4px 0 4px;}
+.backup-content .bk-sub{font-size:13.5px; color:var(--ink-soft); margin-bottom:22px; line-height:1.5;}
+.backup-card{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  box-shadow:var(--shadow); padding:18px; margin-bottom:14px;
+}
+.backup-card h4{
+  font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--label);
+  margin:0 0 8px; font-weight:700;
+}
+.backup-card p{font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin:0 0 14px;}
+.backup-btn{
+  width:100%; padding:12px; border-radius:12px; border:none; font-size:14px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+}
+.backup-btn.primary{background:var(--navy); color:#fff;}
+.backup-btn.secondary{background:#fff; border:1px solid var(--navy-soft); color:var(--navy);}
+.backup-btn svg{width:16px; height:16px;}
+.backup-meta{font-size:12px; color:#948e7f; margin-top:10px; text-align:center;}
+#backupFileInput{display:none;}
 </style>
 </head>
 <body>
@@ -320,6 +352,9 @@ footer.credit{
       <h1>DRAPSATEN CORTE</h1>
       <p>SweetBedding · Colección de colchones</p>
     </div>
+    <button class="settings-btn" id="settingsBtn" aria-label="Copia de seguridad">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
   </div>
   <p class="header-sub">Fichas técnicas al detalle: composición, altura, medidas y precio de cada modelo.</p>
 </header>
@@ -404,6 +439,41 @@ footer.credit{
     </button>
   </div>
   <div class="sheet-content" id="sheetContent"></div>
+</div>
+
+<!-- backup / restore sheet -->
+<div class="sheet-overlay" id="backupSheet">
+  <div class="sheet-hero" style="background:linear-gradient(155deg, #1b1c22, #0a0a0d 75%); aspect-ratio:auto; padding:60px 20px 26px;">
+    <button class="sheet-back" id="backupBack" style="position:absolute; top:16px; left:16px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div style="color:#f4f0e8; max-width:520px; margin:0 auto;">
+      <div class="sheet-eyebrow" style="color:#c9a86a;">DRAPSATEN CORTE</div>
+      <h2 style="margin:6px 0 4px; font-size:25px;">Copia de seguridad</h2>
+      <div style="font-size:13.5px; color:#c8c2b2;">Guarda o restaura los precios que has fijado en esta app.</div>
+    </div>
+  </div>
+  <div class="backup-content">
+    <div class="backup-card">
+      <h4>Descargar copia</h4>
+      <p>Genera un archivo con todos los precios que has fijado en los modelos. Guárdalo donde quieras (Drive, correo, etc.) para no perderlos si cambias de móvil o borras el navegador.</p>
+      <button class="backup-btn primary" id="btnExportBackup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        Descargar copia de seguridad
+      </button>
+      <div class="backup-meta" id="backupMeta"></div>
+    </div>
+
+    <div class="backup-card">
+      <h4>Restaurar copia</h4>
+      <p>Selecciona un archivo de copia de seguridad descargado anteriormente para recuperar los precios guardados.</p>
+      <button class="backup-btn secondary" id="btnImportBackup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg>
+        Restaurar desde archivo
+      </button>
+      <input type="file" id="backupFileInput" accept="application/json,.json">
+    </div>
+  </div>
 </div>
 
 <!-- fullscreen viewer -->
@@ -894,6 +964,65 @@ async function downloadOrShareFicha(p, mode){
     btn.innerHTML = originalHTML;
   }
 }
+
+/* ================= BACKUP / RESTORE ================= */
+const backupSheet = document.getElementById("backupSheet");
+
+function updateBackupMeta(){
+  const n = Object.keys(prices).length;
+  document.getElementById("backupMeta").textContent =
+    n > 0 ? `${n} precio${n===1?"":"s"} guardado${n===1?"":"s"} actualmente` : "No hay precios guardados todavía";
+}
+
+document.getElementById("settingsBtn").addEventListener("click", ()=>{
+  updateBackupMeta();
+  backupSheet.classList.add("open");
+  document.body.style.overflow = "hidden";
+});
+document.getElementById("backupBack").addEventListener("click", ()=>{
+  backupSheet.classList.remove("open");
+  document.body.style.overflow = "";
+});
+
+document.getElementById("btnExportBackup").addEventListener("click", ()=>{
+  const payload = {
+    app: "DRAPSATEN CORTE",
+    exported_at: new Date().toISOString(),
+    prices: prices
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = `drapsaten-corte-backup-${fecha}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+});
+
+document.getElementById("btnImportBackup").addEventListener("click", ()=>{
+  document.getElementById("backupFileInput").click();
+});
+document.getElementById("backupFileInput").addEventListener("change", (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      const restored = data.prices || data;
+      if(typeof restored !== "object") throw new Error("formato inválido");
+      prices = restored;
+      localStorage.setItem("drapsaten_prices", JSON.stringify(prices));
+      updateBackupMeta();
+      render();
+      alert("Copia de seguridad restaurada correctamente.");
+    } catch(err){
+      alert("No se pudo leer el archivo. Comprueba que es una copia de seguridad válida de DRAPSATEN CORTE.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
 
 /* ================= FULLSCREEN IMAGE VIEWER ================= */
 const fsViewer = document.getElementById("fsViewer");
