@@ -32,6 +32,13 @@ exports.handler = async (event) => {
       return jsonResponse(200, { clientes });
     }
 
+    if (event.httpMethod === 'POST' && body.accion === 'importar') {
+      if (!Array.isArray(body.clientes)) return jsonResponse(400, { error: 'Formato de copia no válido: falta la lista de clientes' });
+      clientes = body.clientes;
+      await store.setJSON('clientes', clientes);
+      return jsonResponse(200, { clientes });
+    }
+
     if (event.httpMethod === 'POST') {
       const c = Object.assign({
         nombre: '', localidad: '', direccion: '', telefono: '', email: '', web: '', redes: '',

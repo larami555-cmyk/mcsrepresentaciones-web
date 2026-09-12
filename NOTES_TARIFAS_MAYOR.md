@@ -55,6 +55,40 @@ PRODUCTOS=[...]`). Cada producto:
   el modal del artículo con un aviso destacado (`#modalExpress`). Lista de telas en la
   constante `TELAS_EXPRESS` del JS.
 
+## Colección AURUM (fijos de alta gama, catálogo `AURUM_ESP.pdf`)
+
+Añadida el 10-sep-2026. Es una colección de sofás fijos (Amelie, Colette, Nadine,
+Sophie) con estructura modular (sofás base, sofá+chaiselongue, módulos 1 brazo,
+central, central doble, chaiselongue suelta, rincón, terminal, pouff). Encaja en
+el mismo `PRODUCTOS` y usa el mismo motor de filtros/buscador que el resto, con
+estas diferencias respecto al resto del catálogo:
+
+- **`coleccion`**: siempre `"AURUM"`. Esto le da su propia pestaña de categoría
+  (`"Aurum"`, añadida a `CATEGORIA_ORDER` y a la función que calcula
+  `p._categoria`) en vez de caer en Relax/Fijo/Sofá cama por defecto.
+- **`subcol`**: `"<MODELO> (aurum fijo)"` (AMELIE, COLETTE, NADINE, SOPHIE).
+- **Series de precio distintas**: AURUM va de **S/A a S/E** (no tiene S/O). Por
+  eso `SERIE_ORDER` se amplió a `['O','A','B','C','D','E']`; los productos del
+  resto del catálogo simplemente no tienen la clave `E` y esa fila no se pinta.
+- **Sin `puntosExpress`** (no aplica a esta colección) y **sin `_cabezal`** (no
+  hay variantes con cabezal motorizado/manual, por lo que ese filtro no aparece
+  para estos modelos).
+- **Cheslong**: solo existe la variante "fija" (no hay rinconera ni arcón en
+  AURUM), y solo cuenta como "con cheslong" cuando el título combina cuerpo +
+  chaiselongue con "+" (mismo criterio que el resto del catálogo).
+- **IDs**: rango propio **91001–91091** (91 artículos: 20 Amelie + 18 Colette +
+  26 Nadine + 27 Sophie), para no colisionar con los IDs de fábrica ni con los
+  90001+ ya usados en otras adiciones manuales.
+- **Medida total**: los sofás base y sillones llevan la medida total como
+  primer número del título (antes de "ASIENTOS"), así el cálculo automático de
+  `_medidaTotal` la coge bien sin necesidad de paréntesis. Las composiciones
+  sofá+chaiselongue sí llevan el total explícito entre paréntesis al final
+  (igual que en el resto del catálogo), porque ahí no se puede inferir sumando.
+- Los precios están tomados directamente de las tablas de tarifa por módulo
+  (páginas 28–31 de `AURUM_ESP.pdf`), no de las composiciones de ejemplo del
+  catálogo fotográfico (esas solo muestran combinaciones de tela/medida a
+  título ilustrativo, no son artículos individuales facturables).
+
 ## Convención "(XXXCM)" en el título — medida TOTAL
 
 Cuando un título lleva un número entre paréntesis seguido de CM, ese número es **la
@@ -129,6 +163,10 @@ No hace falta mantener una lista a mano: cualquier `subcol` nuevo que contenga
 | Sofá cama | LOTUS (mecanismo...15cm) | 9 | Sin verificar (solo se quitó la variante chaiselongue, descatalogada) |
 | Sofá cama | BIANCA (mecanismo...15cm) | 4 | **Sin verificar** |
 | Sofá cama | VEGA Y VIGO (mecanismo...12cm) | 2 | **Sin verificar** |
+| Aurum | AMELIE (aurum fijo) | 20 | Completo — nuevo, catálogo AURUM_ESP.pdf |
+| Aurum | COLETTE (aurum fijo) | 18 | Completo — nuevo |
+| Aurum | NADINE (aurum fijo) | 26 | Completo — nuevo |
+| Aurum | SOPHIE (aurum fijo) | 27 | Completo — nuevo |
 | Auxiliar | AUXILIAR (cojines, butacas, pouffs) | 24 | No aplica medida total (se usa el ancho/alto de la pieza tal cual) |
 
 **Modelos eliminados por descatalogación** (según aviso de fábrica, sesión de
@@ -144,20 +182,56 @@ corregido el subcol para no romper el histórico de facetas guardadas; si se qui
 arreglar el nombre visible, cambiar el `subcol` de todos sus productos y verificar que
 no rompe nada más.
 
+## Filtro "con/sin cheslong" en el buscador rápido
+
+El buscador rápido por medida (home) tiene 3 chips: Todos / Con cheslong / Sin cheslong.
+
+- `p._chaiseComposicionAsientos`: true solo si el título tiene "CHAI" Y un "+" (sofá con
+  asientos combinado con la pieza de chaise). Los módulos de chaise SUELTOS (auxiliares,
+  sin "+" en el título, ej. "GIO MODULO CHAISE.RINCONERA...", "STELA MOD.CHAISELONGUE...")
+  no cuentan como "con cheslong" porque no son un sofá completo.
+- `_medidaTotal` **nunca** se calcula combinando el ancho del asiento con el ancho de la
+  cheslong a mano: si no hay `(XXXCM)` verificado en el título Y la pieza es una
+  composición con chaise, `_medidaTotal` se deja en `null` (no aparece en el buscador por
+  medida) en vez de mostrar un número inventado.
+
+## `_medidaTotal`: qué formatos de paréntesis reconoce
+
+El regex acepta `(226CM)`, `(226 CM.)` y también pares `(370 x 225 CM.)` (composiciones en
+L con módulo rincón + terminal: ahí se usa el mayor de los dos números, el lado largo).
+Esto se descubrió porque el modelo **TOMMY** usa el formato "370 CM." (con espacio y
+punto) en vez de "370CM", y el regex antiguo no lo reconocía.
+
 ## Qué falta / pendiente de verificar
 
-- **BIANCA y VEGA Y VIGO** (sofá cama): no se ha tocado su medida total porque no ha
-  aparecido su ficha técnica en ningún documento revisado hasta ahora. Si aparece un PDF/
-  doc con sus dimensiones, aplicar el mismo proceso (ver "Cómo añadir medida total" abajo).
-- **AKUA**: los combos con RINCÓN+TERMINAL, CHESLONG RINCONERA y CHESLONG TERMINAL
-  PARTIDO no tienen medida total confirmada por ficha técnica — se les puso solo lo que
-  ya estaba escrito en el propio título (ancho del módulo), no un total verificado.
-- **LOTUS (mecanismo...15cm)**: nunca se le ha pasado el proceso de verificación de
-  medida total; sus 9 artículos no tienen "(XXXCM)".
-- El "Buscador rápido por medida" (categoría + menos/igual/más de X cm) usa
-  `_medidaTotal`, que para los modelos de la lista de arriba sin verificar cae al
-  fallback (mayor número de un patrón NxN, o primer número con CM) — es una aproximación
-  razonable, no el dato exacto de fábrica.
+- **BIANCA y VEGA** (sofá cama): no se ha tocado su medida total porque no ha
+  aparecido su ficha técnica en ningún documento revisado hasta ahora.
+- **VIGO** (sofá cama + chaiselongue 160cm): sin ficha técnica con el total verificado.
+- **LOTUS (mecanismo...15cm)**: sus composiciones con chaiselongue (80X160/80X185/
+  160X70/185X70) siguen sin medida total verificada; no aparece en el catálogo
+  `MAYOR_CAT_ESP_2026_A.pdf` revisado.
+- **AKUA SOFA 2FIIJOS 62CMS + CHAISE. FIJA 165CM** (nótese el typo "FIIJOS" en el título
+  real): no coincide con el patrón de detección por typo; sigue sin medida total aunque
+  el resto de la familia AKUA sí la tiene (249CM, mismo valor que sus hermanos de 62cm).
+- **POLO 2PL + CHAISELONGUE FIJA 170CMS**: la tabla del catálogo solo da totales para
+  3,5PL/3PL/2,5PL + chaise; el combo 2PL + chaise no aparece con total en la tabla.
+- El resto de familias con cheslong (AKUA, TICO, SENSE, MAGNUM, NINA, NOA, POLO 3,5/3/2,5PL)
+  ya tienen medida total verificada, sacada de `MAYOR_CAT_ESP_2026_A.pdf` (tablas de
+  composición con el total entre paréntesis).
+
+## Modelos discontinuados eliminados del catálogo (septiembre 2026)
+
+- **LOTUS (deslizante de bandeja)**: la versión sofá/relax de LOTUS (con o sin
+  chaiselongue, módulos sueltos, sillones, etc. — 56 artículos) se ha eliminado. LOTUS
+  ahora **solo se fabrica como sofá cama** (subcol `LOTUS (mecanismo italiano - colchón
+  15cm)` y `LOTUS 5 MAX (mecanismo italiano - colchón 15cm)`), que sí se mantiene.
+- **BIANCA** (sofá cama, subcol `BIANCA (mecanismo original italiano - colchón 15cm)`):
+  modelo eliminado, 4 artículos borrados.
+- **VEGA y VIGO** (subcol `VEGA Y VIGO (mecanismo italiano - colchón 12cm)`): modelo
+  eliminado, 2 artículos borrados (los únicos que había, ambos titulados VIGO).
+
+Si en el futuro se recupera alguno de estos modelos, hay que volver a añadir sus
+productos siguiendo el mismo proceso descrito abajo y el flujo de edición del JSON con Python.
 
 ## Cómo añadir/verificar una medida total (proceso seguido en esta sesión)
 
