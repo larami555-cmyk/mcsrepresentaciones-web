@@ -176,3 +176,11 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - Código: `netlify/functions/lib/crm-auth.js` (helper), `crm-login.js` (nuevo), y `crm-clientes.js` / `crm-investigar.js` exigen `authorize(event)` y devuelven 401 si no hay token válido. Cambiar `CRM_PASSWORD` invalida todas las sesiones abiertas.
 - El login espera 1,2 s en cada fallo para frenar la fuerza bruta. Usar una contraseña larga.
 - `subir-fotos` ya tenía su propia contraseña (`FOTOS_PASSWORD`).
+
+## Newsletter con Brevo (20 septiembre 2026)
+
+- Formulario en la portada (bloque `#newsletter`, columna derecha del pie, ES/GL): correo + casilla propia de comunicaciones comerciales + información básica. Envía a `netlify/functions/newsletter.js`.
+- La función llama a Brevo `POST /v3/contacts/doubleOptinConfirmation` (doble confirmación). Tras confirmar, Brevo redirige a `suscripcion-confirmada.html` (noindex).
+- Variables de entorno en Netlify: `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOI_TEMPLATE_ID`. Sin ellas responde "Newsletter sin configurar".
+- Antiabuso: tiempo mínimo de 2,5 s desde que se carga la página, límite de 5 intentos por IP y hora y 300 al día (Netlify Blobs, almacén `newsletter-limits`).
+- Política de privacidad, registro de tratamientos (Excel) y NOTES actualizados. El remitente de los correos debe ser una dirección del dominio propio con SPF/DKIM/DMARC configurados en Brevo.
