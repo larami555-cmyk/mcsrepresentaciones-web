@@ -2,7 +2,7 @@
    1) Pega tu ID de medición de GA4 en GA_ID (formato G-XXXXXXXXXX).
    2) Con GA_ID vacío no se muestra banner ni se carga nada. */
 (function () {
-  var GA_ID = ""; // <-- ID de medición GA4, p. ej. "G-ABC123DEF4"
+  var GA_ID = "G-BH9P7L30X7"; // ID de medición GA4
   var KEY = "mcsCookieConsent";
   var MAX_AGE = 365 * 24 * 60 * 60 * 1000; // se vuelve a preguntar a los 12 meses
 
