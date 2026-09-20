@@ -1,0 +1,12 @@
+name: Comprobar enlaces
+on:
+  schedule:
+    - cron: "0 7 * * 1"   # todos los lunes, 07:00 UTC
+  workflow_dispatch: {}
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buscar enlaces rotos
+        run: python3 scripts/check_links.py

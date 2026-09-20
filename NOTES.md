@@ -160,3 +160,11 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - Google Fonts eliminado: las tipografías (Inter 300–600, Playfair Display 400–700, subset latin) están en `fonts/` con `fonts/fonts.css`. Así no hay conexión a terceros y no hace falta banner de cookies. `crm/index.html` (interno, noindex) sigue usando Google Fonts (Fraunces).
 - Si se añade Analytics, píxeles, mapas o vídeos incrustados, hay que crear política de cookies y banner de consentimiento antes de cargarlos.
 - Titular: MCarmen Sanchez Recarey, NIF 32775127N, Paseo Templarios, Cambre, 15679 A Coruña (sin número de portal; añadirlo si procede).
+
+## Formulario, cookies/analítica y enlaces (20 septiembre 2026)
+
+- **Formulario de contacto** ahora envía por **Netlify Forms** (`form-name=contacto`, POST a `/`). Hay un `<form name="contacto" data-netlify="true" hidden>` estático justo tras `<div id="root">` para que Netlify lo detecte; no borrarlo. Antispam: campo trampa `bot-field` (input `#f-bot`, fuera de pantalla) + filtro de Netlify. Campo nuevo obligatorio `Email o teléfono` (`#f-contacto`) y casilla de consentimiento. Estado del envío en `mcsFS`/`mcsFC` (dentro de `Su`). Avisos por email: Netlify → Forms → notifications (configurados por MCarmen).
+- **Analítica:** `cookies.js` (cargado en el `<head>` de todas las páginas públicas). Pegar el ID GA4 en `var GA_ID = ""` (formato `G-XXXXXXXXXX`). Con GA_ID vacío no hay banner ni carga nada. Google Analytics solo se carga tras pulsar "Aceptar"; "Rechazar" y "Aceptar" tienen el mismo peso visual. El consentimiento se guarda 12 meses en localStorage (`mcsCookieConsent`). Enlace "Configurar cookies" en el pie (solo si hay GA_ID). Política de privacidad actualizada (sección 7 = cookies).
+- **Enlaces:** `scripts/check_links.py` + `.github/workflows/check-links.yml` (cada lunes; si hay enlaces rotos falla y GitHub avisa por email). Probar en local sin red: `python3 scripts/check_links.py --internal-only`.
+- Corregida una `}` suelta al final del `<body>` (un `</style>` duplicado).
+- Pendiente: el artículo "El mueble entra en una nueva era regulatoria" enlaza a `normati-wfdwa7w.runable.site` (externo, de prueba). Cuando MCarmen pase el texto, crear página propia y cambiar el `link`.
