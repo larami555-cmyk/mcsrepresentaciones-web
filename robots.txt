@@ -8,5 +8,6 @@ Disallow: /drapsaten-corte.html
 Disallow: /subir-fotos.html
 Disallow: /monitor-taekwondo-dashboard.html
 Disallow: /tkd
+Disallow: /form-test.html
 
 Sitemap: https://mcsrepresentaciones.es/sitemap.xml
