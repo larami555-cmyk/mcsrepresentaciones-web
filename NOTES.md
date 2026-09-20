@@ -152,3 +152,11 @@ Cualquier texto nuevo que vea el visitante debe existir en las dos lenguas, sin 
 ## Novedades: formato unificado
 
 Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y descripción. Los artículos usan la portada nativa `.mcs-cover` (mismo degradado y tipografía que las páginas de artículo), no capturas.
+
+## Textos legales y fuentes locales (20 septiembre 2026)
+
+- Nuevas páginas: `aviso-legal.html` (art. 10 LSSI-CE) y `privacidad.html` (RGPD/LOPDGDD + sección de cookies). Enlazadas en el pie de `index.html` (clase `.mcs-legal-links`) y en el sitemap.
+- Aviso RGPD de primera capa bajo los botones del formulario de contacto (ES/GL).
+- Google Fonts eliminado: las tipografías (Inter 300–600, Playfair Display 400–700, subset latin) están en `fonts/` con `fonts/fonts.css`. Así no hay conexión a terceros y no hace falta banner de cookies. `crm/index.html` (interno, noindex) sigue usando Google Fonts (Fraunces).
+- Si se añade Analytics, píxeles, mapas o vídeos incrustados, hay que crear política de cookies y banner de consentimiento antes de cargarlos.
+- Titular: MCarmen Sanchez Recarey, NIF 32775127N, Paseo Templarios, Cambre, 15679 A Coruña (sin número de portal; añadirlo si procede).
