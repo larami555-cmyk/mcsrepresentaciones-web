@@ -1,2 +1,12 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /crm/
+Disallow: /admin/
+Disallow: /tarifas-
+Disallow: /calculadora-essenzia.html
+Disallow: /drapsaten-corte.html
+Disallow: /subir-fotos.html
+Disallow: /monitor-taekwondo-dashboard.html
+Disallow: /tkd
+
+Sitemap: https://mcsrepresentaciones.es/sitemap.xml
