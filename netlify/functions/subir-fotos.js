@@ -1,4 +1,5 @@
 // v2 - forzar redeploy de la función
+const crypto = require('crypto');
 const GITHUB_API = 'https://api.github.com';
 const OWNER = 'larami555-cmyk';
 const REPO = 'mcsrepresentaciones-web';
@@ -33,7 +34,13 @@ exports.handler = async (event) => {
 
   const { password, marca, files } = payload;
 
-  if (!process.env.FOTOS_PASSWORD || password !== process.env.FOTOS_PASSWORD) {
+  const expected = process.env.FOTOS_PASSWORD || '';
+  if (expected.length < 10) {
+    return jsonResponse(500, { error: 'Falta configurar FOTOS_PASSWORD en Netlify (mínimo 10 caracteres)' });
+  }
+  const sha = (x) => crypto.createHash('sha256').update(String(x)).digest();
+  if (!crypto.timingSafeEqual(sha(password || ''), sha(expected))) {
+    await new Promise((r) => setTimeout(r, 1200)); // frena los intentos por fuerza bruta
     return jsonResponse(401, { error: 'Contraseña incorrecta' });
   }
 
