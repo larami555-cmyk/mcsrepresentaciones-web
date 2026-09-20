@@ -139,3 +139,16 @@ Se añadió NETLIFY_BLOBS_TOKEN (personal access token) como variable de entorno
 - **Al insertar varios objetos seguidos en un array con un script Python**, comprobar que no falte la coma `,` entre `}` y `{` del siguiente objeto — un `"}{id:"` sin coma de por medio es sintácticamente inválido y da un error de "Unexpected token" difícil de localizar a simple vista. Revisar siempre con `grep -c '"}{id:"' index.html` tras una inserción masiva.
 - **Colores/clases Tailwind inventados sin comprobar el bundle:** se usó `text-[#D8D2C5]` para la barra negra y no existía en el bundle precompilado (quedó sin aplicar). Siempre comprobar con `grep -c '\.text-\\\[\\#RRGGBB\\\]{' index.html` (con las barras invertidas exactas) antes de dar por hecho que un color arbitrario está disponible; si no lo está, usar uno de los ya confirmados en el proyecto (`text-white`, `text-[#8A7F74]`, `text-[#C5A880]`, etc.) o crear una clase CSS propia.
 
+
+
+## ⚠️ Regla fija: TODO texto visible en Castellano y Galego (siempre)
+
+Cualquier texto nuevo que vea el visitante debe existir en las dos lenguas, sin excepciones:
+- Textos fijos → `mcsI18n.es` y `mcsI18n.gl` (nunca literales en el JSX).
+- Datos (`mcsNovedades`, `mcsDocumentos`, marcas) → campo en castellano + campo `Gl` (`titulo`/`tituloGl`, `desc`/`descGl`, `fecha`/`fechaGl`, `tipo`/`tipoGl`, `linkLabel`/`linkLabelGl`, `link`/`linkGl`).
+- Imágenes con texto dentro NO son traducibles: usar portada nativa (`cover:1` en `mcsNovedades`) o una imagen por idioma.
+- Páginas sueltas (ej. `guia-tejidos-naturales.html`): atributos `data-gl` + script que lee `localStorage.mcsLang`.
+
+## Novedades: formato unificado
+
+Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y descripción. Los artículos usan la portada nativa `.mcs-cover` (mismo degradado y tipografía que las páginas de artículo), no capturas.
