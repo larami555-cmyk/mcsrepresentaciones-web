@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Por qué se arrugan los tejidos naturales — MCS Representaciones</title>
 <style>
@@ -45,11 +46,11 @@
   <div class="wrap">
     <div class="header-top">
       <div class="logo">MCS<span>REPRESENTACIONES</span></div>
-      <div class="eyebrow-top">GUÍA DE PRODUCTO</div>
+      <div class="eyebrow-top" data-gl="GUÍA DE PRODUTO">GUÍA DE PRODUCTO</div>
     </div>
-    <div class="eyebrow">Materiales</div>
-    <h1>Por qué se arrugan<br>los tejidos <em>naturales</em></h1>
-    <p class="intro">Un comportamiento propio del material, no un defecto de fabricación.</p>
+    <div class="eyebrow" data-gl="Materiais">Materiales</div>
+    <h1 data-gl="Por que se engurran<br>os tecidos <em>naturais</em>">Por qué se arrugan<br>los tejidos <em>naturales</em></h1>
+    <p class="intro" data-gl="Un comportamento propio do material, non un defecto de fabricación.">Un comportamiento propio del material, no un defecto de fabricación.</p>
   </div>
 </header>
 
@@ -59,8 +60,8 @@
     <div class="section-inner">
       <div class="num">01</div>
       <div>
-        <h2>Las fibras celulósicas recuperan despacio</h2>
-        <p>El algodón, el lino y la viscosa tienen baja recuperación elástica. Tras una presión sostenida, como el peso del cuerpo durante 8 horas, tardan en recuperar su forma. Las fibras sintéticas (poliéster, elastano) están diseñadas para recuperarla rápido, pero no aportan la misma transpirabilidad ni el mismo tacto.</p>
+        <h2 data-gl="As fibras celulósicas recuperan devagar">Las fibras celulósicas recuperan despacio</h2>
+        <p data-gl="O algodón, o liño e a viscosa teñen baixa recuperación elástica. Tras unha presión sostida, como o peso do corpo durante 8 horas, tardan en recuperar a súa forma. As fibras sintéticas (poliéster, elastano) están deseñadas para recuperala rápido, pero non achegan a mesma transpirabilidade nin o mesmo tacto.">El algodón, el lino y la viscosa tienen baja recuperación elástica. Tras una presión sostenida, como el peso del cuerpo durante 8 horas, tardan en recuperar su forma. Las fibras sintéticas (poliéster, elastano) están diseñadas para recuperarla rápido, pero no aportan la misma transpirabilidad ni el mismo tacto.</p>
       </div>
     </div>
   </div>
@@ -69,8 +70,8 @@
     <div class="section-inner">
       <div class="num">02</div>
       <div>
-        <h2>La viscosa absorbe humedad</h2>
-        <p>La viscosa es celulosa regenerada. Absorbe la humedad ambiental y la transpiración y, al hacerlo, se ablanda y pierde recuperación. Al secarse conserva las marcas. Por eso la funda muestra pliegues visuales tras el uso.</p>
+        <h2 data-gl="A viscosa absorbe humidade">La viscosa absorbe humedad</h2>
+        <p data-gl="A viscosa é celulosa rexenerada. Absorbe a humidade ambiental e a transpiración e, ao facelo, ablándase e perde recuperación. Ao secarse conserva as marcas. Por iso a funda mostra pregamentos visuais tras o uso.">La viscosa es celulosa regenerada. Absorbe la humedad ambiental y la transpiración y, al hacerlo, se ablanda y pierde recuperación. Al secarse conserva las marcas. Por eso la funda muestra pliegues visuales tras el uso.</p>
       </div>
     </div>
   </div>
@@ -79,15 +80,15 @@
     <div class="section-inner">
       <div class="num">03</div>
       <div>
-        <h2>El acolchado se asienta las primeras semanas</h2>
-        <p>El relleno bajo la funda se compacta con el peso y la presión repetida durante las primeras semanas de uso. Es un asentamiento normal en cualquier acolchado natural: ocurre una vez y después se estabiliza.</p>
+        <h2 data-gl="O acolchado asenta as primeiras semanas">El acolchado se asienta las primeras semanas</h2>
+        <p data-gl="O recheo baixo a funda compáctase co peso e a presión repetida durante as primeiras semanas de uso. É un asentamento normal en calquera acolchado natural: ocorre unha vez e despois estabilízase.">El relleno bajo la funda se compacta con el peso y la presión repetida durante las primeras semanas de uso. Es un asentamiento normal en cualquier acolchado natural: ocurre una vez y después se estabiliza.</p>
       </div>
     </div>
   </div>
 
   <div class="summary">
-    <div class="eyebrow">En resumen</div>
-    <p>Las fibras naturales marcan la presión del cuerpo porque no tienen la memoria elástica de las sintéticas; a cambio aportan transpirabilidad y confort. <em>Ocurre en la funda y el acolchado, no en el núcleo que sostiene el cuerpo.</em> Es un comportamiento esperado, no un fallo de calidad.</p>
+    <div class="eyebrow" data-gl="En resumo">En resumen</div>
+    <p data-gl="As fibras naturais marcan a presión do corpo porque non teñen a memoria elástica das sintéticas; a cambio achegan transpirabilidade e confort. <em>Ocorre na funda e no acolchado, non no núcleo que sostén o corpo.</em> É un comportamento esperado, non un fallo de calidade.">Las fibras naturales marcan la presión del cuerpo porque no tienen la memoria elástica de las sintéticas; a cambio aportan transpirabilidad y confort. <em>Ocurre en la funda y el acolchado, no en el núcleo que sostiene el cuerpo.</em> Es un comportamiento esperado, no un fallo de calidad.</p>
   </div>
 
 </main>
@@ -96,5 +97,15 @@
   <p>MCS Representaciones · Galicia</p>
 </footer>
 
+<script>
+  // Mismo idioma que el sitio principal (Castellano / Galego)
+  try{
+    if(localStorage.getItem("mcsLang")==="gl"){
+      document.documentElement.lang="gl";
+      document.title="Por que se engurran os tecidos naturais — MCS Representaciones";
+      document.querySelectorAll("[data-gl]").forEach(function(el){el.innerHTML=el.getAttribute("data-gl")});
+    }
+  }catch(e){}
+</script>
 </body>
 </html>
