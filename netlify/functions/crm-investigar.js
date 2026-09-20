@@ -1,4 +1,5 @@
 const { getStore } = require('@netlify/blobs');
+const { authorize } = require('./lib/crm-auth');
 
 function jsonResponse(statusCode, obj) {
   return {
@@ -42,12 +43,13 @@ Sé conciso. Máximo 6 elementos por lista.`;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return jsonResponse(405, { error: 'Método no soportado' });
+  if (!authorize(event)) return jsonResponse(401, { error: 'No autorizado' });
 
   let body = {};
   try { body = JSON.parse(event.body || '{}'); } catch (e) { return jsonResponse(400, { error: 'JSON inválido' }); }
 
   const { id } = body;
-  // Sin contraseña de acceso: uso estrictamente personal, a petición de MCarmen.
+  // Acceso protegido por token de sesión (ver crm-login).
   if (!process.env.ANTHROPIC_API_KEY) {
     return jsonResponse(500, { error: 'Falta configurar ANTHROPIC_API_KEY en Netlify (Site settings → Environment variables)' });
   }

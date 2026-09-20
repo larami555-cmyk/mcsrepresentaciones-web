@@ -207,10 +207,28 @@
   body.pdf-export .potRow .track{background:#eee !important;}
   body.pdf-export .potRow .fill{background:#999 !important;}
   body.pdf-export a{color:#000 !important;text-decoration:underline !important;}
+  #loginOverlay{position:fixed;inset:0;background:#FAF8F5;display:none;align-items:center;justify-content:center;z-index:9999;padding:24px}
+  #loginOverlay.show{display:flex}
+  #loginBox{background:#fff;border:1px solid #EDE8E0;padding:32px;max-width:360px;width:100%;text-align:center}
+  #loginBox h2{font-size:20px;margin:0 0 6px}
+  #loginBox p{font-size:13px;color:#6B645E;margin:0 0 18px}
+  #loginBox input{width:100%;padding:12px;border:1px solid #D0CCC4;font:inherit;margin-bottom:12px;box-sizing:border-box}
+  #loginBox button{width:100%;padding:12px;background:#121212;color:#fff;border:0;font:inherit;cursor:pointer}
+  #loginBox button:disabled{opacity:.6;cursor:wait}
+  #loginErr{color:#A33A2A;font-size:13px;min-height:18px;margin-top:10px}
 </style>
 </head>
 <body>
 
+<div id="loginOverlay">
+  <div id="loginBox">
+    <h2>Inteligencia Comercial</h2>
+    <p>Acceso privado. Introduce tu contraseña.</p>
+    <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña">
+    <button id="loginBtn" type="button">Entrar</button>
+    <div id="loginErr" role="alert"></div>
+  </div>
+</div>
 
 <div id="app">
   <aside id="sidebar">
@@ -222,6 +240,7 @@
     <div class="viewTabs">
       <button class="viewTab active" id="tabClientes" onclick="switchView('clientes')">Clientes</button>
       <button class="viewTab" id="tabBackup" onclick="switchView('backup')">Copia de seguridad</button>
+      <button class="viewTab" id="tabSalir" onclick="crmLogout()">Salir</button>
     </div>
     <div id="clientesSidebarBody">
       <button id="newClientBtn"><span class="plus">+</span> Nuevo cliente</button>
@@ -288,6 +307,34 @@
 const MCS_BRANDS = ["Treku","Baixmoduls","Tobisa","Essenzia Dormire","Tapizados Mayor","KingSofá"];
 const FN_CLIENTES = '/.netlify/functions/crm-clientes';
 const FN_INVESTIGAR = '/.netlify/functions/crm-investigar';
+const FN_LOGIN = '/.netlify/functions/crm-login';
+const TOKEN_KEY = 'mcsCrmToken';
+function crmToken(){ try{ return sessionStorage.getItem(TOKEN_KEY)||''; }catch(e){ return ''; } }
+function crmHeaders(extra){ return Object.assign({'x-crm-token': crmToken()}, extra||{}); }
+function showLogin(msg){
+  document.getElementById('app').classList.remove('ready');
+  document.getElementById('loginOverlay').classList.add('show');
+  document.getElementById('loginErr').textContent = msg||'';
+  const i = document.getElementById('loginPass'); i.value=''; i.focus();
+}
+function crmLogout(){ try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){} clients=[]; showLogin(''); }
+async function doLogin(){
+  const btn = document.getElementById('loginBtn'), err = document.getElementById('loginErr');
+  const pass = document.getElementById('loginPass').value;
+  if(!pass){ err.textContent='Escribe la contraseña.'; return; }
+  btn.disabled = true; err.textContent='';
+  try{
+    const r = await fetch(FN_LOGIN, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pass})});
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error || 'No se pudo entrar');
+    try{ sessionStorage.setItem(TOKEN_KEY, d.token); }catch(e){}
+    document.getElementById('loginOverlay').classList.remove('show');
+    attemptLoad();
+  }catch(e){ err.textContent = e.message; }
+  btn.disabled = false;
+}
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('loginPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 
 let clients = [];
 let activeId = null;
@@ -295,10 +342,12 @@ let editingField = null;
 let currentView = 'clientes';
 let pendingImport = null;
 
-// ---------- CARGA DIRECTA (sin contraseña, uso personal) ----------
+// ---------- CARGA (requiere sesión iniciada) ----------
 async function attemptLoad(){
   try{
-    const r = await fetch(FN_CLIENTES);
+    if(!crmToken()){ showLogin(''); return; }
+    const r = await fetch(FN_CLIENTES, { headers: crmHeaders() });
+    if(r.status===401){ try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){} showLogin('Tu sesión ha caducado. Vuelve a entrar.'); return; }
     if(!r.ok) throw new Error('Error del servidor');
     const data = await r.json();
     clients = data.clientes || [];
@@ -324,10 +373,11 @@ function escapeHtml(s){
 async function apiCall(url, method, payload){
   const r = await fetch(url, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: crmHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload || {})
   });
   const data = await r.json().catch(()=>({}));
+  if(r.status===401){ try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){} showLogin('Tu sesión ha caducado. Vuelve a entrar.'); throw new Error('Sesión caducada'); }
   if(!r.ok) throw new Error(data.error || 'Error del servidor');
   return data;
 }

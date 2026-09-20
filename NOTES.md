@@ -168,3 +168,11 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - **Enlaces:** `scripts/check_links.py` + `.github/workflows/check-links.yml` (cada lunes; si hay enlaces rotos falla y GitHub avisa por email). Probar en local sin red: `python3 scripts/check_links.py --internal-only`.
 - Corregida una `}` suelta al final del `<body>` (un `</style>` duplicado).
 - Artículo "El mueble entra en una nueva era regulatoria": ya alojado en `normativa-mueble.html` (ES/GL con `data-gl`, mismo patrón que la guía de tejidos). La tarjeta de Novedades enlaza a esa página. El PDF del sitio externo se sustituye por el botón "Imprimir o guardar como PDF" (`window.print()`). Contenido normativo aportado por MCarmen (Septiembre 2026): revisar cada trimestre.
+
+## CRM protegido con contraseña (20 septiembre 2026)
+
+- Variable de entorno obligatoria en Netlify: **`CRM_PASSWORD`** (mínimo 10 caracteres; mejor una frase larga). Sin ella, el CRM queda cerrado (falla cerrado) y `crm-login` devuelve "Falta configurar CRM_PASSWORD". Ámbitos: todos, incluidas Functions. Tras crearla o cambiarla, hay que redesplegar.
+- Flujo: `crm/index.html` muestra la pantalla de acceso → `POST /.netlify/functions/crm-login` con la contraseña → devuelve un token firmado (HMAC, caduca a las 12 h) que el navegador guarda en `sessionStorage` (se borra al cerrar la pestaña) y envía en la cabecera `x-crm-token`.
+- Código: `netlify/functions/lib/crm-auth.js` (helper), `crm-login.js` (nuevo), y `crm-clientes.js` / `crm-investigar.js` exigen `authorize(event)` y devuelven 401 si no hay token válido. Cambiar `CRM_PASSWORD` invalida todas las sesiones abiertas.
+- El login espera 1,2 s en cada fallo para frenar la fuerza bruta. Usar una contraseña larga.
+- `subir-fotos` ya tenía su propia contraseña (`FOTOS_PASSWORD`).
