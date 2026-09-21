@@ -4,7 +4,10 @@ const { getStore } = require('@netlify/blobs');
 
 const SITE = 'https://mcsrepresentaciones.es';
 const MAX_PER_IP_HOUR = 5;      // intentos por IP y hora
-const MAX_PER_DAY = 300;        // intentos totales al día (evita el uso abusivo del envío de confirmaciones)
+const MAX_PER_DAY = 300;
+const OWNER_EMAIL = 'mcsrepresentaciones@gmail.com';   // recibe el aviso de cada solicitud
+const SENDER_EMAIL = 'novedades@mcsrepresentaciones.es';
+const MAX_ALERTS_PER_DAY = 20;  // tope de avisos al día para no llenar el buzón        // intentos totales al día (evita el uso abusivo del envío de confirmaciones)
 
 function json(statusCode, obj) {
   return { statusCode, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, body: JSON.stringify(obj) };
@@ -28,6 +31,40 @@ async function rateLimit(ip) {
   }
 }
 
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Aviso por correo a la titular cuando alguien pide suscribirse. Nunca hace fallar el alta.
+async function notifyOwner(key, email, lang) {
+  try {
+    const store = getStore({ name: 'newsletter-limits', siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4', token: process.env.BLOBS_ACCESS_TOKEN });
+    const dayKey = 'alerts-' + Math.floor(Date.now() / 86400000);
+    const cur = await store.get(dayKey, { type: 'json' });
+    const n = (cur && cur.n) || 0;
+    if (n >= MAX_ALERTS_PER_DAY) return;
+    await store.setJSON(dayKey, { n: n + 1 });
+
+    const when = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
+    const html = '<div style="font-family:Arial,sans-serif;line-height:1.5;color:#121212">'
+      + '<p><strong>Nueva solicitud de suscripción a la newsletter</strong></p>'
+      + '<p>Correo: <strong>' + esc(email) + '</strong><br>Idioma: ' + esc(lang === 'gl' ? 'gallego' : 'castellano') + '<br>Fecha: ' + esc(when) + '</p>'
+      + '<p>La persona debe confirmar su suscripción desde el correo que le ha enviado Brevo. '
+      + 'Cuando confirme, aparecerá en Brevo → CRM → Listas → Newsletter web.</p></div>';
+    const r = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        sender: { name: 'MCS Representaciones', email: SENDER_EMAIL },
+        to: [{ email: OWNER_EMAIL }],
+        subject: 'Nueva solicitud de suscripción',
+        htmlContent: html
+      })
+    });
+    if (!r.ok) console.error('Aviso a la titular', r.status, (await r.text()).slice(0, 200));
+  } catch (e) {
+    console.error('notifyOwner:', e.message);
+  }
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Método no permitido' });
 
@@ -38,7 +75,7 @@ exports.handler = async (event) => {
   try { b = JSON.parse(event.body || '{}'); } catch (e) { return json(400, { error: 'JSON inválido' }); }
 
   const email = String(b.email || '').trim().toLowerCase();
-  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json(400, { error: 'Correo no válido' });
+  if (email.length > 254 || !/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(email)) return json(400, { error: 'Correo no válido' });
   if (b.consent !== true) return json(400, { error: 'Falta el consentimiento' });
 
   // Envío demasiado rápido: probablemente un robot. Se responde "ok" sin hacer nada.
@@ -54,7 +91,10 @@ exports.handler = async (event) => {
       headers: { 'api-key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ email, includeListIds: [list], templateId: tpl, redirectionUrl: SITE + '/suscripcion-confirmada.html' })
     });
-    if (r.status === 201 || r.status === 204 || r.ok) return json(200, { ok: true });
+    if (r.status === 201 || r.status === 204 || r.ok) {
+      await notifyOwner(key, email, b.lang);
+      return json(200, { ok: true });
+    }
     console.error('Brevo', r.status, (await r.text()).slice(0, 300));
     return json(502, { error: 'No se pudo completar la suscripción' });
   } catch (e) {

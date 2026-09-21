@@ -184,3 +184,9 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - Variables de entorno en Netlify: `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOI_TEMPLATE_ID`. Sin ellas responde "Newsletter sin configurar".
 - Antiabuso: tiempo mínimo de 2,5 s desde que se carga la página, límite de 5 intentos por IP y hora y 300 al día (Netlify Blobs, almacén `newsletter-limits`).
 - Política de privacidad, registro de tratamientos (Excel) y NOTES actualizados. El remitente de los correos debe ser una dirección del dominio propio con SPF/DKIM/DMARC configurados en Brevo.
+
+## Aviso de nuevas suscripciones (21 septiembre 2026)
+
+- `newsletter.js` envía un correo a `mcsrepresentaciones@gmail.com` (desde `novedades@mcsrepresentaciones.es`, vía la API transaccional de Brevo `/v3/smtp/email`) cada vez que Brevo acepta una solicitud de suscripción. Es un aviso de la *solicitud*, no de la confirmación: la persona aparece en la lista `Newsletter web` solo cuando confirma.
+- Nunca hace fallar el alta: si el aviso falla, solo se registra en el log. Tope de 20 avisos al día (almacén Blobs `newsletter-limits`, clave `alerts-<día>`).
+- La validación del correo es estricta (solo ASCII, sin `<>` ni espacios), en servidor y en el formulario.
