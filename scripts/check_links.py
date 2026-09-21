@@ -12,6 +12,8 @@ SKIP = ("schema.org", "w3.org", "fonts.g", "googletagmanager", "google-analytics
         "cdn.jsdelivr", "tailwindcss.com", "localhost", "example.com")
 # Se ignoran los enlaces de carpetas privadas o internas
 PAGES = [f for f in glob.glob("*.html") if not f.startswith(("tarifas-", "monitor-", "subir-fotos", "calculadora-", "drapsaten-"))]
+# Las redes sociales rechazan a los robots (400/403/999) aunque el enlace funcione: se cuentan como "no verificables"
+SOCIAL = ("facebook.com", "instagram.com", "linkedin.com", "pinterest.", "twitter.com", "x.com", "tiktok.com")
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"
 
 def text(f): return open(f, encoding="utf-8", errors="ignore").read()
@@ -49,7 +51,7 @@ def check(u):
                     return u, r.status, "OK"
             except urllib.error.HTTPError as e:
                 last = e.code
-                if e.code in (401, 403, 405, 429, 999): 
+                if e.code in (401, 403, 405, 429, 999) or (e.code == 400 and any(d in u for d in SOCIAL)):
                     if method == "GET": return u, e.code, "WARN"
                     continue
                 if method == "GET": return u, e.code, "FAIL"
