@@ -240,7 +240,6 @@
     <div class="viewTabs">
       <button class="viewTab active" id="tabClientes" onclick="switchView('clientes')">Clientes</button>
       <button class="viewTab" id="tabBackup" onclick="switchView('backup')">Copia de seguridad</button>
-      <button class="viewTab" id="tabSalir" onclick="crmLogout()">Salir</button>
     </div>
     <div id="clientesSidebarBody">
       <button id="newClientBtn"><span class="plus">+</span> Nuevo cliente</button>
@@ -342,10 +341,9 @@ let editingField = null;
 let currentView = 'clientes';
 let pendingImport = null;
 
-// ---------- CARGA (requiere sesión iniciada) ----------
+// ---------- CARGA (acceso sin contraseña) ----------
 async function attemptLoad(){
   try{
-    if(!crmToken()){ showLogin(''); return; }
     const r = await fetch(FN_CLIENTES, { headers: crmHeaders() });
     if(r.status===401){ try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){} showLogin('Tu sesión ha caducado. Vuelve a entrar.'); return; }
     if(!r.ok) throw new Error('Error del servidor');

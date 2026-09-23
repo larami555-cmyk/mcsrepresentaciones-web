@@ -1,5 +1,4 @@
 const { getStore } = require('@netlify/blobs');
-const { authorize } = require('./lib/crm-auth');
 
 function jsonResponse(statusCode, obj) {
   return {
@@ -14,13 +13,12 @@ function uid() {
 }
 
 exports.handler = async (event) => {
-  if (!authorize(event)) return jsonResponse(401, { error: 'No autorizado' });
   let body = {};
   if (event.body) {
     try { body = JSON.parse(event.body); } catch (e) { /* body vacío o no-JSON, ok para GET */ }
   }
 
-  // Acceso protegido: token de sesión emitido por crm-login (contraseña en CRM_PASSWORD).
+  // Acceso abierto (sin contraseña) por decisión de la titular, 23 sept 2026.
 
   const store = getStore({
     name: 'crm-data',

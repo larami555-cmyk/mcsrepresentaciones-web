@@ -190,3 +190,8 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - `newsletter.js` envía un correo a `mcsrepresentaciones@gmail.com` (desde `novedades@mcsrepresentaciones.es`, vía la API transaccional de Brevo `/v3/smtp/email`) cada vez que Brevo acepta una solicitud de suscripción. Es un aviso de la *solicitud*, no de la confirmación: la persona aparece en la lista `Newsletter web` solo cuando confirma.
 - Nunca hace fallar el alta: si el aviso falla, solo se registra en el log. Tope de 20 avisos al día (almacén Blobs `newsletter-limits`, clave `alerts-<día>`).
 - La validación del correo es estricta (solo ASCII, sin `<>` ni espacios), en servidor y en el formulario.
+
+## CRM sin contraseña (23 septiembre 2026)
+
+- Por decisión de la titular, `crm/index.html` ya no pide contraseña: `crm-clientes.js` y `crm-investigar.js` no exigen token. Se quitó el botón "Salir". `crm-login.js` y `lib/crm-auth.js` siguen en el repo por si se quiere volver a activar (basta con restaurar `authorize(event)` y la comprobación de `crmToken()` en `attemptLoad`).
+- Protección de coste: `crm-investigar.js` tiene un tope de **20 investigaciones al día** (almacén Blobs `crm-limits`, clave `inv-AAAA-MM-DD`). Al superarlo devuelve 429 con mensaje.
