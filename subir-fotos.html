@@ -54,6 +54,8 @@
   .hint{display:none;font-size:12px;color:var(--muted);margin:-12px 0 18px;line-height:1.5;}
   #preview .thumb video{width:100%;height:100%;object-fit:cover;display:block;}
   #preview .thumb .tag{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;}
+  .saved{font-size:12px;color:#1a7a3c;margin:0 0 20px;}
+  .saved a{color:var(--muted);}
 </style>
 </head>
 <body>
@@ -62,8 +64,11 @@
   <h1>Subir fotos al catálogo</h1>
   <p class="sub">Arrastra varias fotos a la vez, elige la marca y súbelas de golpe.</p>
 
-  <label>Contraseña</label>
-  <input type="password" id="password" placeholder="Contraseña del panel de fotos" />
+  <div id="passBox">
+    <label>Contraseña</label>
+    <input type="password" id="password" placeholder="Contraseña del panel de fotos" autocomplete="current-password" />
+  </div>
+  <p class="saved" id="passSaved" style="display:none">✓ Contraseña recordada en este dispositivo · <a href="#" id="passForget">olvidar</a></p>
 
   <label>Marca</label>
   <select id="marca">
@@ -116,6 +121,19 @@ dropzone.addEventListener('drop', (e) => {
 fileInput.addEventListener('change', (e) => addFiles(e.target.files));
 
 const MAX_VIDEO = 4 * 1024 * 1024;
+// La contraseña se recuerda en este dispositivo tras la primera subida correcta
+const passEl = document.getElementById('password');
+function passGuardada() { try { return localStorage.getItem('mcsFotosPass') || ''; } catch (e) { return ''; } }
+function pintarPass() {
+  const g = passGuardada();
+  if (g) passEl.value = g;
+  document.getElementById('passBox').style.display = g ? 'none' : 'block';
+  document.getElementById('passSaved').style.display = g ? 'block' : 'none';
+}
+document.getElementById('passForget').addEventListener('click', (e) => {
+  e.preventDefault(); try { localStorage.removeItem('mcsFotosPass'); } catch (x) {} passEl.value = ''; pintarPass();
+});
+pintarPass();
 const marcaSel = document.getElementById('marca');
 const feriaBox = document.getElementById('feriaBox');
 const textoEl = document.getElementById('texto');
@@ -248,6 +266,7 @@ uploadBtn.addEventListener('click', async () => {
       }
 
       if (!res.ok) {
+        if (res.status === 401) { try { localStorage.removeItem('mcsFotosPass'); } catch (x) {} passEl.value = ''; pintarPass(); }
         const detalle = data.error || `código ${res.status} (probablemente tardó demasiado)`;
         throw new Error(`Error en la tanda ${b + 1} (foto ${subidas + 1} a ${subidas + batch.length}): ${detalle}. Ya se subieron ${subidas} fotos correctamente. Quita las fotos ya subidas y reintenta con el resto.`);
       }
@@ -257,6 +276,8 @@ uploadBtn.addEventListener('click', async () => {
       setStatus(`Subidas ${subidas} de ${selectedFiles.length}…`, '');
     }
 
+    try { localStorage.setItem('mcsFotosPass', password); } catch (x) {}
+    pintarPass();
     setStatus(`✓ Publicado: ${subidas} archivo(s)${texto ? ' y el comentario' : ''}.\nSe verá en la web en 1–2 minutos.`, 'ok');
     textoEl.value = '';
     selectedFiles = [];
