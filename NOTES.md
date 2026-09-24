@@ -204,3 +204,6 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - Subida desde el móvil: panel `subir-fotos` → destino **★ FERIA HÁBITAT 2026**. Admite fotos y vídeos (máx. 4 MB cada vídeo, por el límite de 6 MB de las funciones de Netlify). Vídeos grandes: reenviarlos por WhatsApp para que se compriman.
 - Comentarios/reseñas: campo de texto en el panel (destino Feria), se guardan como `content/catalogo/feria/nota-*.md` (texto en el cuerpo). Documentos PDF (máx. 4 MB) en `documentos/feria/`, ficha `doc-*.md` con `documento` y `nombre`. La página lee los .md desde la propia web (no jsDelivr) para evitar caché.
 - Para retirar el banner tras la feria: borrar el bloque `(Date.now()>=Date.parse("2026-09-28...` en `index.html`.
+
+## Página de suscripción (24 septiembre 2026)
+- `suscribirse.html` (también `/suscribirse` y `/suscribete`): enlace directo para compartir con clientes. Mismo alta que el bloque `#newsletter` (función `newsletter.js`, doble confirmación Brevo). ES/GL con botones; `?lang=gl` abre en gallego.
