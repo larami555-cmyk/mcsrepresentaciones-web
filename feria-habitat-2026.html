@@ -85,6 +85,18 @@
   .lb .x{top:8px;right:8px}
   .lb .prev{left:4px;top:50%;transform:translateY(-50%)}
   .lb .next{right:4px;top:50%;transform:translateY(-50%)}
+  [hidden]{display:none!important}
+  .notas{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
+  .nota{background:#fff;border:1px solid #EDE8E0;border-left:3px solid #C1633D;padding:18px 22px}
+  .nota time{display:block;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8A7F74;margin-bottom:8px}
+  .nota p{font-size:15px;line-height:1.65;color:#3d362e;white-space:pre-line}
+  .docs{margin-top:36px}
+  .docs h2{font-size:22px;font-weight:500;margin-bottom:14px}
+  .doc{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;border:1px solid #EDE8E0;text-decoration:none;color:#121212;margin-bottom:8px}
+  .doc:hover{border-color:#C1633D}
+  .doc .ic{width:38px;height:46px;flex-shrink:0;background:#FAF8F5;border:1px solid #EDE8E0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#C1633D}
+  .doc .n{font-size:14px;line-height:1.4}
+  .doc .a{margin-left:auto;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8A7F74;white-space:nowrap}
   @media (max-width:640px){.gal{grid-template-columns:repeat(2,1fr);gap:6px}.gal-head h2{font-size:22px}}
 </style>
 </head>
@@ -108,6 +120,7 @@
       <h2 data-es="Desde la feria" data-gl="Desde a feira">Desde la feria</h2>
       <span class="gal-count" id="count"></span>
     </div>
+    <div class="notas" id="notas"></div>
     <div class="filters" id="filters" hidden>
       <button class="on" data-f="all" data-es="Todo" data-gl="Todo">Todo</button>
       <button data-f="foto" data-es="Fotos" data-gl="Fotos">Fotos</button>
@@ -115,6 +128,10 @@
     </div>
     <div class="gal" id="gal"></div>
     <div class="empty" id="empty" hidden data-es="Las primeras fotos y vídeos llegan el lunes 28 de septiembre.<br>Vuelve durante la feria para ver las novedades." data-gl="As primeiras fotos e vídeos chegan o luns 28 de setembro.<br>Volve durante a feira para ver as novidades.">Las primeras fotos y vídeos llegan el lunes 28 de septiembre.<br>Vuelve durante la feria para ver las novedades.</div>
+    <div class="docs" id="docs" hidden>
+      <h2 data-es="Documentos" data-gl="Documentos">Documentos</h2>
+      <div id="docList"></div>
+    </div>
   </section>
 
   <div class="summary">
@@ -147,10 +164,13 @@ try{
 
 // Galería: lee lo que se sube desde el panel de fotos (destino "Feria")
 var REPO="larami555-cmyk/mcsrepresentaciones-web", BRANCH="main", DIR="content/catalogo/feria";
+function ts(n){var m=n.match(/-(\d+)-(\d+)\.md$/);return m?(+m[1])*100+(+m[2]):0}
+function cuando(t){try{return new Date(Math.floor(t/100)).toLocaleString(GL?"gl-ES":"es-ES",{timeZone:"Europe/Madrid",weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}catch(e){return ""}}
+var notas=[], docs=[];
 var items=[], shown=[], idx=0, filtro="all";
 var gal=document.getElementById("gal"), empty=document.getElementById("empty"), count=document.getElementById("count");
 
-function fm(t){var m=t.match(/^---\s*([\s\S]*?)\s*---/),d={};if(!m)return d;m[1].split("\n").forEach(function(l){var i=l.indexOf(":");if(i<0)return;d[l.slice(0,i).trim()]=l.slice(i+1).trim().replace(/^["']|["']$/g,"")});return d}
+function fm(t){var m=t.match(/^---\s*([\s\S]*?)\s*---\n?([\s\S]*)$/),d={};if(!m)return d;d.cuerpo=(m[2]||"").trim();m[1].split("\n").forEach(function(l){var i=l.indexOf(":");if(i<0)return;d[l.slice(0,i).trim()]=l.slice(i+1).trim().replace(/^["']|["']$/g,"")});return d}
 
 function load(){
   gal.innerHTML='<div class="empty" style="grid-column:1/-1">'+"Cargando…"+'</div>';
@@ -158,14 +178,16 @@ function load(){
     .then(function(r){return r.ok?r.json():[]})
     .then(function(files){
       var md=(Array.isArray(files)?files:[]).filter(function(f){return /\.md$/.test(f.name)});
-      var ts=function(n){var m=n.match(/-(\d+)-(\d+)\.md$/);return m?(+m[1])*100+(+m[2]):0};
       md.sort(function(a,b){return ts(b.name)-ts(a.name)}); // lo más reciente primero
       return Promise.all(md.map(function(f){
-        return fetch("https://cdn.jsdelivr.net/gh/"+REPO+"@"+BRANCH+"/"+DIR+"/"+f.name).then(function(r){return r.text()}).then(fm).catch(function(){return {}});
+        // se lee de la propia web (sin caché de terceros); si aún no está desplegado, se omite
+        return fetch("/"+DIR+"/"+f.name,{cache:"no-cache"}).then(function(r){return r.ok?r.text():""}).then(function(t){var d=fm(t);d.ts=ts(f.name);return d}).catch(function(){return {}});
       }));
     })
     .then(function(list){
       items=list.filter(function(d){return d.imagen||d.video}).map(function(d){return d.video?{t:"video",src:d.video}:{t:"foto",src:d.imagen}});
+      notas=list.filter(function(d){return d.tipo==="nota"&&d.cuerpo});
+      docs=list.filter(function(d){return d.documento});
       render();
     })
     .catch(function(){items=[];render()});
@@ -176,9 +198,17 @@ function render(){
   gal.innerHTML="";
   var hayVideo=items.some(function(i){return i.t==="video"}), hayFoto=items.some(function(i){return i.t==="foto"});
   document.getElementById("filters").hidden=!(hayVideo&&hayFoto);
-  empty.hidden=items.length>0;
+  empty.hidden=(items.length+notas.length+docs.length)>0;
+  var nEl=document.getElementById("notas");nEl.innerHTML="";
+  notas.forEach(function(n){var c=document.createElement("article");c.className="nota";
+    var tm=document.createElement("time");tm.textContent=cuando(n.ts);var p=document.createElement("p");p.textContent=n.cuerpo;
+    c.appendChild(tm);c.appendChild(p);nEl.appendChild(c)});
+  var dEl=document.getElementById("docList");dEl.innerHTML="";document.getElementById("docs").hidden=!docs.length;
+  docs.forEach(function(d){var a=document.createElement("a");a.className="doc";a.href=d.documento;a.target="_blank";a.rel="noopener";
+    a.innerHTML='<span class="ic">PDF</span><span class="n"></span><span class="a">'+(GL?"Abrir":"Abrir")+'</span>';
+    a.querySelector(".n").textContent=d.nombre||(GL?"Documento":"Documento");dEl.appendChild(a)});
   var nf=items.filter(function(i){return i.t==="foto"}).length, nv=items.length-nf;
-  count.textContent=items.length?(nf+(GL?" fotos":" fotos")+(nv?" · "+nv+" vídeos":"")):"";
+  count.textContent=items.length?((nf?nf+(nf===1?" foto":" fotos"):"")+(nf&&nv?" · ":"")+(nv?nv+(nv===1?" vídeo":" vídeos"):"")):"";
   shown.forEach(function(it,i){
     var b=document.createElement("button");b.className="item";b.type="button";
     if(it.t==="video"){

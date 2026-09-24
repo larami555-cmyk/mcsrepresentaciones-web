@@ -49,6 +49,8 @@
   .bar-fill{height:100%;background:var(--gold);width:0%;transition:width .3s;}
   .back{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:20px;padding:6px 0;}
   .back:hover{color:var(--dark);}
+  textarea{width:100%;padding:12px 14px;border:1px solid var(--border);background:#fff;font:inherit;font-size:14px;margin-bottom:20px;border-radius:2px;resize:vertical;}
+  #preview .thumb .doc{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#fff;font-size:10px;font-weight:700;color:#b3261e;}
   .hint{display:none;font-size:12px;color:var(--muted);margin:-12px 0 18px;line-height:1.5;}
   #preview .thumb video{width:100%;height:100%;object-fit:cover;display:block;}
   #preview .thumb .tag{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;}
@@ -71,9 +73,14 @@
     <option value="kingsofa">KINGSOFÁ</option>
     <option value="tapizadosmayor">TAPIZADOS MAYOR</option>
     <option value="essenzia">ESSENZIA DORMIRE</option>
-    <option value="feria">★ FERIA HÁBITAT 2026 (fotos y vídeos)</option>
+    <option value="feria">★ FERIA HÁBITAT 2026 (fotos, vídeos, PDF y comentarios)</option>
   </select>
-  <p class="hint" id="hintFeria">En Feria puedes subir también vídeos cortos (máx. 4 MB cada uno). Si un vídeo pesa más, envíatelo antes por WhatsApp: lo comprime solo.</p>
+  <div id="feriaBox" style="display:none">
+    <p class="hint" style="display:block">En Feria puedes subir fotos, vídeos cortos y documentos PDF (máx. 4 MB cada vídeo o PDF). Si un vídeo pesa más, envíatelo antes por WhatsApp: lo comprime solo.</p>
+    <label>Comentario o reseña (opcional)</label>
+    <textarea id="texto" maxlength="2000" rows="4" placeholder="Ej.: Primer día en el stand de Treku. Mucho interés por la nueva colección…"></textarea>
+    <p class="hint" style="display:block;margin-top:-14px">Puedes publicar solo el comentario, sin fotos.</p>
+  </div>
 
   <div class="dropzone" id="dropzone">
     <p><strong>Toca aquí</strong> o arrastra tus fotos<br/>(puedes seleccionar varias a la vez)</p>
@@ -110,29 +117,36 @@ fileInput.addEventListener('change', (e) => addFiles(e.target.files));
 
 const MAX_VIDEO = 4 * 1024 * 1024;
 const marcaSel = document.getElementById('marca');
-const hintFeria = document.getElementById('hintFeria');
+const feriaBox = document.getElementById('feriaBox');
+const textoEl = document.getElementById('texto');
+textoEl.addEventListener('input', () => renderPreview());
 function syncMarca() {
   const feria = marcaSel.value === 'feria';
-  hintFeria.style.display = feria ? 'block' : 'none';
-  fileInput.accept = feria ? 'image/*,video/*' : 'image/*';
-  if (!feria) { selectedFiles = selectedFiles.filter(f => !isVideo(f)); renderPreview(); }
+  feriaBox.style.display = feria ? 'block' : 'none';
+  fileInput.accept = feria ? 'image/*,video/*,application/pdf' : 'image/*';
+  uploadBtn.textContent = feria ? 'Publicar' : 'Subir fotos';
+  if (!feria) { selectedFiles = selectedFiles.filter(f => !isVideo(f) && !isDoc(f)); }
+  renderPreview();
 }
 marcaSel.addEventListener('change', syncMarca);
 syncMarca();
 
 function isVideo(f) { return f.type.startsWith('video/'); }
+function isDoc(f) { return f.type === 'application/pdf' || /\.pdf$/i.test(f.name); }
+function esFeria() { return marcaSel.value === 'feria'; }
+function textoVal() { return esFeria() ? textoEl.value.trim() : ''; }
 
 function addFiles(fileList) {
   const grandes = [];
   for (const f of fileList) {
     if (f.type.startsWith('image/')) selectedFiles.push(f);
-    else if (isVideo(f) && marcaSel.value === 'feria') {
+    else if ((isVideo(f) || isDoc(f)) && esFeria()) {
       if (f.size > MAX_VIDEO) grandes.push(f.name);
       else selectedFiles.push(f);
     }
   }
   renderPreview();
-  if (grandes.length) setStatus(`No se añadieron ${grandes.length} vídeo(s) por pesar más de 4 MB. Envíatelos por WhatsApp y súbelos desde ahí.`, 'error');
+  if (grandes.length) setStatus(`No se añadieron ${grandes.length} archivo(s) por pesar más de 4 MB. Los vídeos, envíatelos por WhatsApp y súbelos desde ahí.`, 'error');
 }
 
 function readRaw(file) {
@@ -149,8 +163,9 @@ function renderPreview() {
   selectedFiles.forEach((f, idx) => {
     const div = document.createElement('div');
     div.className = 'thumb';
-    const img = document.createElement(isVideo(f) ? 'video' : 'img');
-    img.src = URL.createObjectURL(f);
+    const img = document.createElement(isDoc(f) ? 'div' : (isVideo(f) ? 'video' : 'img'));
+    if (isDoc(f)) { img.className = 'doc'; img.textContent = 'PDF'; img.title = f.name; }
+    else img.src = URL.createObjectURL(f);
     if (isVideo(f)) { img.muted = true; img.playsInline = true; const t = document.createElement('span'); t.className = 'tag'; t.textContent = 'VÍDEO'; div.appendChild(t); }
     const btn = document.createElement('button');
     btn.textContent = '×';
@@ -159,7 +174,7 @@ function renderPreview() {
     div.appendChild(btn);
     preview.appendChild(div);
   });
-  uploadBtn.disabled = selectedFiles.length === 0;
+  uploadBtn.disabled = selectedFiles.length === 0 && !textoVal();
 }
 
 function resizeImage(file, maxDim = 1600, quality = 0.82) {
@@ -197,7 +212,8 @@ uploadBtn.addEventListener('click', async () => {
     setStatus('Escribe la contraseña.', 'error');
     return;
   }
-  if (selectedFiles.length === 0) return;
+  const texto = textoVal();
+  if (selectedFiles.length === 0 && !texto) return;
 
   uploadBtn.disabled = true;
   bar.style.display = 'block';
@@ -206,16 +222,17 @@ uploadBtn.addEventListener('click', async () => {
   try {
     // Cada vídeo va solo en su tanda; las fotos, de 3 en 3
     const batches = [];
-    const fotos = selectedFiles.filter(f => !isVideo(f));
+    const fotos = selectedFiles.filter(f => !isVideo(f) && !isDoc(f));
     for (let i = 0; i < fotos.length; i += BATCH_SIZE) batches.push(fotos.slice(i, i + BATCH_SIZE));
-    selectedFiles.filter(isVideo).forEach(v => batches.push([v]));
+    selectedFiles.filter(f => isVideo(f) || isDoc(f)).forEach(v => batches.push([v]));
+    if (batches.length === 0) batches.push([]); // solo comentario
 
     let subidas = 0;
     for (let b = 0; b < batches.length; b++) {
       const batch = batches[b];
       const files = await Promise.all(batch.map(async (f) => ({
         name: f.name,
-        base64: isVideo(f) ? await readRaw(f) : await resizeImage(f)
+        base64: (isVideo(f) || isDoc(f)) ? await readRaw(f) : await resizeImage(f)
       })));
 
       let res, data;
@@ -223,7 +240,7 @@ uploadBtn.addEventListener('click', async () => {
         res = await fetch('/.netlify/functions/subir-fotos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, marca, files })
+          body: JSON.stringify(b === 0 && texto ? { password, marca, files, texto } : { password, marca, files })
         });
         data = await res.json().catch(() => ({}));
       } catch (netErr) {
@@ -236,17 +253,18 @@ uploadBtn.addEventListener('click', async () => {
       }
 
       subidas += data.subidas;
-      barFill.style.width = Math.round((subidas / selectedFiles.length) * 100) + '%';
+      barFill.style.width = Math.round(((b + 1) / batches.length) * 100) + '%';
       setStatus(`Subidas ${subidas} de ${selectedFiles.length}…`, '');
     }
 
-    setStatus(`✓ ${subidas} foto(s) subidas correctamente.\nSe verán en la web en unos minutos.`, 'ok');
+    setStatus(`✓ Publicado: ${subidas} archivo(s)${texto ? ' y el comentario' : ''}.\nSe verá en la web en 1–2 minutos.`, 'ok');
+    textoEl.value = '';
     selectedFiles = [];
     renderPreview();
   } catch (err) {
     setStatus('Error: ' + err.message, 'error');
   } finally {
-    uploadBtn.disabled = selectedFiles.length === 0;
+    uploadBtn.disabled = selectedFiles.length === 0 && !textoVal();
   }
 });
 
