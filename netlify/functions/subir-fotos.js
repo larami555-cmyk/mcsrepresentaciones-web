@@ -84,7 +84,7 @@ exports.handler = async (event) => {
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
       const ext = (f.name.split('.').pop() || 'jpg').toLowerCase();
-      const esVideo = marca === 'feria' && EXT_VIDEO.includes(ext);
+      const esVideo = EXT_VIDEO.includes(ext);
       const esDoc = marca === 'feria' && EXT_DOC.includes(ext);
       const tipo = esDoc ? 'documento' : (esVideo ? 'video' : 'imagen');
       const safeExt = (esVideo || esDoc) ? ext : (EXT_FOTO.includes(ext) ? ext : 'jpg');

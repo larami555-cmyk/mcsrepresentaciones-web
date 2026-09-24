@@ -78,6 +78,13 @@
   display: block;
   background: #f1efe9;
 }
+  .card video {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  display: block;
+  background: #111;
+}
   .card .label {
     padding: 10px 14px;
     font-size: 12px;
@@ -167,13 +174,14 @@ async function loadBrand(brandKey) {
     const mdFiles = Array.isArray(files) ? files.filter(f => f.name.endsWith(".md")) : [];
 
     const items = await Promise.all(mdFiles.map(async f => {
-      const rawRes = await fetch(`https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/content/catalogo/${brandKey}/${f.name}`);
+      const rawRes = await fetch(`/content/catalogo/${brandKey}/${f.name}`, { cache: "no-cache" });
+      if (!rawRes.ok) return {};
       const rawText = await rawRes.text();
       const data = parseFrontmatter(rawText);
-      return { brandKey, imagen: data.imagen, slug: data.slug || "" };
+      return { brandKey, imagen: data.imagen, video: data.video, slug: data.slug || "", ts: Number((f.name.match(/-(\d+)-\d+\.md$/) || [])[1] || 0) };
     }));
 
-    cache[brandKey] = items.filter(i => i.imagen);
+    cache[brandKey] = items.filter(i => i.imagen || i.video);
     return cache[brandKey];
   } catch (e) {
     cache[brandKey] = [];
@@ -199,7 +207,9 @@ async function renderGrid() {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <img src="${item.imagen}" alt="${brandLabel}" loading="lazy" />
+      ${item.video
+        ? `<video src="${item.video}#t=0.1" controls playsinline preload="metadata"></video>`
+        : `<img src="${item.imagen}" alt="${brandLabel}" loading="lazy" />`}
       <div class="label">${brandLabel}</div>
     `;
     gridEl.appendChild(card);

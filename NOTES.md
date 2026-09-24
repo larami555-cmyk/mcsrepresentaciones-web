@@ -200,6 +200,7 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 ## Feria Hábitat València 2026 (28 sept – 1 oct)
 - Banner horizontal bajo las tarjetas de Novedades (`index.html`, clase `.mcs-feria-banner`). Se muestra solo a partir del **27/09/2026 23:00** (hora de Madrid). Para verlo antes: `/?feria`.
 - Página: `feria-habitat-2026.html` (ES/GL). La galería lee `content/catalogo/feria/*.md` (campo `imagen` o `video`), lo más reciente primero, con visor a pantalla completa.
+- Vídeos también en todas las marcas (catálogo los muestra con reproductor). El catálogo lee las fichas .md desde la propia web, no desde jsDelivr (evita hasta 12 h de caché).
 - Subida desde el móvil: panel `subir-fotos` → destino **★ FERIA HÁBITAT 2026**. Admite fotos y vídeos (máx. 4 MB cada vídeo, por el límite de 6 MB de las funciones de Netlify). Vídeos grandes: reenviarlos por WhatsApp para que se compriman.
 - Comentarios/reseñas: campo de texto en el panel (destino Feria), se guardan como `content/catalogo/feria/nota-*.md` (texto en el cuerpo). Documentos PDF (máx. 4 MB) en `documentos/feria/`, ficha `doc-*.md` con `documento` y `nombre`. La página lee los .md desde la propia web (no jsDelivr) para evitar caché.
 - Para retirar el banner tras la feria: borrar el bloque `(Date.now()>=Date.parse("2026-09-28...` en `index.html`.
