@@ -5,7 +5,9 @@ const OWNER = 'larami555-cmyk';
 const REPO = 'mcsrepresentaciones-web';
 const BRANCH = 'main';
 
-const MARCAS_VALIDAS = ['treku', 'baixmoduls', 'tobisa', 'kingsofa', 'tapizadosmayor', 'essenzia'];
+const MARCAS_VALIDAS = ['treku', 'baixmoduls', 'tobisa', 'kingsofa', 'tapizadosmayor', 'essenzia', 'feria'];
+const EXT_FOTO = ['jpg', 'jpeg', 'png', 'webp'];
+const EXT_VIDEO = ['mp4', 'mov', 'm4v', 'webm'];
 
 function jsonResponse(statusCode, obj) {
   return {
@@ -78,8 +80,9 @@ exports.handler = async (event) => {
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
       const ext = (f.name.split('.').pop() || 'jpg').toLowerCase();
-      const safeExt = ['jpg', 'jpeg', 'png', 'webp'].includes(ext) ? ext : 'jpg';
-      const baseName = `foto-${timestamp}-${i}`;
+      const esVideo = marca === 'feria' && EXT_VIDEO.includes(ext);
+      const safeExt = esVideo ? ext : (EXT_FOTO.includes(ext) ? ext : 'jpg');
+      const baseName = `${esVideo ? 'video' : 'foto'}-${timestamp}-${i}`;
       const imgPath = `images/catalogo/${marca}/${baseName}.${safeExt}`;
       const mdPath = `content/catalogo/${marca}/${baseName}.md`;
 
@@ -91,7 +94,7 @@ exports.handler = async (event) => {
       if (!imgBlobRes.ok) throw new Error(`Error subiendo ${f.name}: ` + (await imgBlobRes.text()));
       const imgBlob = await imgBlobRes.json();
 
-      const mdContent = `---\nimagen: "/${imgPath}"\nslug: "${baseName}"\n---\n`;
+      const mdContent = `---\n${esVideo ? 'video' : 'imagen'}: "/${imgPath}"\nslug: "${baseName}"\n---\n`;
       const mdBlobRes = await fetch(`${GITHUB_API}/repos/${OWNER}/${REPO}/git/blobs`, {
         method: 'POST',
         headers: ghHeaders,

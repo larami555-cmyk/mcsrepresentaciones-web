@@ -49,6 +49,9 @@
   .bar-fill{height:100%;background:var(--gold);width:0%;transition:width .3s;}
   .back{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:20px;padding:6px 0;}
   .back:hover{color:var(--dark);}
+  .hint{display:none;font-size:12px;color:var(--muted);margin:-12px 0 18px;line-height:1.5;}
+  #preview .thumb video{width:100%;height:100%;object-fit:cover;display:block;}
+  #preview .thumb .tag{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -68,7 +71,9 @@
     <option value="kingsofa">KINGSOFÁ</option>
     <option value="tapizadosmayor">TAPIZADOS MAYOR</option>
     <option value="essenzia">ESSENZIA DORMIRE</option>
+    <option value="feria">★ FERIA HÁBITAT 2026 (fotos y vídeos)</option>
   </select>
+  <p class="hint" id="hintFeria">En Feria puedes subir también vídeos cortos (máx. 4 MB cada uno). Si un vídeo pesa más, envíatelo antes por WhatsApp: lo comprime solo.</p>
 
   <div class="dropzone" id="dropzone">
     <p><strong>Toca aquí</strong> o arrastra tus fotos<br/>(puedes seleccionar varias a la vez)</p>
@@ -103,11 +108,40 @@ dropzone.addEventListener('drop', (e) => {
 });
 fileInput.addEventListener('change', (e) => addFiles(e.target.files));
 
+const MAX_VIDEO = 4 * 1024 * 1024;
+const marcaSel = document.getElementById('marca');
+const hintFeria = document.getElementById('hintFeria');
+function syncMarca() {
+  const feria = marcaSel.value === 'feria';
+  hintFeria.style.display = feria ? 'block' : 'none';
+  fileInput.accept = feria ? 'image/*,video/*' : 'image/*';
+  if (!feria) { selectedFiles = selectedFiles.filter(f => !isVideo(f)); renderPreview(); }
+}
+marcaSel.addEventListener('change', syncMarca);
+syncMarca();
+
+function isVideo(f) { return f.type.startsWith('video/'); }
+
 function addFiles(fileList) {
+  const grandes = [];
   for (const f of fileList) {
     if (f.type.startsWith('image/')) selectedFiles.push(f);
+    else if (isVideo(f) && marcaSel.value === 'feria') {
+      if (f.size > MAX_VIDEO) grandes.push(f.name);
+      else selectedFiles.push(f);
+    }
   }
   renderPreview();
+  if (grandes.length) setStatus(`No se añadieron ${grandes.length} vídeo(s) por pesar más de 4 MB. Envíatelos por WhatsApp y súbelos desde ahí.`, 'error');
+}
+
+function readRaw(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
 }
 
 function renderPreview() {
@@ -115,8 +149,9 @@ function renderPreview() {
   selectedFiles.forEach((f, idx) => {
     const div = document.createElement('div');
     div.className = 'thumb';
-    const img = document.createElement('img');
+    const img = document.createElement(isVideo(f) ? 'video' : 'img');
     img.src = URL.createObjectURL(f);
+    if (isVideo(f)) { img.muted = true; img.playsInline = true; const t = document.createElement('span'); t.className = 'tag'; t.textContent = 'VÍDEO'; div.appendChild(t); }
     const btn = document.createElement('button');
     btn.textContent = '×';
     btn.onclick = (ev) => { ev.stopPropagation(); selectedFiles.splice(idx, 1); renderPreview(); };
@@ -169,17 +204,18 @@ uploadBtn.addEventListener('click', async () => {
   setStatus('Procesando fotos…', '');
 
   try {
+    // Cada vídeo va solo en su tanda; las fotos, de 3 en 3
     const batches = [];
-    for (let i = 0; i < selectedFiles.length; i += BATCH_SIZE) {
-      batches.push(selectedFiles.slice(i, i + BATCH_SIZE));
-    }
+    const fotos = selectedFiles.filter(f => !isVideo(f));
+    for (let i = 0; i < fotos.length; i += BATCH_SIZE) batches.push(fotos.slice(i, i + BATCH_SIZE));
+    selectedFiles.filter(isVideo).forEach(v => batches.push([v]));
 
     let subidas = 0;
     for (let b = 0; b < batches.length; b++) {
       const batch = batches[b];
       const files = await Promise.all(batch.map(async (f) => ({
         name: f.name,
-        base64: await resizeImage(f)
+        base64: isVideo(f) ? await readRaw(f) : await resizeImage(f)
       })));
 
       let res, data;
@@ -204,7 +240,7 @@ uploadBtn.addEventListener('click', async () => {
       setStatus(`Subidas ${subidas} de ${selectedFiles.length}…`, '');
     }
 
-    setStatus(`✓ ${subidas} foto(s) subidas correctamente.\nEl catálogo se actualizará en unos minutos.`, 'ok');
+    setStatus(`✓ ${subidas} foto(s) subidas correctamente.\nSe verán en la web en unos minutos.`, 'ok');
     selectedFiles = [];
     renderPreview();
   } catch (err) {

@@ -195,3 +195,10 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 
 - Por decisión de la titular, `crm/index.html` ya no pide contraseña: `crm-clientes.js` y `crm-investigar.js` no exigen token. Se quitó el botón "Salir". `crm-login.js` y `lib/crm-auth.js` siguen en el repo por si se quiere volver a activar (basta con restaurar `authorize(event)` y la comprobación de `crmToken()` en `attemptLoad`).
 - Protección de coste: `crm-investigar.js` tiene un tope de **20 investigaciones al día** (almacén Blobs `crm-limits`, clave `inv-AAAA-MM-DD`). Al superarlo devuelve 429 con mensaje.
+
+
+## Feria Hábitat València 2026 (28 sept – 1 oct)
+- Banner horizontal bajo las tarjetas de Novedades (`index.html`, clase `.mcs-feria-banner`). Se muestra solo a partir del **28/09/2026 00:00** (hora de Madrid). Para verlo antes: `/?feria`.
+- Página: `feria-habitat-2026.html` (ES/GL). La galería lee `content/catalogo/feria/*.md` (campo `imagen` o `video`), lo más reciente primero, con visor a pantalla completa.
+- Subida desde el móvil: panel `subir-fotos` → destino **★ FERIA HÁBITAT 2026**. Admite fotos y vídeos (máx. 4 MB cada vídeo, por el límite de 6 MB de las funciones de Netlify). Vídeos grandes: reenviarlos por WhatsApp para que se compriman.
+- Para retirar el banner tras la feria: borrar el bloque `(Date.now()>=Date.parse("2026-09-28...` en `index.html`.
