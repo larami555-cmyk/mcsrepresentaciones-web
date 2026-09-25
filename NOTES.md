@@ -208,3 +208,4 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 ## Página de suscripción (24 septiembre 2026)
 - `suscribirse.html` (también `/suscribirse` y `/suscribete`): enlace directo para compartir con clientes. Mismo alta que el bloque `#newsletter` (función `newsletter.js`, doble confirmación Brevo). ES/GL con botones; `?lang=gl` abre en gallego.
 - Logo: todas las páginas sueltas usan `images/logo-mcs-h.png` (recorte sin tocar de `logo-mcs.png`, el logotipo oficial e inalterable). Nunca sustituirlo por texto "MCS".
+- `suscribirse-feria.html` (`/suscribirse-feria`): versión solo Feria Valencia 2026 para la invitación. Misma lista de Brevo; envía `origen:"feria"` y el aviso a MCarmen lo indica en el asunto.

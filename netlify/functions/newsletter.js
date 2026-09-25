@@ -34,7 +34,7 @@ async function rateLimit(ip) {
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 // Aviso por correo a la titular cuando alguien pide suscribirse. Nunca hace fallar el alta.
-async function notifyOwner(key, email, lang) {
+async function notifyOwner(key, email, lang, origen) {
   try {
     const store = getStore({ name: 'newsletter-limits', siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4', token: process.env.BLOBS_ACCESS_TOKEN });
     const dayKey = 'alerts-' + Math.floor(Date.now() / 86400000);
@@ -46,7 +46,7 @@ async function notifyOwner(key, email, lang) {
     const when = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
     const html = '<div style="font-family:Arial,sans-serif;line-height:1.5;color:#121212">'
       + '<p><strong>Nueva solicitud de suscripción a la newsletter</strong></p>'
-      + '<p>Correo: <strong>' + esc(email) + '</strong><br>Idioma: ' + esc(lang === 'gl' ? 'gallego' : 'castellano') + '<br>Fecha: ' + esc(when) + '</p>'
+      + '<p>Correo: <strong>' + esc(email) + '</strong><br>Idioma: ' + esc(lang === 'gl' ? 'gallego' : 'castellano') + '<br>Fecha: ' + esc(when) + (origen === 'feria' ? '<br>Origen: <strong>Feria Hábitat Valencia 2026</strong> (invitación)' : '') + '</p>'
       + '<p>La persona debe confirmar su suscripción desde el correo que le ha enviado Brevo. '
       + 'Cuando confirme, aparecerá en Brevo → CRM → Listas → Newsletter web.</p></div>';
     const r = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -55,7 +55,7 @@ async function notifyOwner(key, email, lang) {
       body: JSON.stringify({
         sender: { name: 'MCS Representaciones', email: SENDER_EMAIL },
         to: [{ email: OWNER_EMAIL }],
-        subject: 'Nueva solicitud de suscripción',
+        subject: origen === 'feria' ? 'Nueva suscripción · Feria Valencia 2026' : 'Nueva solicitud de suscripción',
         htmlContent: html
       })
     });
@@ -92,7 +92,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ email, includeListIds: [list], templateId: tpl, redirectionUrl: SITE + '/suscripcion-confirmada.html' })
     });
     if (r.status === 201 || r.status === 204 || r.ok) {
-      await notifyOwner(key, email, b.lang);
+      await notifyOwner(key, email, b.lang, b.origen === 'feria' ? 'feria' : '');
       return json(200, { ok: true });
     }
     console.error('Brevo', r.status, (await r.text()).slice(0, 300));
