@@ -96,6 +96,13 @@
   .plano .stands{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:14px;font-size:14px;color:#3d362e}
   .plano .stands b{color:#C1633D;font-weight:600}
   .plano .full{display:inline-block;margin-top:12px;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8A7F74}
+  .ficha{margin-top:22px;border-top:1px solid #EDE8E0}
+  .ficha .r{display:grid;grid-template-columns:170px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid #EDE8E0;font-size:14px;line-height:1.55;color:#3d362e}
+  .ficha .k{font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;color:#8A7F74;padding-top:3px}
+  .ficha .v b{color:#121212;font-weight:600}
+  .ficha .src{font-size:11.5px;color:#8A7F74;margin-top:12px}
+  .ficha .src a{color:inherit}
+  @media (max-width:640px){.ficha .r{grid-template-columns:1fr;gap:4px}}
   .notas{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
   .nota{background:#fff;border:1px solid #EDE8E0;border-left:3px solid #C1633D;padding:18px 22px}
   .nota time{display:block;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8A7F74;margin-bottom:8px}
@@ -129,14 +136,22 @@
   <img class="banner" src="./images/feria-habitat-2026.jpg" alt="Feria Hábitat Valencia 2026, 28 de septiembre a 1 de octubre, con Treku y Essenzia Dormire">
 
   <details class="plano" id="plano">
-    <summary><span data-es="Ver plano de la feria y stands" data-gl="Ver plano da feira e stands">Ver plano de la feria y stands</span><span class="ico" aria-hidden="true">+</span></summary>
+    <summary><span data-es="Ficha de la feria: plano, horario y datos" data-gl="Ficha da feira: plano, horario e datos">Ficha de la feria: plano, horario y datos</span><span class="ico" aria-hidden="true">+</span></summary>
     <div class="in">
       <a href="./images/plano-feria-habitat-2026.jpg" target="_blank" rel="noopener"><img src="./images/plano-feria-habitat-2026.jpg" alt="Plano de Feria Valencia: niveles 2 y 3, pabellones de Feria Hábitat Valencia 2026" loading="lazy" width="1024" height="633"></a>
-      <div class="stands">
-        <span><b>Treku</b> · <span data-es="Nivel 3 · Pabellón 1 · C21" data-gl="Nivel 3 · Pavillón 1 · C21">Nivel 3 · Pabellón 1 · C21</span></span>
-        <span><b>Essenzia Dormire</b> · <span data-es="Nivel 2 · Pabellón 4 · A25" data-gl="Nivel 2 · Pavillón 4 · A25">Nivel 2 · Pabellón 4 · A25</span></span>
-      </div>
       <a class="full" href="./images/plano-feria-habitat-2026.jpg" target="_blank" rel="noopener" data-es="Abrir el plano a tamaño completo &rarr;" data-gl="Abrir o plano a tamaño completo &rarr;">Abrir el plano a tamaño completo &rarr;</a>
+      <div class="ficha">
+        <div class="r"><div class="k" data-es="Fechas" data-gl="Datas">Fechas</div><div class="v" data-es="Del 28 de septiembre al 1 de octubre de 2026" data-gl="Do 28 de setembro ao 1 de outubro de 2026">Del 28 de septiembre al 1 de octubre de 2026</div></div>
+        <div class="r"><div class="k" data-es="Horario" data-gl="Horario">Horario</div><div class="v" data-es="De 9:30 a 18:30 h · <b>jueves 1 de octubre hasta las 17:00 h</b>" data-gl="De 9:30 a 18:30 h · <b>xoves 1 de outubro ata as 17:00 h</b>">De 9:30 a 18:30 h · <b>jueves 1 de octubre hasta las 17:00 h</b></div></div>
+        <div class="r"><div class="k" data-es="Carácter" data-gl="Carácter">Carácter</div><div class="v" data-es="Profesional · Internacional (reconocida por la UFI y la Secretaría de Estado de Comercio)" data-gl="Profesional · Internacional (recoñecida pola UFI e a Secretaría de Estado de Comercio)">Profesional · Internacional (reconocida por la UFI y la Secretaría de Estado de Comercio)</div></div>
+        <div class="r"><div class="k" data-es="Certámenes" data-gl="Certames">Certámenes</div><div class="v" data-es="Feria Hábitat Valencia (60ª edición del mueble, 57ª de iluminación, 22ª NUDE jóvenes talentos) · Textilhogar · Espacio Cocina SICI · 360 by Cevisama" data-gl="Feira Hábitat Valencia (60ª edición do moble, 57ª de iluminación, 22ª NUDE mozos talentos) · Textilhogar · Espacio Cocina SICI · 360 by Cevisama">Feria Hábitat Valencia (60ª edición del mueble, 57ª de iluminación, 22ª NUDE jóvenes talentos) · Textilhogar · Espacio Cocina SICI · 360 by Cevisama</div></div>
+        <div class="r"><div class="k" data-es="Ubicación" data-gl="Localización">Ubicación</div><div class="v" data-es="<b>Feria Hábitat Valencia y Textilhogar:</b> Nivel 2, pabellones 1, 2, 3 y 4 · Nivel 3, pabellones 1, 2 y 4 · Pabellón 6 bis<br><b>Espacio Cocina SICI:</b> Nivel 3, pabellón 3<br><b>360 by Cevisama:</b> Nivel 2, pabellón 6" data-gl="<b>Feira Hábitat Valencia e Textilhogar:</b> Nivel 2, pavillóns 1, 2, 3 e 4 · Nivel 3, pavillóns 1, 2 e 4 · Pavillón 6 bis<br><b>Espacio Cocina SICI:</b> Nivel 3, pavillón 3<br><b>360 by Cevisama:</b> Nivel 2, pavillón 6"><b>Feria Hábitat Valencia y Textilhogar:</b> Nivel 2, pabellones 1, 2, 3 y 4 · Nivel 3, pabellones 1, 2 y 4 · Pabellón 6 bis<br><b>Espacio Cocina SICI:</b> Nivel 3, pabellón 3<br><b>360 by Cevisama:</b> Nivel 2, pabellón 6</div></div>
+        <div class="r"><div class="k" data-es="Sectores" data-gl="Sectores">Sectores</div><div class="v" data-es="Mueble moderno, de diseño, clásico y tapizado · descanso · iluminación · decoración · outdoor · textil hogar · cocina · baño" data-gl="Moble moderno, de deseño, clásico e tapizado · descanso · iluminación · decoración · exterior · téxtil fogar · cociña · baño">Mueble moderno, de diseño, clásico y tapizado · descanso · iluminación · decoración · outdoor · textil hogar · cocina · baño</div></div>
+        <div class="r"><div class="k" data-es="Superficie" data-gl="Superficie">Superficie</div><div class="v" data-es="112.000 m² en total (90.000 m² de Feria Hábitat Valencia y Textilhogar)" data-gl="112.000 m² en total (90.000 m² de Feira Hábitat Valencia e Textilhogar)">112.000 m² en total (90.000 m² de Feria Hábitat Valencia y Textilhogar)</div></div>
+        <div class="r"><div class="k" data-es="Expositores" data-gl="Expositores">Expositores</div><div class="v" data-es="1.221 marcas y firmas · 78 % españolas y 22 % extranjeras · 24 países" data-gl="1.221 marcas e firmas · 78 % españolas e 22 % estranxeiras · 24 países">1.221 marcas y firmas · 78 % españolas y 22 % extranjeras · 24 países</div></div>
+        <div class="r"><div class="k" data-es="Nuestros stands" data-gl="Os nosos stands">Nuestros stands</div><div class="v" data-es="<b>Treku:</b> Nivel 3 · Pabellón 1 · C21<br><b>Essenzia Dormire:</b> Nivel 2 · Pabellón 4 · A25" data-gl="<b>Treku:</b> Nivel 3 · Pavillón 1 · C21<br><b>Essenzia Dormire:</b> Nivel 2 · Pavillón 4 · A25"><b>Treku:</b> Nivel 3 · Pabellón 1 · C21<br><b>Essenzia Dormire:</b> Nivel 2 · Pabellón 4 · A25</div></div>
+        <p class="src" data-es="Datos oficiales de Feria Hábitat Valencia a 31/07/2026. &lt;a href=&quot;https://www.feriahabitatvalencia.com/datos-generales-2026/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Ver ficha oficial&lt;/a&gt;" data-gl="Datos oficiais de Feira Hábitat Valencia a 31/07/2026. &lt;a href=&quot;https://www.feriahabitatvalencia.com/datos-generales-2026/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Ver ficha oficial&lt;/a&gt;">Datos oficiales de Feria Hábitat Valencia a 31/07/2026. <a href="https://www.feriahabitatvalencia.com/datos-generales-2026/" target="_blank" rel="noopener">Ver ficha oficial</a></p>
+      </div>
     </div>
   </details>
 
