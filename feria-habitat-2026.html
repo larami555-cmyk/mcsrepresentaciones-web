@@ -86,6 +86,16 @@
   .lb .prev{left:4px;top:50%;transform:translateY(-50%)}
   .lb .next{right:4px;top:50%;transform:translateY(-50%)}
   [hidden]{display:none!important}
+  .plano{margin:-16px 0 40px;border:1px solid #EDE8E0;background:#fff}
+  .plano summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;color:#121212}
+  .plano summary::-webkit-details-marker{display:none}
+  .plano summary .ico{font-size:18px;color:#C1633D;transition:transform .3s}
+  .plano[open] summary .ico{transform:rotate(45deg)}
+  .plano .in{padding:0 20px 20px}
+  .plano img{display:block;width:100%;height:auto;border:1px solid #EDE8E0}
+  .plano .stands{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:14px;font-size:14px;color:#3d362e}
+  .plano .stands b{color:#C1633D;font-weight:600}
+  .plano .full{display:inline-block;margin-top:12px;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8A7F74}
   .notas{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
   .nota{background:#fff;border:1px solid #EDE8E0;border-left:3px solid #C1633D;padding:18px 22px}
   .nota time{display:block;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8A7F74;margin-bottom:8px}
@@ -117,6 +127,18 @@
 </header>
 <main class="wrap">
   <img class="banner" src="./images/feria-habitat-2026.jpg" alt="Feria Hábitat Valencia 2026, 28 de septiembre a 1 de octubre, con Treku y Essenzia Dormire">
+
+  <details class="plano" id="plano">
+    <summary><span data-es="Ver plano de la feria y stands" data-gl="Ver plano da feira e stands">Ver plano de la feria y stands</span><span class="ico" aria-hidden="true">+</span></summary>
+    <div class="in">
+      <a href="./images/plano-feria-habitat-2026.jpg" target="_blank" rel="noopener"><img src="./images/plano-feria-habitat-2026.jpg" alt="Plano de Feria Valencia: niveles 2 y 3, pabellones de Feria Hábitat Valencia 2026" loading="lazy" width="1024" height="633"></a>
+      <div class="stands">
+        <span><b>Treku</b> · <span data-es="Nivel 3 · Pabellón 1" data-gl="Nivel 3 · Pavillón 1">Nivel 3 · Pabellón 1</span></span>
+        <span><b>Essenzia Dormire</b> · <span data-es="Nivel 2 · Pabellón 4 · A25" data-gl="Nivel 2 · Pavillón 4 · A25">Nivel 2 · Pabellón 4 · A25</span></span>
+      </div>
+      <a class="full" href="./images/plano-feria-habitat-2026.jpg" target="_blank" rel="noopener" data-es="Abrir el plano a tamaño completo &rarr;" data-gl="Abrir o plano a tamaño completo &rarr;">Abrir el plano a tamaño completo &rarr;</a>
+    </div>
+  </details>
 
   <section>
     <div class="gal-head">
@@ -242,6 +264,7 @@ document.getElementById("lbN").onclick=function(e){e.stopPropagation();open(idx+
 lb.onclick=function(e){if(e.target===lb)close()};
 document.addEventListener("keydown",function(e){if(!lb.classList.contains("open"))return;if(e.key==="Escape")close();if(e.key==="ArrowLeft")open(idx-1);if(e.key==="ArrowRight")open(idx+1)});
 
+if(location.hash==="#plano"){var pl=document.getElementById("plano");pl.open=true;setTimeout(function(){pl.scrollIntoView({behavior:"smooth"})},300)}
 load();
 </script>
 </body>
