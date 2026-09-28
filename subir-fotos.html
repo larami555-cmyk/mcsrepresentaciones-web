@@ -56,6 +56,18 @@
   #preview .thumb .tag{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;}
   .saved{font-size:12px;color:#1a7a3c;margin:0 0 20px;}
   .saved a{color:var(--muted);}
+  .gestion{margin-top:40px;border-top:1px solid var(--border);padding-top:20px;}
+  .gestion summary{font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;cursor:pointer;padding:6px 0;}
+  .gestion p{font-size:13px;color:var(--muted);margin:10px 0 14px;}
+  button.sec{width:100%;background:#fff;color:var(--dark);border:1px solid var(--dark);padding:13px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;}
+  #gGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:14px;}
+  #gGrid .it{position:relative;aspect-ratio:1;border:1px solid var(--border);background:#fff;overflow:hidden;border-radius:2px;}
+  #gGrid .it img,#gGrid .it video{width:100%;height:100%;object-fit:cover;display:block;}
+  #gGrid .it .txt{padding:6px;font-size:10.5px;line-height:1.35;color:var(--dark);height:100%;overflow:hidden;}
+  #gGrid .it .tag{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;}
+  #gGrid .it button{position:absolute;top:4px;right:4px;background:#b3261e;color:#fff;border:0;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;line-height:1;}
+  #gGrid .it.borrando{opacity:.35;pointer-events:none;}
+  #gStatus{margin-top:12px;font-size:13px;color:var(--muted);text-align:center;}
 </style>
 </head>
 <body>
@@ -97,6 +109,14 @@
   <button class="main" id="uploadBtn" disabled>Subir</button>
   <div class="bar" id="bar"><div class="bar-fill" id="barFill"></div></div>
   <div id="status"></div>
+
+  <details class="gestion" id="gestion">
+    <summary>🗑 Borrar fotos subidas por error</summary>
+    <p>Usa la marca elegida arriba. Toca la papelera de la foto que quieras quitar. Desaparece de la web en 1–2 minutos.</p>
+    <button class="sec" id="gCargar">Ver lo subido en esta marca</button>
+    <div id="gStatus"></div>
+    <div id="gGrid"></div>
+  </details>
 </div>
 
 <script>
@@ -322,6 +342,45 @@ function setStatus(msg, cls) {
   statusEl.textContent = msg;
   statusEl.className = cls || '';
 }
+// ---- Borrar lo subido ----
+const gGrid = document.getElementById('gGrid'), gStatus = document.getElementById('gStatus');
+function gPass() { return passGuardada() || passEl.value; }
+async function gApi(body) {
+  const r = await fetch('/.netlify/functions/borrar-fotos', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ password: gPass(), marca: marcaSel.value }, body)) });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401) { try { localStorage.removeItem('mcsFotosPass'); } catch (x) {} passEl.value = ''; pintarPass(); throw new Error('Escribe la contraseña arriba y vuelve a intentarlo'); }
+  if (!r.ok) throw new Error(d.error || ('código ' + r.status));
+  if (!passGuardada() && passEl.value) { try { localStorage.setItem('mcsFotosPass', passEl.value); } catch (x) {} pintarPass(); }
+  return d;
+}
+async function gCargar() {
+  if (!gPass()) { gStatus.textContent = 'Escribe primero la contraseña arriba.'; return; }
+  gGrid.innerHTML = ''; gStatus.textContent = 'Cargando…';
+  try {
+    const d = await gApi({ accion: 'listar' });
+    const nombre = marcaSel.options[marcaSel.selectedIndex].text;
+    if (!d.items.length) { gStatus.textContent = 'No hay nada subido en ' + nombre + '.'; return; }
+    gStatus.textContent = d.items.length + ' elemento(s) en ' + nombre + ' · los más recientes primero';
+    d.items.forEach(it => {
+      const el = document.createElement('div'); el.className = 'it';
+      if (it.tipo === 'nota') { el.innerHTML = '<div class="txt"></div><span class="tag">COMENTARIO</span>'; el.querySelector('.txt').textContent = it.texto || '(comentario)'; }
+      else if (it.tipo === 'video' && it.media) { el.innerHTML = '<video muted playsinline preload="metadata"></video><span class="tag">VÍDEO</span>'; el.querySelector('video').src = '/' + it.media + '#t=0.5'; }
+      else if (it.tipo === 'doc') { el.innerHTML = '<div class="txt" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:#b3261e">PDF</div>'; }
+      else if (it.media) { const im = document.createElement('img'); im.loading = 'lazy'; im.alt = ''; im.src = '/' + it.media; el.appendChild(im); }
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = '🗑'; b.setAttribute('aria-label', 'Borrar');
+      b.onclick = async () => {
+        if (!confirm('¿Borrar este elemento de la web? No se puede deshacer.')) return;
+        el.classList.add('borrando'); gStatus.textContent = 'Borrando…';
+        try { await gApi({ accion: 'borrar', slugs: [it.slug] }); el.remove(); gStatus.textContent = '✓ Borrado. Desaparece de la web en 1–2 minutos.'; }
+        catch (e) { el.classList.remove('borrando'); gStatus.textContent = 'Error: ' + e.message; }
+      };
+      el.appendChild(b); gGrid.appendChild(el);
+    });
+  } catch (e) { gStatus.textContent = 'Error: ' + e.message; }
+}
+document.getElementById('gCargar').addEventListener('click', gCargar);
+marcaSel.addEventListener('change', () => { gGrid.innerHTML = ''; gStatus.textContent = ''; });
 </script>
 </body>
 </html>

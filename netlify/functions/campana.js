@@ -45,16 +45,14 @@ exports.handler = async (event) => {
 
     if (p.accion === 'estado') return json(200, { ok: true, id: prev ? prev.id : null, status: prev ? 'draft' : null });
 
+    // Siempre con el diseño más reciente publicado en la web
+    const html = await (await fetch(SITE + c.file + '?v=' + Date.now())).text();
+    if (!html.includes('</html>')) throw new Error('No se pudo leer el diseño del correo');
+    const datos = { name: c.name, subject: c.subject, previewText: c.previewText, sender: SENDER,
+      htmlContent: html, recipients: { listIds: [list] } };
     let id = prev && prev.id;
-    if (!id) {
-      const html = await (await fetch(SITE + c.file + '?v=' + Date.now())).text();
-      if (!html.includes('</html>')) throw new Error('No se pudo leer el diseño del correo');
-      const r = await brevo('/emailCampaigns', 'POST', key, {
-        name: c.name, subject: c.subject, previewText: c.previewText, sender: SENDER,
-        htmlContent: html, recipients: { listIds: [list] }
-      });
-      id = r.id;
-    }
+    if (id) await brevo(`/emailCampaigns/${id}`, 'PUT', key, datos);
+    else id = (await brevo('/emailCampaigns', 'POST', key, datos)).id;
     if (p.accion === 'enviar') {
       await brevo(`/emailCampaigns/${id}/sendNow`, 'POST', key);
       return json(200, { ok: true, id, status: 'sent', enviada: true });
