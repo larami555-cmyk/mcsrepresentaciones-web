@@ -154,9 +154,36 @@ function isDoc(f) { return f.type === 'application/pdf' || /\.pdf$/i.test(f.name
 function esFeria() { return marcaSel.value === 'feria'; }
 function textoVal() { return esFeria() ? textoEl.value.trim() : ''; }
 
-function addFiles(fileList) {
-  const grandes = [];
-  for (const f of fileList) {
+function isHeic(f) { return /image\/hei[cf]/i.test(f.type) || /\.hei[cf]$/i.test(f.name); }
+
+let heicLib = null;
+function loadHeic() {
+  if (heicLib) return heicLib;
+  heicLib = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+    s.onload = () => resolve(window.heic2any);
+    s.onerror = () => { heicLib = null; reject(new Error('no se pudo cargar el conversor HEIC')); };
+    document.head.appendChild(s);
+  });
+  return heicLib;
+}
+
+async function heicToJpeg(f) {
+  const heic2any = await loadHeic();
+  let out = await heic2any({ blob: f, toType: 'image/jpeg', quality: 0.9 });
+  if (Array.isArray(out)) out = out[0];
+  return new File([out], f.name.replace(/\.hei[cf]$/i, '') + '.jpg', { type: 'image/jpeg' });
+}
+
+async function addFiles(fileList) {
+  const grandes = [], fallidas = [];
+  const lista = Array.from(fileList);
+  if (lista.some(isHeic)) setStatus('Convirtiendo fotos HEIC…');
+  for (let f of lista) {
+    if (isHeic(f)) {
+      try { f = await heicToJpeg(f); } catch (e) { fallidas.push(f.name); continue; }
+    }
     if (f.type.startsWith('image/')) selectedFiles.push(f);
     else if (isVideo(f) || (isDoc(f) && esFeria())) {
       if (f.size > MAX_VIDEO) grandes.push(f.name);
@@ -164,6 +191,8 @@ function addFiles(fileList) {
     }
   }
   renderPreview();
+  setStatus('');
+  if (fallidas.length) setStatus(`No se pudieron convertir ${fallidas.length} foto(s) HEIC. Hazles captura de pantalla o envíatelas por WhatsApp y súbelas desde ahí.`, 'error');
   if (grandes.length) setStatus(`No se añadieron ${grandes.length} archivo(s) por pesar más de 4 MB. Los vídeos, envíatelos por WhatsApp y súbelos desde ahí.`, 'error');
 }
 
@@ -212,10 +241,10 @@ function resizeImage(file, maxDim = 1600, quality = 0.82) {
         const dataUrl = canvas.toDataURL('image/jpeg', quality);
         resolve(dataUrl.split(',')[1]);
       };
-      img.onerror = reject;
+      img.onerror = () => reject(new Error(`el móvil no puede leer la foto "${file.name}". Quítala y súbela de nuevo tras enviártela por WhatsApp`));
       img.src = e.target.result;
     };
-    reader.onerror = reject;
+    reader.onerror = () => reject(new Error(`no se pudo leer "${file.name}"`));
     reader.readAsDataURL(file);
   });
 }
@@ -283,7 +312,7 @@ uploadBtn.addEventListener('click', async () => {
     selectedFiles = [];
     renderPreview();
   } catch (err) {
-    setStatus('Error: ' + err.message, 'error');
+    setStatus('Error: ' + ((err && err.message) || 'archivo no válido'), 'error');
   } finally {
     uploadBtn.disabled = selectedFiles.length === 0 && !textoVal();
   }
