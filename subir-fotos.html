@@ -141,9 +141,9 @@ dropzone.addEventListener('drop', (e) => {
 fileInput.addEventListener('change', (e) => addFiles(e.target.files));
 
 const MAX_VIDEO = 4 * 1024 * 1024;
-// La contraseña se recuerda en este dispositivo tras la primera subida correcta
+// La contraseña ya NO se recuerda: se pide siempre al entrar
 const passEl = document.getElementById('password');
-function passGuardada() { try { return localStorage.getItem('mcsFotosPass') || ''; } catch (e) { return ''; } }
+function passGuardada() { return ''; }
 function pintarPass() {
   const g = passGuardada();
   if (g) passEl.value = g;
@@ -325,7 +325,6 @@ uploadBtn.addEventListener('click', async () => {
       setStatus(`Subidas ${subidas} de ${selectedFiles.length}…`, '');
     }
 
-    try { localStorage.setItem('mcsFotosPass', password); } catch (x) {}
     pintarPass();
     setStatus(`✓ Publicado: ${subidas} archivo(s)${texto ? ' y el comentario' : ''}.\nSe verá en la web en 1–2 minutos.`, 'ok');
     textoEl.value = '';
@@ -351,7 +350,6 @@ async function gApi(body) {
   const d = await r.json().catch(() => ({}));
   if (r.status === 401) { try { localStorage.removeItem('mcsFotosPass'); } catch (x) {} passEl.value = ''; pintarPass(); throw new Error('Escribe la contraseña arriba y vuelve a intentarlo'); }
   if (!r.ok) throw new Error(d.error || ('código ' + r.status));
-  if (!passGuardada() && passEl.value) { try { localStorage.setItem('mcsFotosPass', passEl.value); } catch (x) {} pintarPass(); }
   return d;
 }
 async function gCargar() {
