@@ -10,7 +10,7 @@ const CAMPANAS = {
     file: '/email/feria-dia1.html'
   }
 };
-const SENDER = { name: 'MCS Representaciones', email: 'mcsrepresentaciones@gmail.com' };
+const SENDER = { name: 'MCS Representaciones', email: 'novedades@mcsrepresentaciones.es' };
 const sha = s => crypto.createHash('sha256').update(String(s)).digest();
 const json = (code, obj) => ({ statusCode: code, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, body: JSON.stringify(obj) });
 
