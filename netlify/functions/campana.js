@@ -8,6 +8,12 @@ const CAMPANAS = {
     subject: 'Primer día en Feria Hábitat Valencia 2026 ¡Acompáñame!',
     previewText: 'Treku y Essenzia Dormire ya te esperan. Te cuento dónde encontrarnos.',
     file: '/email/feria-dia1.html'
+  },
+  'balance-feria': {
+    name: 'Balance Feria Hábitat Valencia 2026',
+    subject: 'Gracias por hacer de esta feria un éxito',
+    previewText: 'Balance muy positivo de Feria Hábitat València 2026. Gracias por vuestra asistencia e implicación.',
+    file: '/email/balance-feria.html'
   }
 };
 const SENDER = { name: 'MCS Representaciones', email: 'novedades@mcsrepresentaciones.es' };
