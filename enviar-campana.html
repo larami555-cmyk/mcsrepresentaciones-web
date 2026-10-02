@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Enviar campaña · MCS</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F5F1EB;font-family:Helvetica,Arial,sans-serif;color:#2B2622}
+.w{max-width:640px;margin:0 auto;padding:20px 16px 40px}h1{font-size:22px;margin:6px 0 4px}p.s{margin:0 0 16px;color:#6B625A;font-size:15px}
+.card{background:#fff;padding:16px;margin-bottom:14px}.k{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#C1633D;font-weight:bold;margin-bottom:4px}
+.v{font-size:15px;line-height:1.5}iframe{width:100%;height:520px;border:1px solid #EAE3DA;background:#fff}
+input{width:100%;font-size:16px;padding:12px;border:1px solid #D8CFC4;margin:6px 0 10px}
+button{width:100%;font-size:16px;font-weight:bold;letter-spacing:1px;padding:16px;border:0;margin-top:8px;cursor:pointer}
+.b1{background:#fff;color:#2B2622;border:1px solid #2B2622}.b2{background:#C1633D;color:#fff}button:disabled{opacity:.5}
+#st{margin-top:14px;font-size:15px;line-height:1.5;min-height:22px}.ok{color:#2E7D4F}.err{color:#B3261E}
+</style></head><body><div class="w">
+<h1>Campaña: Primer día de Feria</h1><p class="s">Se envía a la lista <b>Newsletter web</b> de Brevo.</p>
+<div class="card"><div class="k">Asunto</div><div class="v">Primer día en Feria Hábitat Valencia 2026 ¡Acompáñame!</div></div>
+<div class="card"><div class="k">Vista previa</div><iframe src="/email/feria-dia1.html" title="Vista previa del correo"></iframe></div>
+<div class="card" id="passBox"><div class="k">Contraseña del panel de fotos</div><input type="password" id="pass" autocomplete="current-password"></div>
+<div class="card"><div class="k">1 · Prueba (recomendado)</div><input type="email" id="prueba" placeholder="tu correo" value="mcsrepresentaciones@gmail.com">
+<button class="b1" id="btnPrueba">ENVIARME UNA PRUEBA</button></div>
+<div class="card"><div class="k">2 · Envío a todos</div><button class="b2" id="btnEnviar">ENVIAR A TODA LA LISTA</button></div>
+<div id="st"></div></div>
+<script>
+const CAMP='feria-dia1', st=document.getElementById('st'), passEl=document.getElementById('pass');
+let saved=''; try{saved=localStorage.getItem('mcsFotosPass')||'';}catch(e){}
+if(saved){document.getElementById('passBox').style.display='none';}
+const pass=()=>saved||passEl.value;
+function msg(t,c){st.textContent=t;st.className=c||'';}
+function bloquear(on){document.querySelectorAll('button').forEach(b=>b.disabled=on);}
+async function llamar(accion,extra){
+  const r=await fetch('/.netlify/functions/campana',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({password:pass(),campana:CAMP,accion},extra||{}))});
+  let d={};try{d=await r.json();}catch(e){}
+  if(r.status===401){try{localStorage.removeItem('mcsFotosPass');}catch(e){}saved='';document.getElementById('passBox').style.display='';}
+  if(!r.ok) throw new Error(d.error||('Error '+r.status));
+  if(!saved&&passEl.value){try{localStorage.setItem('mcsFotosPass',passEl.value);}catch(e){}saved=passEl.value;}
+  return d;
+}
+function enviada(){msg('✓ Campaña enviada a toda la lista. Puedes ver aperturas en Brevo → Campañas.','ok');bloquear(true);}
+document.getElementById('btnPrueba').onclick=async()=>{
+  bloquear(true);msg('Enviando prueba…');
+  try{const d=await llamar('prueba',{emailPrueba:document.getElementById('prueba').value});
+    if(d.enviada){enviada();return;} msg('✓ Prueba enviada a '+d.prueba+'. Revisa tu correo (y spam). Si está bien, pulsa el botón 2.','ok');}
+  catch(e){msg('Error: '+e.message,'err');} bloquear(false);
+};
+document.getElementById('btnEnviar').onclick=async()=>{
+  if(!confirm('¿Enviar ahora la campaña a TODOS los contactos de la lista? No se puede deshacer.'))return;
+  bloquear(true);msg('Enviando…');
+  try{await llamar('enviar');enviada();}catch(e){msg('Error: '+e.message,'err');bloquear(false);}
+};
+if(saved){llamar('estado').then(d=>{if(d.enviada)enviada();}).catch(()=>{});}
+</script></body></html>

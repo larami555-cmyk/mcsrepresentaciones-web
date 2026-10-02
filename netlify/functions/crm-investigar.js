@@ -1,4 +1,5 @@
 const { getStore } = require('@netlify/blobs');
+const DAILY_LIMIT = 20; // tope de investigaciones al día (el CRM no tiene contraseña)
 
 function jsonResponse(statusCode, obj) {
   return {
@@ -47,7 +48,6 @@ exports.handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); } catch (e) { return jsonResponse(400, { error: 'JSON inválido' }); }
 
   const { id } = body;
-  // Sin contraseña de acceso: uso estrictamente personal, a petición de MCarmen.
   if (!process.env.ANTHROPIC_API_KEY) {
     return jsonResponse(500, { error: 'Falta configurar ANTHROPIC_API_KEY en Netlify (Site settings → Environment variables)' });
   }
@@ -57,6 +57,18 @@ exports.handler = async (event) => {
     siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4',
     token: process.env.BLOBS_ACCESS_TOKEN
   });
+  const limits = getStore({
+    name: 'crm-limits',
+    siteID: '0b92cef2-4cc9-4f80-b0da-4dcb41ee07b4',
+    token: process.env.BLOBS_ACCESS_TOKEN
+  });
+  const dayKey = 'inv-' + new Date().toISOString().slice(0, 10);
+  const usados = Number(await limits.get(dayKey)) || 0;
+  if (usados >= DAILY_LIMIT) {
+    return jsonResponse(429, { error: `Se ha alcanzado el límite de ${DAILY_LIMIT} investigaciones por hoy. Vuelve a intentarlo mañana.` });
+  }
+  await limits.set(dayKey, String(usados + 1));
+
   let clientes = (await store.get('clientes', { type: 'json' })) || [];
   const idx = clientes.findIndex(x => x.id === id);
   if (idx === -1) return jsonResponse(404, { error: 'Cliente no encontrado' });

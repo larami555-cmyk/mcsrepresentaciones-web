@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://mcsrepresentaciones.es/</loc></url>
-  <url><loc>https://mcsrepresentaciones.es/balance-feria-habitat-2026.html</loc></url>
-  <url><loc>https://mcsrepresentaciones.es/catalogo.html</loc></url>
-  <url><loc>https://mcsrepresentaciones.es/novedad-sweetbedding.html</loc></url>
-  <url><loc>https://mcsrepresentaciones.es/guia-tejidos-naturales.html</loc></url>
+  <url><loc>https://mcsrepresentaciones.es/</loc><lastmod>2026-10-02</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/catalogo.html</loc><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/novedad-sweetbedding.html</loc><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/feria-habitat-2026.html</loc><lastmod>2026-09-28</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/balance-feria-habitat-2026.html</loc><lastmod>2026-10-02</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/suscribirse.html</loc><lastmod>2026-09-24</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/suscribirse-feria.html</loc><lastmod>2026-09-24</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/guia-tejidos-naturales.html</loc><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/aviso-legal.html</loc><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/privacidad.html</loc><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://mcsrepresentaciones.es/normativa-mueble.html</loc><lastmod>2026-09-20</lastmod></url>
 </urlset>

@@ -6,7 +6,10 @@ Disallow: /tarifas-
 Disallow: /calculadora-essenzia.html
 Disallow: /drapsaten-corte.html
 Disallow: /subir-fotos.html
+Disallow: /enviar-campana.html
+Disallow: /email/
 Disallow: /monitor-taekwondo-dashboard.html
 Disallow: /tkd
+Disallow: /suscripcion-confirmada.html
 
 Sitemap: https://mcsrepresentaciones.es/sitemap.xml

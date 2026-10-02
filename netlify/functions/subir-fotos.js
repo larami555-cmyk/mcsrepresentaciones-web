@@ -1,10 +1,15 @@
 // v2 - forzar redeploy de la función
+const crypto = require('crypto');
 const GITHUB_API = 'https://api.github.com';
 const OWNER = 'larami555-cmyk';
 const REPO = 'mcsrepresentaciones-web';
 const BRANCH = 'main';
 
-const MARCAS_VALIDAS = ['treku', 'baixmoduls', 'tobisa', 'kingsofa', 'tapizadosmayor', 'essenzia'];
+const MARCAS_VALIDAS = ['treku', 'baixmoduls', 'tobisa', 'kingsofa', 'tapizadosmayor', 'essenzia', 'feria'];
+const EXT_FOTO = ['jpg', 'jpeg', 'png', 'webp'];
+const EXT_VIDEO = ['mp4', 'mov', 'm4v', 'webm'];
+const EXT_DOC = ['pdf'];
+const MAX_TEXTO = 2000;
 
 function jsonResponse(statusCode, obj) {
   return {
@@ -31,9 +36,17 @@ exports.handler = async (event) => {
     return jsonResponse(400, { error: 'JSON inválido' });
   }
 
-  const { password, marca, files } = payload;
+  const { password, marca } = payload;
+  const files = Array.isArray(payload.files) ? payload.files : [];
+  const texto = marca === 'feria' ? String(payload.texto || '').replace(/\r/g, '').trim().slice(0, MAX_TEXTO) : '';
 
-  if (!process.env.FOTOS_PASSWORD || password !== process.env.FOTOS_PASSWORD) {
+  const expected = process.env.FOTOS_PASSWORD || '';
+  if (expected.length < 10) {
+    return jsonResponse(500, { error: 'Falta configurar FOTOS_PASSWORD en Netlify (mínimo 10 caracteres)' });
+  }
+  const sha = (x) => crypto.createHash('sha256').update(String(x)).digest();
+  if (!crypto.timingSafeEqual(sha(password || ''), sha(expected))) {
+    await new Promise((r) => setTimeout(r, 1200)); // frena los intentos por fuerza bruta
     return jsonResponse(401, { error: 'Contraseña incorrecta' });
   }
 
@@ -41,7 +54,7 @@ exports.handler = async (event) => {
     return jsonResponse(400, { error: 'Marca no válida' });
   }
 
-  if (!Array.isArray(files) || files.length === 0) {
+  if (files.length === 0 && !texto) {
     return jsonResponse(400, { error: 'No se han recibido fotografías' });
   }
 
@@ -71,9 +84,13 @@ exports.handler = async (event) => {
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
       const ext = (f.name.split('.').pop() || 'jpg').toLowerCase();
-      const safeExt = ['jpg', 'jpeg', 'png', 'webp'].includes(ext) ? ext : 'jpg';
-      const baseName = `foto-${timestamp}-${i}`;
-      const imgPath = `images/catalogo/${marca}/${baseName}.${safeExt}`;
+      const esVideo = EXT_VIDEO.includes(ext);
+      const esDoc = marca === 'feria' && EXT_DOC.includes(ext);
+      const tipo = esDoc ? 'documento' : (esVideo ? 'video' : 'imagen');
+      const safeExt = (esVideo || esDoc) ? ext : (EXT_FOTO.includes(ext) ? ext : 'jpg');
+      const baseName = `${esDoc ? 'doc' : (esVideo ? 'video' : 'foto')}-${timestamp}-${i + 1}`;
+      const imgPath = esDoc ? `documentos/feria/${baseName}.${safeExt}` : `images/catalogo/${marca}/${baseName}.${safeExt}`;
+      const nombre = String(f.name || '').replace(/\.[^.]+$/, '').replace(/["\n\r\\]/g, ' ').slice(0, 120);
       const mdPath = `content/catalogo/${marca}/${baseName}.md`;
 
       const imgBlobRes = await fetch(`${GITHUB_API}/repos/${OWNER}/${REPO}/git/blobs`, {
@@ -84,7 +101,7 @@ exports.handler = async (event) => {
       if (!imgBlobRes.ok) throw new Error(`Error subiendo ${f.name}: ` + (await imgBlobRes.text()));
       const imgBlob = await imgBlobRes.json();
 
-      const mdContent = `---\nimagen: "/${imgPath}"\nslug: "${baseName}"\n---\n`;
+      const mdContent = `---\n${tipo}: "/${imgPath}"\nslug: "${baseName}"\n${esDoc ? `nombre: "${nombre}"\n` : ''}---\n`;
       const mdBlobRes = await fetch(`${GITHUB_API}/repos/${OWNER}/${REPO}/git/blobs`, {
         method: 'POST',
         headers: ghHeaders,
@@ -95,6 +112,18 @@ exports.handler = async (event) => {
 
       treeItems.push({ path: imgPath, mode: '100644', type: 'blob', sha: imgBlob.sha });
       treeItems.push({ path: mdPath, mode: '100644', type: 'blob', sha: mdBlob.sha });
+    }
+
+    // Comentario / reseña (solo Feria): va en el cuerpo del .md
+    if (texto) {
+      const notaName = `nota-${timestamp}-0`;
+      const notaMd = `---\ntipo: "nota"\nslug: "${notaName}"\n---\n${texto}\n`;
+      const notaRes = await fetch(`${GITHUB_API}/repos/${OWNER}/${REPO}/git/blobs`, {
+        method: 'POST', headers: ghHeaders,
+        body: JSON.stringify({ content: Buffer.from(notaMd).toString('base64'), encoding: 'base64' })
+      });
+      if (!notaRes.ok) throw new Error('Error guardando el comentario');
+      treeItems.push({ path: `content/catalogo/${marca}/${notaName}.md`, mode: '100644', type: 'blob', sha: (await notaRes.json()).sha });
     }
 
     // 4. Árbol nuevo
@@ -111,7 +140,7 @@ exports.handler = async (event) => {
       method: 'POST',
       headers: ghHeaders,
       body: JSON.stringify({
-        message: `Subida de ${files.length} foto(s) a ${marca} vía panel de fotos`,
+        message: `Subida de ${files.length} archivo(s)${texto ? ' + comentario' : ''} a ${marca} vía panel de fotos`,
         tree: treeData.sha,
         parents: [latestCommitSha]
       })
@@ -127,7 +156,7 @@ exports.handler = async (event) => {
     });
     if (!updateRefRes.ok) throw new Error('Error actualizando la rama: ' + (await updateRefRes.text()));
 
-    return jsonResponse(200, { ok: true, subidas: files.length });
+    return jsonResponse(200, { ok: true, subidas: files.length, comentario: !!texto });
   } catch (err) {
     return jsonResponse(500, { error: err.message });
   }

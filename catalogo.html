@@ -4,6 +4,24 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Catálogo — MCS Representaciones</title>
+  <script src="./cookies.js"></script>
+  <meta name="description" content="Catálogos de las marcas que representa MCS Representaciones: Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor y KingSofá.">
+  <link rel="canonical" href="https://mcsrepresentaciones.es/catalogo.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCS Representaciones">
+  <meta property="og:title" content="Catálogo — MCS Representaciones">
+  <meta property="og:description" content="Catálogos de las marcas que representa MCS Representaciones: Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor y KingSofá.">
+  <meta property="og:url" content="https://mcsrepresentaciones.es/catalogo.html">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:locale:alternate" content="gl_ES">
+  <meta property="og:image" content="https://mcsrepresentaciones.es/images/og-mcs.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="MCS Representaciones: muebles, tapicería y descanso en Galicia">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Catálogo — MCS Representaciones">
+  <meta name="twitter:description" content="Catálogos de las marcas que representa MCS Representaciones: Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor y KingSofá.">
+  <meta name="twitter:image" content="https://mcsrepresentaciones.es/images/og-mcs.jpg">
 <style>
   :root {
     --ink: #2c2c2a;
@@ -60,7 +78,13 @@
   display: block;
   background: #f1efe9;
 }
-  }
+  .card video {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  display: block;
+  background: #111;
+}
   .card .label {
     padding: 10px 14px;
     font-size: 12px;
@@ -74,10 +98,13 @@
     padding: 60px 0;
     font-size: 14px;
   }
+  .back{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:18px;padding:6px 0;}
+  .back:hover{color:var(--accent);}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <a class="back" href="/">&larr; Volver a la web</a>
   <div class="filters" id="filters"></div>
   <div id="grid" class="grid"></div>
 </div>
@@ -147,13 +174,14 @@ async function loadBrand(brandKey) {
     const mdFiles = Array.isArray(files) ? files.filter(f => f.name.endsWith(".md")) : [];
 
     const items = await Promise.all(mdFiles.map(async f => {
-      const rawRes = await fetch(`https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/content/catalogo/${brandKey}/${f.name}`);
+      const rawRes = await fetch(`/content/catalogo/${brandKey}/${f.name}`, { cache: "no-cache" });
+      if (!rawRes.ok) return {};
       const rawText = await rawRes.text();
       const data = parseFrontmatter(rawText);
-      return { brandKey, imagen: data.imagen, slug: data.slug || "" };
+      return { brandKey, imagen: data.imagen, video: data.video, slug: data.slug || "", ts: Number((f.name.match(/-(\d+)-\d+\.md$/) || [])[1] || 0) };
     }));
 
-    cache[brandKey] = items.filter(i => i.imagen);
+    cache[brandKey] = items.filter(i => i.imagen || i.video);
     return cache[brandKey];
   } catch (e) {
     cache[brandKey] = [];
@@ -179,7 +207,9 @@ async function renderGrid() {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <img src="${item.imagen}" alt="${brandLabel}" loading="lazy" />
+      ${item.video
+        ? `<video src="${item.video}#t=0.1" controls playsinline preload="metadata"></video>`
+        : `<img src="${item.imagen}" alt="${brandLabel}" loading="lazy" />`}
       <div class="label">${brandLabel}</div>
     `;
     gridEl.appendChild(card);

@@ -152,3 +152,60 @@ Cualquier texto nuevo que vea el visitante debe existir en las dos lenguas, sin 
 ## Novedades: formato unificado
 
 Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y descripción. Los artículos usan la portada nativa `.mcs-cover` (mismo degradado y tipografía que las páginas de artículo), no capturas.
+
+## Textos legales y fuentes locales (20 septiembre 2026)
+
+- Nuevas páginas: `aviso-legal.html` (art. 10 LSSI-CE) y `privacidad.html` (RGPD/LOPDGDD + sección de cookies). Enlazadas en el pie de `index.html` (clase `.mcs-legal-links`) y en el sitemap.
+- Aviso RGPD de primera capa bajo los botones del formulario de contacto (ES/GL).
+- Google Fonts eliminado: las tipografías (Inter 300–600, Playfair Display 400–700, subset latin) están en `fonts/` con `fonts/fonts.css`. Así no hay conexión a terceros y no hace falta banner de cookies. `crm/index.html` (interno, noindex) sigue usando Google Fonts (Fraunces).
+- Si se añade Analytics, píxeles, mapas o vídeos incrustados, hay que crear política de cookies y banner de consentimiento antes de cargarlos.
+- Titular: MCarmen Sanchez Recarey, NIF 32775127N, Paseo Templarios, Cambre, 15679 A Coruña (sin número de portal; añadirlo si procede).
+
+## Formulario, cookies/analítica y enlaces (20 septiembre 2026)
+
+- **Formulario de contacto** ahora envía por **Netlify Forms** (`form-name=contacto`, POST a `/`). Hay un `<form name="contacto" data-netlify="true" hidden>` estático justo tras `<div id="root">` para que Netlify lo detecte; no borrarlo. Antispam: campo trampa `bot-field` (input `#f-bot`, fuera de pantalla) + filtro de Netlify. Campo nuevo obligatorio `Email o teléfono` (`#f-contacto`) y casilla de consentimiento. Estado del envío en `mcsFS`/`mcsFC` (dentro de `Su`). Avisos por email: Netlify → Forms → notifications (configurados por MCarmen).
+- **Analítica:** `cookies.js` (cargado en el `<head>` de todas las páginas públicas). Pegar el ID GA4 en `var GA_ID = ""` (formato `G-XXXXXXXXXX`). Con GA_ID vacío no hay banner ni carga nada. Google Analytics solo se carga tras pulsar "Aceptar"; "Rechazar" y "Aceptar" tienen el mismo peso visual. El consentimiento se guarda 12 meses en localStorage (`mcsCookieConsent`). Enlace "Configurar cookies" en el pie (solo si hay GA_ID). Política de privacidad actualizada (sección 7 = cookies).
+- **Enlaces:** `scripts/check_links.py` + `.github/workflows/check-links.yml` (cada lunes; si hay enlaces rotos falla y GitHub avisa por email). Probar en local sin red: `python3 scripts/check_links.py --internal-only`.
+- Corregida una `}` suelta al final del `<body>` (un `</style>` duplicado).
+- Artículo "El mueble entra en una nueva era regulatoria": ya alojado en `normativa-mueble.html` (ES/GL con `data-gl`, mismo patrón que la guía de tejidos). La tarjeta de Novedades enlaza a esa página. El PDF del sitio externo se sustituye por el botón "Imprimir o guardar como PDF" (`window.print()`). Contenido normativo aportado por MCarmen (Septiembre 2026): revisar cada trimestre.
+
+## CRM protegido con contraseña (20 septiembre 2026)
+
+- Variable de entorno obligatoria en Netlify: **`CRM_PASSWORD`** (mínimo 10 caracteres; mejor una frase larga). Sin ella, el CRM queda cerrado (falla cerrado) y `crm-login` devuelve "Falta configurar CRM_PASSWORD". Ámbitos: todos, incluidas Functions. Tras crearla o cambiarla, hay que redesplegar.
+- Flujo: `crm/index.html` muestra la pantalla de acceso → `POST /.netlify/functions/crm-login` con la contraseña → devuelve un token firmado (HMAC, caduca a las 12 h) que el navegador guarda en `sessionStorage` (se borra al cerrar la pestaña) y envía en la cabecera `x-crm-token`.
+- Código: `netlify/functions/lib/crm-auth.js` (helper), `crm-login.js` (nuevo), y `crm-clientes.js` / `crm-investigar.js` exigen `authorize(event)` y devuelven 401 si no hay token válido. Cambiar `CRM_PASSWORD` invalida todas las sesiones abiertas.
+- El login espera 1,2 s en cada fallo para frenar la fuerza bruta. Usar una contraseña larga.
+- `subir-fotos` ya tenía su propia contraseña (`FOTOS_PASSWORD`).
+
+## Newsletter con Brevo (20 septiembre 2026)
+
+- Formulario en la portada (bloque `#newsletter`, columna derecha del pie, ES/GL): correo + casilla propia de comunicaciones comerciales + información básica. Envía a `netlify/functions/newsletter.js`.
+- La función llama a Brevo `POST /v3/contacts/doubleOptinConfirmation` (doble confirmación). Tras confirmar, Brevo redirige a `suscripcion-confirmada.html` (noindex).
+- Variables de entorno en Netlify: `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOI_TEMPLATE_ID`. Sin ellas responde "Newsletter sin configurar".
+- Antiabuso: tiempo mínimo de 2,5 s desde que se carga la página, límite de 5 intentos por IP y hora y 300 al día (Netlify Blobs, almacén `newsletter-limits`).
+- Política de privacidad, registro de tratamientos (Excel) y NOTES actualizados. El remitente de los correos debe ser una dirección del dominio propio con SPF/DKIM/DMARC configurados en Brevo.
+
+## Aviso de nuevas suscripciones (21 septiembre 2026)
+
+- `newsletter.js` envía un correo a `mcsrepresentaciones@gmail.com` (desde `novedades@mcsrepresentaciones.es`, vía la API transaccional de Brevo `/v3/smtp/email`) cada vez que Brevo acepta una solicitud de suscripción. Es un aviso de la *solicitud*, no de la confirmación: la persona aparece en la lista `Newsletter web` solo cuando confirma.
+- Nunca hace fallar el alta: si el aviso falla, solo se registra en el log. Tope de 20 avisos al día (almacén Blobs `newsletter-limits`, clave `alerts-<día>`).
+- La validación del correo es estricta (solo ASCII, sin `<>` ni espacios), en servidor y en el formulario.
+
+## CRM sin contraseña (23 septiembre 2026)
+
+- Por decisión de la titular, `crm/index.html` ya no pide contraseña: `crm-clientes.js` y `crm-investigar.js` no exigen token. Se quitó el botón "Salir". `crm-login.js` y `lib/crm-auth.js` siguen en el repo por si se quiere volver a activar (basta con restaurar `authorize(event)` y la comprobación de `crmToken()` en `attemptLoad`).
+- Protección de coste: `crm-investigar.js` tiene un tope de **20 investigaciones al día** (almacén Blobs `crm-limits`, clave `inv-AAAA-MM-DD`). Al superarlo devuelve 429 con mensaje.
+
+
+## Feria Hábitat València 2026 (28 sept – 1 oct)
+- Banner horizontal bajo las tarjetas de Novedades (`index.html`, clase `.mcs-feria-banner`). Se muestra solo a partir del **27/09/2026 23:00** (hora de Madrid). Para verlo antes: `/?feria`.
+- Página: `feria-habitat-2026.html` (ES/GL). La galería lee `content/catalogo/feria/*.md` (campo `imagen` o `video`), lo más reciente primero, con visor a pantalla completa.
+- Vídeos también en todas las marcas (catálogo los muestra con reproductor). El catálogo lee las fichas .md desde la propia web, no desde jsDelivr (evita hasta 12 h de caché).
+- Subida desde el móvil: panel `subir-fotos` → destino **★ FERIA HÁBITAT 2026**. Admite fotos y vídeos (máx. 4 MB cada vídeo, por el límite de 6 MB de las funciones de Netlify). Vídeos grandes: reenviarlos por WhatsApp para que se compriman.
+- Comentarios/reseñas: campo de texto en el panel (destino Feria), se guardan como `content/catalogo/feria/nota-*.md` (texto en el cuerpo). Documentos PDF (máx. 4 MB) en `documentos/feria/`, ficha `doc-*.md` con `documento` y `nombre`. La página lee los .md desde la propia web (no jsDelivr) para evitar caché.
+- Para retirar el banner tras la feria: borrar el bloque `(Date.now()>=Date.parse("2026-09-28...` en `index.html`.
+
+## Página de suscripción (24 septiembre 2026)
+- `suscribirse.html` (también `/suscribirse` y `/suscribete`): enlace directo para compartir con clientes. Mismo alta que el bloque `#newsletter` (función `newsletter.js`, doble confirmación Brevo). ES/GL con botones; `?lang=gl` abre en gallego.
+- Logo: todas las páginas sueltas usan `images/logo-mcs-h.png` (recorte sin tocar de `logo-mcs.png`, el logotipo oficial e inalterable). Nunca sustituirlo por texto "MCS".
+- `suscribirse-feria.html` (`/suscribirse-feria`): versión solo Feria Valencia 2026 para la invitación. Misma lista de Brevo; envía `origen:"feria"` y el aviso a MCarmen lo indica en el asunto.
