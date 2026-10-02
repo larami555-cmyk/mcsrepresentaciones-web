@@ -19,7 +19,8 @@ button{width:100%;font-size:16px;font-weight:bold;letter-spacing:1px;padding:16p
 <div id="st"></div></div>
 <script>
 const CAMP='feria-dia1', st=document.getElementById('st'), passEl=document.getElementById('pass');
-let saved=''; // la contraseña ya NO se recuerda: se pide siempre
+let saved=''; try{saved=localStorage.getItem('mcsFotosPass')||'';}catch(e){}
+if(saved){document.getElementById('passBox').style.display='none';}
 const pass=()=>saved||passEl.value;
 function msg(t,c){st.textContent=t;st.className=c||'';}
 function bloquear(on){document.querySelectorAll('button').forEach(b=>b.disabled=on);}
@@ -28,6 +29,7 @@ async function llamar(accion,extra){
   let d={};try{d=await r.json();}catch(e){}
   if(r.status===401){try{localStorage.removeItem('mcsFotosPass');}catch(e){}saved='';document.getElementById('passBox').style.display='';}
   if(!r.ok) throw new Error(d.error||('Error '+r.status));
+  if(!saved&&passEl.value){try{localStorage.setItem('mcsFotosPass',passEl.value);}catch(e){}saved=passEl.value;}
   return d;
 }
 function enviada(){msg('✓ Campaña enviada a toda la lista. Puedes ver aperturas en Brevo → Campañas.','ok');bloquear(true);}
