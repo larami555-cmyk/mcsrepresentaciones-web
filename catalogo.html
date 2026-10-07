@@ -200,7 +200,7 @@ async function renderGrid() {
     gridEl.innerHTML = '<div class="empty">Todavía no hay fotografías en esta sección.</div>';
     return;
   }
-
+ 
   gridEl.innerHTML = "";
   items.forEach(item => {
     const brandLabel = BRANDS.find(b => b.key === item.brandKey)?.label || "";
