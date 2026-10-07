@@ -3,7 +3,19 @@ const crypto = require('crypto');
 const GITHUB_API = 'https://api.github.com';
 const OWNER = 'larami555-cmyk', REPO = 'mcsrepresentaciones-web', BRANCH = 'main';
 const MARCAS = ['treku', 'baixmoduls', 'tobisa', 'kingsofa', 'tapizadosmayor', 'essenzia', 'feria'];
-const SLUG = /^(foto|video|doc|nota)-\d+-\d+$/;
+const SLUG_NUEVO = /^(foto|video|doc|nota)-\d+-\d+$/;
+const SLUG = /^[a-zA-Z0-9_-]{1,80}$/; // acepta también nombres antiguos (p.ej. "producto-1")
+const parseFrontmatter = (text) => {
+  const m = text.match(/^---\s*([\s\S]*?)\s*---/);
+  const d = {};
+  if (!m) return d;
+  m[1].split('\n').forEach(line => {
+    const i = line.indexOf(':');
+    if (i === -1) return;
+    d[line.slice(0, i).trim()] = line.slice(i + 1).trim().replace(/^["']|["']$/g, '');
+  });
+  return d;
+};
 const json = (c, o) => ({ statusCode: c, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, body: JSON.stringify(o) });
 const sha = x => crypto.createHash('sha256').update(String(x)).digest();
 
@@ -41,11 +53,30 @@ exports.handler = async (event) => {
         if (!x.startsWith(mdDir) || !x.endsWith('.md')) continue;
         const slug = x.slice(mdDir.length, -3);
         if (!SLUG.test(slug)) continue;
-        const it = { slug, tipo: slug.split('-')[0], ts: Number(slug.split('-')[1]), media: mediaOf(slug)[0] || null };
-        if (it.tipo === 'nota') {
+        const esNuevo = SLUG_NUEVO.test(slug);
+        const it = {
+          slug,
+          tipo: esNuevo ? slug.split('-')[0] : 'foto',
+          ts: esNuevo ? Number(slug.split('-')[1]) : 0,
+          media: mediaOf(slug)[0] || null
+        };
+        // Para archivos antiguos (o notas), la ruta de la imagen/vídeo no sigue el
+        // patrón previsible: se lee directamente del frontmatter del .md.
+        if (it.tipo === 'nota' || !it.media) {
           try {
             const f = await call(`/contents/${x}?ref=${head}`);
-            it.texto = Buffer.from(f.content, 'base64').toString('utf8').replace(/^---[\s\S]*?---\s*/, '').trim().slice(0, 300);
+            const raw = Buffer.from(f.content, 'base64').toString('utf8');
+            const fm = parseFrontmatter(raw);
+            if (it.tipo === 'nota') {
+              it.texto = raw.replace(/^---[\s\S]*?---\s*/, '').trim().slice(0, 300);
+            } else if (fm.video) {
+              it.tipo = 'video';
+              it.media = fm.video.replace(/^\//, '');
+            } else if (fm.imagen) {
+              it.media = fm.imagen.replace(/^\//, '');
+            } else if (fm.documento) {
+              it.tipo = 'doc';
+            }
           } catch (e) { it.texto = ''; }
         }
         items.push(it);
@@ -61,7 +92,18 @@ exports.handler = async (event) => {
       for (const s of slugs) {
         const md = `${mdDir}${s}.md`;
         if (paths.includes(md)) borrar.push(md);
-        borrar.push(...mediaOf(s));
+        const media = mediaOf(s);
+        if (media.length) {
+          borrar.push(...media);
+        } else if (paths.includes(md)) {
+          // Nombre antiguo: la ruta real de la imagen/vídeo está en el frontmatter, no se puede adivinar.
+          try {
+            const f = await call(`/contents/${md}?ref=${head}`);
+            const fm = parseFrontmatter(Buffer.from(f.content, 'base64').toString('utf8'));
+            const real = (fm.imagen || fm.video || '').replace(/^\//, '');
+            if (real && paths.includes(real)) borrar.push(real);
+          } catch (e) {}
+        }
       }
       if (!borrar.length) return json(404, { error: 'No se encontró el archivo (puede que ya esté borrado)' });
       const nt = await call('/git/trees', { method: 'POST', body: JSON.stringify({
