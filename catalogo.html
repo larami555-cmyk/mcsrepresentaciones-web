@@ -194,7 +194,7 @@ async function renderGrid() {
 
   const brandKeys = currentFilter === "all" ? BRANDS.map(b => b.key) : [currentFilter];
   const results = await Promise.all(brandKeys.map(loadBrand));
-  const items = results.flat();
+  const items = results.flat().sort((a, b) => b.ts - a.ts); // más reciente primero
 
   if (items.length === 0) {
     gridEl.innerHTML = '<div class="empty">Todavía no hay fotografías en esta sección.</div>';
