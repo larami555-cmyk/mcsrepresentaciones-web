@@ -72,6 +72,8 @@
   .extras{font-size:11.5px;border-top:1px solid var(--line);padding-top:7px;display:flex;flex-direction:column;gap:4px;}
   .extras label{display:flex;gap:6px;align-items:center;cursor:pointer;}
   .extras small{color:var(--muted);}
+  .extras label.blk{display:block;cursor:default;}
+  .extras label.blk select{display:block;width:100%;margin-top:3px;font-size:12px;}
   .pricebox{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;}
   .price{font-size:19px;font-weight:700;color:var(--navy);}
   .pricenote{font-size:10.5px;color:var(--muted);}
@@ -146,10 +148,11 @@
   </section>
 
   <section id="s-canapes">
-    <div class="info">Magnum, Rox, Varadero (Terra/madera y Lady/metal) y Oslo. Extras facturados en puntos (tapa partida, apertura motorizada, anclaje de unión) sumados también a coste.</div>
+    <div class="info">Magnum, Rox, Varadero (Terra/madera y Lady/metal) y Oslo. Extras facturados en puntos (tapa partida, apertura motorizada, anclaje de unión) sumados también a coste. Oslo es de madera: tiene un único precio, la serie de tejido no le afecta.</div>
     <div class="search-row"><input type="text" id="k-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="k-ancho"></select></div>
+      <div class="f"><label>Largo</label><select id="k-largo"><option value="190">180 · 190 cm</option><option value="200">200 cm</option></select></div>
       <div class="f"><label>Serie tejido</label><select id="k-serie"><option value="A">Serie A</option><option value="B">Serie B</option><option value="C">Serie C</option></select></div>
       <div class="f"><label>Orden</label><select id="k-orden"><option value="asc">Precio ↑</option><option value="desc">Precio ↓</option><option value="az">Nombre A–Z</option></select></div>
     </div>
@@ -157,7 +160,7 @@
   </section>
 
   <section id="s-bases">
-    <div class="info">Lyon (estándar y acabado Milán), Gran Suite, Gran Suite Spring y Funda Sena.</div>
+    <div class="info">Base 3D, Lyon (estándar y acabado Milán), Gran Suite, Gran Suite Spring y Funda Sena. La Base 3D no va por serie de tejido: tiene precio por largo, color y patas aparte (se eligen en su propia tarjeta).</div>
     <div class="search-row"><input type="text" id="b-search" placeholder="Buscar modelo…"></div>
     <div class="bar">
       <div class="f"><label>Ancho</label><select id="b-ancho"></select></div>
@@ -249,7 +252,7 @@
       <div class="toolcard">
         <div class="toolicon">🖨️</div>
         <h3>EXPORTAR PDF</h3>
-        <p>Descarga en PDF el listado que estés viendo ahora mismo (la pestaña activa, con los filtros aplicados)</p>
+        <p>Descarga en PDF el listado de la última pestaña que hayas visitado (Colchones, Canapés, Bases…), con los filtros aplicados</p>
         <div class="toolbtns">
           <button id="btn-export-pdf" class="toolbtn dark">Exportar PDF</button>
         </div>
@@ -403,6 +406,12 @@ const osloPrecio = { A190:[608,637,692,731,817,1409,1620], A200:[639,669,726,768
 
 /* ============ BASES ============ */
 const bases = [
+  /* Base 3D (soporte fijo tapizado) — catálogo oficial, págs. 216-217. Sin series: precio por largo. No se fabrica precio para ancho 200. */
+  { id:'base-3d', nombre:'Base 3D', tipo3d:true, anchos:[90,105,135,150,160,180],
+    precios:{'190':[163,175,206,218,242,274], '200':[168,180,213,225,249,282]},
+    nPatas:{90:6,105:6,135:7,150:7,160:9,180:9},
+    patas:[{id:'madera', n:'Redonda madera 25 cm', p:7},{id:'metal25', n:'Redonda metálica 25 cm', p:4},{id:'metal35', n:'Redonda metálica 35 cm', p:7}],
+    extras:[{id:'perim', n:'Perímetro tapizado', p:60},{id:'pletinas', n:'Pletinas de unión', p:15}] },
   { id:'lyon-standard', nombre:'Base Lyon (Artic/Nórdica/Madera Haya)', A:[400,421,474,491,536,563,647], B:[432,455,503,521,563,591,679], C:[484,505,558,573,620,644,741], anchos:[90,105,135,150,160,180,200] },
   { id:'lyon-milan', nombre:'Base Lyon (acabado Milán)', A:[520,564,686,727,805,866,996], B:[561,609,727,770,845,909,1046], C:[629,677,807,847,930,991,1140], anchos:[90,105,135,150,160,180,200] },
   { id:'gransuite', nombre:'Gran Suite', A:[393,460,547,574,639,673,774], B:[428,493,580,603,671,707,812], C:[470,547,632,657,725,756,886], anchos:[90,105,135,150,160,180,200] },
@@ -527,11 +536,12 @@ function renderCanapes(){
   const ancho = parseInt(kAnchoSel.value);
   const idx = ANCHOS.indexOf(ancho);
   const serie = document.getElementById('k-serie').value;
+  const largoK = document.getElementById('k-largo').value;
   const orden = document.getElementById('k-orden').value;
   const query = document.getElementById('k-search').value.trim().toLowerCase();
   const grid = document.getElementById('k-grid'); grid.innerHTML='';
   let items = canapes.filter(c=> query==='' || c.nombre.toLowerCase().includes(query)).map(c=>{
-    const raw = c[serie+'190'][idx];
+    const raw = c[serie+largoK][idx];
     const base = raw*PUNTO;
     if(!extraState[c.id]) extraState[c.id] = new Set();
     let extraCost = 0;
@@ -539,15 +549,16 @@ function renderCanapes(){
     return {...c, precio: base+extraCost, base, raw};
   });
   if(!extraState['oslo']) extraState['oslo'] = new Set();
-  const osloExtras = [{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680}];
+  const osloExtras = [{n:'Tapa perímetro tela',p:80},{n:'Tapa partida',p:120},{n:'Apertura lateral',p:140},{n:'Apertura motorizada simple',p:611},{n:'Apertura motorizada gemelo',p:680},{n:'Anclaje de unión',p:15}];
   let osloExtraCost = 0; extraState['oslo'].forEach(n=>{ const e=osloExtras.find(x=>x.n===n); if(e) osloExtraCost += e.p*PUNTO; });
-  const osloRaw = osloPrecio.A190[idx], osloBase = osloRaw*PUNTO;
-  if(query==='' || 'oslo'.includes(query)) items.push({ id:'oslo', nombre:'Oslo', material:'Canapé madera', base:osloBase, raw:osloRaw, precio:osloBase+osloExtraCost, extras:osloExtras });
+  const osloRaw = osloPrecio['A'+largoK][idx], osloBase = osloRaw*PUNTO;
+  if(query==='' || 'oslo'.includes(query)) items.push({ id:'oslo', nombre:'Oslo', material:'Canapé madera · precio único (sin serie de tejido)', sinSerie:true, base:osloBase, raw:osloRaw, precio:osloBase+osloExtraCost, extras:osloExtras });
 
   if(orden==='asc') items.sort((a,b)=>a.precio-b.precio);
   else if(orden==='desc') items.sort((a,b)=>b.precio-a.precio);
   else items.sort((a,b)=>a.nombre.localeCompare(b.nombre));
 
+  if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
   items.forEach(c=>{
     const card=document.createElement('div'); card.className='card';
     let extrasHtml = '';
@@ -558,11 +569,11 @@ function renderCanapes(){
       }).join('') + '</div>';
     }
     card.innerHTML=`
-      <div class="row"><h3>${c.nombre}</h3><span class="tag">${ancho} cm</span></div>
+      <div class="row"><h3>${c.nombre}</h3><span class="tag${c.sinSerie?' alt':''}">${c.sinSerie?'Sin serie':'Serie '+serie}</span></div>
       <div class="sub">${c.material||''}</div>
       ${extrasHtml}
       <div class="pricebox">
-        <div><div class="pricenote">${c.raw} pts × 0,40 € = ${c.base.toFixed(2)} €</div>
+        <div><div class="pricenote">${ancho}×${largoK==='190'?'180 / 190':'200'} cm · ${c.raw} pts × ${PUNTO.toFixed(2).replace('.',',')} € = ${c.base.toFixed(2)} €</div>
         <div class="price">${c.precio.toFixed(2)} €</div></div>
       </div>`;
     grid.appendChild(card);
@@ -575,12 +586,24 @@ function renderCanapes(){
     });
   });
 }
-['k-ancho','k-serie','k-orden','k-search'].forEach(id=>document.getElementById(id).addEventListener(id==='k-search'?'input':'change',renderCanapes));
+['k-ancho','k-largo','k-serie','k-orden','k-search'].forEach(id=>document.getElementById(id).addEventListener(id==='k-search'?'input':'change',renderCanapes));
 
 /* ================= RENDER: BASES ================= */
 const bAnchoSel = document.getElementById('b-ancho');
 ANCHOS.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' cm'; bAnchoSel.appendChild(o); });
 bAnchoSel.value = '150';
+const base3dState = { largo:'190', color:false, perim:false, pletinas:false, patas:'' };
+function calcBase3D(b, ancho){
+  const idx = b.anchos.indexOf(ancho);
+  if(idx===-1) return {raw:null, precio:null, pts:null};
+  const raw = b.precios[base3dState.largo][idx];
+  let pts = raw;
+  if(base3dState.color) pts += raw*0.10;
+  b.extras.forEach(e=>{ if(base3dState[e.id]) pts += e.p; });
+  const pata = b.patas.find(x=>x.id===base3dState.patas);
+  if(pata) pts += pata.p * b.nPatas[ancho];
+  return {raw, pts, precio: pts*PUNTO};
+}
 function renderBases(){
   const ancho = parseInt(bAnchoSel.value);
   const serie = document.getElementById('b-serie').value;
@@ -588,6 +611,7 @@ function renderBases(){
   const query = document.getElementById('b-search').value.trim().toLowerCase();
   const grid = document.getElementById('b-grid'); grid.innerHTML='';
   let items = bases.filter(b=> query==='' || b.nombre.toLowerCase().includes(query)).map(b=>{
+    if(b.tipo3d){ const r = calcBase3D(b, ancho); return {...b, raw:r.raw, pts:r.pts, precio:r.precio}; }
     const idx = b.anchos.indexOf(ancho);
     const raw = idx>-1?b[serie][idx]:null;
     return {...b, raw, precio: raw==null?null:raw*PUNTO};
@@ -598,6 +622,35 @@ function renderBases(){
   if(items.length===0){ grid.innerHTML='<div class="empty">Sin resultados.</div>'; return; }
   items.forEach(b=>{
     const card=document.createElement('div'); card.className='card';
+    if(b.tipo3d){
+      const st = base3dState, n = b.nPatas[ancho];
+      const eur = v => (v*PUNTO).toFixed(2)+' €';
+      const patasOpts = '<option value="">Sin patas</option>' + b.patas.map(x=>
+        `<option value="${x.id}" ${st.patas===x.id?'selected':''}>${x.n} · ${x.p} pts/ud${n?' × '+n+' = '+eur(x.p*n):''}</option>`).join('');
+      const ptsTxt = b.pts==null ? '—' : (Number.isInteger(b.pts)? b.pts : b.pts.toFixed(1).replace('.',','));
+      card.innerHTML=`
+        <div class="row"><h3>${b.nombre}</h3><span class="tag alt">Sin serie</span></div>
+        <div class="sub">Soporte fijo tapizado · 5 cm · patas no incluidas${n?' ('+n+' patas en '+ancho+' cm)':''}</div>
+        <div class="extras">
+          <label class="blk">Largo <select data-b3="largo"><option value="190" ${st.largo==='190'?'selected':''}>180 · 190 cm</option><option value="200" ${st.largo==='200'?'selected':''}>200 cm</option></select></label>
+          <label><input type="checkbox" data-b3="color" ${st.color?'checked':''}> Color blanco / gris / chocolate <small>(+10% s/tarifa${b.raw!=null?' = '+eur(b.raw*0.10):''})</small></label>
+          ${b.extras.map(e=>`<label><input type="checkbox" data-b3="${e.id}" ${st[e.id]?'checked':''}> ${e.n} <small>(${e.p} pts = ${eur(e.p)})</small></label>`).join('')}
+          <label class="blk">Patas <select data-b3="patas">${patasOpts}</select></label>
+        </div>
+        <div class="pricebox">
+          <div><div class="pricenote">${ancho}×${st.largo==='190'?'180 / 190':'200'} cm · base ${b.raw??'—'} pts${b.pts!=null && b.pts!==b.raw?' · total '+ptsTxt+' pts':''}${b.raw==null?' · no disponible en este ancho':''}</div>
+          <div class="price">${b.precio!=null?b.precio.toFixed(2)+' €':'—'}</div></div>
+        </div>`;
+      grid.appendChild(card);
+      card.querySelectorAll('[data-b3]').forEach(el=>{
+        el.addEventListener('change', ev=>{
+          const k = ev.target.dataset.b3;
+          base3dState[k] = ev.target.type==='checkbox' ? ev.target.checked : ev.target.value;
+          renderBases();
+        });
+      });
+      return;
+    }
     const badgeB = b.origen==='magnifique' ? '<span class="tag mg">Magnifique</span>' : `<span class="tag">Serie ${serie}</span>`;
     card.innerHTML=`
       <div class="row"><h3>${b.nombre}</h3>${badgeB}</div>
@@ -663,7 +716,7 @@ function renderCamas(){
     extraStateCamas[m.nombre].forEach(n=>{ const e=m.extras.find(x=>x.n===n); if(e) extraCost += e.p*PUNTO; });
     const precio = base==null?null:base+extraCost;
     const card=document.createElement('div'); card.className='card';
-    const extrasHtml = '<div class="extras">' + m.extras.map(e=>{
+    const extrasHtml = !m.extras.length ? '' : '<div class="extras">' + m.extras.map(e=>{
       const checked = extraStateCamas[m.nombre].has(e.n) ? 'checked' : '';
       return `<label><input type="checkbox" data-id="${m.nombre}" data-name="${e.n}" ${checked}> ${e.n} <small>(${e.p} pts = ${(e.p*PUNTO).toFixed(2)} €)</small></label>`;
     }).join('') + '</div>';
@@ -848,12 +901,14 @@ document.querySelectorAll('.subtab').forEach(b=>{
 });
 
 /* ================= NAV ================= */
+let ultimaPestana = 'colchones';
 document.querySelectorAll('nav button').forEach(b=>{
   b.addEventListener('click', ()=>{
     document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     document.getElementById('s-'+b.dataset.t).classList.add('active');
+    if(b.dataset.t!=='herramientas') ultimaPestana = b.dataset.t;
   });
 });
 
@@ -882,14 +937,26 @@ renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(
 
 /* ================= HERRAMIENTAS: Exportar PDF + Copia de seguridad ================= */
 document.getElementById('btn-export-pdf').addEventListener('click', ()=>{
+  // Se imprime la última pestaña de producto visitada (con sus filtros), no la de Herramientas.
+  const herr = document.getElementById('s-herramientas');
+  const destino = document.getElementById('s-'+ultimaPestana);
+  herr.classList.remove('active'); destino.classList.add('active');
+  let restaurado = false;
+  const restaurar = ()=>{
+    if(restaurado) return; restaurado = true;
+    destino.classList.remove('active'); herr.classList.add('active');
+    window.removeEventListener('afterprint', restaurar);
+  };
+  window.addEventListener('afterprint', restaurar);
   window.print();
+  setTimeout(restaurar, 60000); // por si el navegador no avisa al terminar
 });
 
 document.getElementById('btn-export-backup').addEventListener('click', ()=>{
   let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
   // Incrusta el valor del punto actual como valor por defecto, para que la copia
   // funcione correctamente aunque se abra en otro navegador/dispositivo sin ese localStorage.
-  html = html.replace('let PUNTO = 0.40;', 'let PUNTO = ' + PUNTO + ';');
+  html = html.replace(/let PUNTO = [\d.]+;/, 'let PUNTO = ' + PUNTO + ';');
   const hoy = new Date();
   const fechaStr = hoy.toISOString().slice(0,10);
   const blob = new Blob([html], {type:'text/html'});
@@ -932,7 +999,7 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-09-12 · 21:10</div>
+<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-11-13 · 21:30</div>
 </body>
 </html>
 
