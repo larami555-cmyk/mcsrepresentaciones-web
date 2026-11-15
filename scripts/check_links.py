@@ -30,6 +30,7 @@ for f in PAGES:
         p = u.split("#")[0].split("?")[0]
         if not p: continue
         path = p.lstrip("/") if p.startswith("/") else os.path.normpath(os.path.join(os.path.dirname(f), p))
+        if path in ("", "."): path = "index.html"   # "/" es la portada
         if not os.path.exists(path): internal_bad.append((f, u))
 
 # ---- externos ----

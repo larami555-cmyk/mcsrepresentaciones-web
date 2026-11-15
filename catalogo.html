@@ -3,26 +3,32 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Catálogo — MCS Representaciones</title>
+<title>Catálogo de muebles, sofás y descanso para tiendas en Galicia | MCS Representaciones</title>
   <script src="./cookies.js"></script>
-  <meta name="description" content="Catálogos de las marcas que representa MCS Representaciones: Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor y KingSofá.">
+  <meta name="description" content="Fotos de catálogo de Treku, Baixmoduls, Tobisa, KingSofá, Tapizados Mayor y Essenzia Dormire: muebles, tapicería y descanso para tiendas en Galicia.">
   <link rel="canonical" href="https://mcsrepresentaciones.es/catalogo.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCS Representaciones">
-  <meta property="og:title" content="Catálogo — MCS Representaciones">
-  <meta property="og:description" content="Catálogos de las marcas que representa MCS Representaciones: Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor y KingSofá.">
+  <meta property="og:title" content="Catálogo de muebles, sofás y descanso para tiendas en Galicia | MCS Representaciones">
+  <meta property="og:description" content="Fotos de catálogo de Treku, Baixmoduls, Tobisa, KingSofá, Tapizados Mayor y Essenzia Dormire: muebles, tapicería y descanso para tiendas en Galicia.">
   <meta property="og:url" content="https://mcsrepresentaciones.es/catalogo.html">
   <meta property="og:locale" content="es_ES">
-  <meta property="og:locale:alternate" content="gl_ES">
   <meta property="og:image" content="https://mcsrepresentaciones.es/images/og-mcs.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="MCS Representaciones: muebles, tapicería y descanso en Galicia">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Catálogo — MCS Representaciones">
-  <meta name="twitter:description" content="Catálogos de las marcas que representa MCS Representaciones: Treku, Baixmoduls, Tobisa, Essenzia Dormire, Tapizados Mayor y KingSofá.">
+  <meta name="twitter:title" content="Catálogo de muebles, sofás y descanso para tiendas en Galicia | MCS Representaciones">
+  <meta name="twitter:description" content="Fotos de catálogo de Treku, Baixmoduls, Tobisa, KingSofá, Tapizados Mayor y Essenzia Dormire: muebles, tapicería y descanso para tiendas en Galicia.">
   <meta name="twitter:image" content="https://mcsrepresentaciones.es/images/og-mcs.jpg">
+<meta name="google" content="notranslate">
+<link rel="icon" type="image/png" sizes="32x32" href="./images/icon-32.png">
+<link rel="stylesheet" href="./fonts/fonts.css">
 <style>
+  h1{font-family:'Playfair Display',serif;font-weight:500;font-size:30px;line-height:1.15;margin:0 0 10px}
+  .lead{max-width:720px;font-size:15px;line-height:1.6;color:#5A534D;margin:0 0 24px}
+  .lead a{color:#C1633D}
+  @media (min-width:800px){h1{font-size:40px}}
   :root {
     --ink: #2c2c2a;
     --muted: #8a8880;
@@ -104,22 +110,26 @@
 </head>
 <body>
 <div class="wrap">
-  <a class="back" href="/">&larr; Volver a la web</a>
+  <a class="back" href="/" data-gl="&larr; Volver á web">&larr; Volver a la web</a>
+  <h1 data-gl="Catálogo de mobles, sofás e descanso para tendas">Catálogo de muebles, sofás y descanso para tiendas</h1>
+  <p class="lead" data-gl="Fotos reais de produto dos seis fabricantes nacionais que MCS Representaciones representa en Galicia: moble de deseño de Treku, moble modular e xuvenil de Baixmoduls e Tobisa, sofás de KingSofá e Tapizados Mayor, e colchóns e descanso de Essenzia Dormire. Filtra por marca e, se algunha peza encaixa na túa tenda, <a href=&quot;/#contacto&quot;>escríbeme</a>.">Fotos reales de producto de los seis fabricantes nacionales que MCS Representaciones representa en Galicia: mueble de diseño de Treku, mueble modular y juvenil de Baixmoduls y Tobisa, sofás de KingSofá y Tapizados Mayor, y colchones y descanso de Essenzia Dormire. Filtra por marca y, si alguna pieza encaja en tu tienda, <a href="/#contacto">escríbeme</a>.</p>
   <div class="filters" id="filters"></div>
   <div id="grid" class="grid"></div>
 </div>
 
 <script>
+var MCS_GL=false;
+try{if(localStorage.getItem("mcsLang")==="gl"){MCS_GL=true;document.documentElement.lang="gl";document.title="Catálogo de mobles, sofás e descanso para tendas en Galicia | MCS Representaciones";document.querySelectorAll("[data-gl]").forEach(function(el){el.innerHTML=el.getAttribute("data-gl")});}}catch(e){}
 const REPO = "larami555-cmyk/mcsrepresentaciones-web";
 const BRANCH = "main";
 
 const BRANDS = [
-  { key: "treku", label: "TREKU" },
-  { key: "baixmoduls", label: "BAIXMODULS" },
-  { key: "tobisa", label: "Tobisa" },
-  { key: "kingsofa", label: "KingSofá" },
-  { key: "tapizadosmayor", label: "Tapizados Mayor" },
-  { key: "essenzia", label: "Essenzia Dormire" }
+  { key: "treku", label: "TREKU", cat: "mueble de diseño", catGl: "moble de deseño" },
+  { key: "baixmoduls", label: "BAIXMODULS", cat: "mueble modular", catGl: "moble modular" },
+  { key: "tobisa", label: "Tobisa", cat: "mueble juvenil", catGl: "moble xuvenil" },
+  { key: "kingsofa", label: "KingSofá", cat: "sofás", catGl: "sofás" },
+  { key: "tapizadosmayor", label: "Tapizados Mayor", cat: "tapicería", catGl: "tapicería" },
+  { key: "essenzia", label: "Essenzia Dormire", cat: "colchones y descanso", catGl: "colchóns e descanso" }
 ];
 
 const filtersEl = document.getElementById("filters");
@@ -203,13 +213,15 @@ async function renderGrid() {
  
   gridEl.innerHTML = "";
   items.forEach(item => {
-    const brandLabel = BRANDS.find(b => b.key === item.brandKey)?.label || "";
+    const brand = BRANDS.find(b => b.key === item.brandKey) || {};
+    const brandLabel = brand.label || "";
+    const altText = brandLabel + ": " + (MCS_GL ? brand.catGl : brand.cat) + (MCS_GL ? " para tendas en Galicia" : " para tiendas en Galicia");
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
       ${item.video
         ? `<video src="${item.video}#t=0.1" controls playsinline preload="metadata"></video>`
-        : `<img src="${item.imagen}" alt="${brandLabel}" loading="lazy" />`}
+        : `<img src="${item.imagen}" alt="${altText}" width="480" height="440" loading="lazy" decoding="async" />`}
       <div class="label">${brandLabel}</div>
     `;
     gridEl.appendChild(card);
