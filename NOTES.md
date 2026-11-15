@@ -246,3 +246,12 @@ La portada y el catálogo ya no llegan vacíos a quien no ejecuta JavaScript (Go
 - **Si el paso falla** en producción, la página se publica como antes y el log de Netlify muestra `[static] AVISO`. En las vistas previas de un pull request, el fallo detiene el deploy.
 - **Probar en local:** `npm install && node scripts/build-static.mjs --strict`, mirar, y después `git checkout index.html catalogo.html` para no subir el resultado.
 - El idioma del HTML estático es castellano; el gallego sigue aplicándose en el navegador.
+
+## Versión en gallego con dirección propia: /gl/ (15 noviembre 2026)
+
+- El mismo paso de publicación (`scripts/build-static.mjs`) genera **`/gl/`**: portada, catálogo, las 7 páginas de marca y los 5 artículos, 14 páginas en total. No existe carpeta `gl/` en el repo; se crea al publicar.
+- **De dónde sale el texto:** la portada se pinta con la app en gallego (`mcsI18n.gl`); el resto, de los atributos `data-gl` de cada página. El título gallego sale de la línea `document.title="…"` del script de cada página y la descripción, de `data-gl-content` en `<meta name="description">`. Página nueva con versión gallega: ponerle `data-gl`, esas dos cosas, y añadirla a `GL_PAGES` en el script.
+- Cada pareja lleva `hreflang` es/gl recíproco y canonical propio; las direcciones `/gl/` se añaden solas al sitemap publicado.
+- `_redirects`: `/gl/* /:splat 200` sirve desde la raíz todo lo que no exista en `/gl/` (imágenes, fuentes, páginas sin traducir), así que las rutas relativas `./images/...` funcionan igual.
+- Las páginas `/gl/` fijan `localStorage.mcsLang="gl"` al cargar. En la portada, el botón "Galego" lleva a `/gl/` y "Castellano" vuelve a `/`.
+- Logotipo de SweetBedding: `images/logo-sweetbedding.png`, recortado de la portada de su dosier (baja resolución; sustituir si llega un archivo mejor).

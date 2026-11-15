@@ -112,7 +112,7 @@ BRANDS = [
         slug="sweetbedding-galicia",
         fit=("Colchones de núcleos perfilados y muelles ensacados, junto con complementos de descanso. Encaja en colchonerías que buscan diferenciar su oferta y explicar al cliente las características de los materiales y del soporte.",
              "Colchóns de núcleos perfilados e molas ensacadas, xunto con complementos de descanso. Encaixa en colchoarías que buscan diferenciar a súa oferta e explicarlle ao cliente as características dos materiais e do soporte."), id="sweetbedding", folder=None, name="SweetBedding", photo="images/novedad-sweetbedding.jpg",
-        logo="", web="https://sweetbedding.es",
+        logo="images/logo-sweetbedding.png", web="https://sweetbedding.es",
         cat=("colchones y descanso", "colchóns e descanso"),
         tag=("Descanso · Fabricación suiza", "Descanso · Fabricación suíza"),
         intro=("Soy la agente comercial de SweetBedding para las tiendas de muebles y de descanso de A Coruña, Lugo, Ourense y Pontevedra.",
@@ -260,6 +260,7 @@ def page(b):
     title_es = f"{name} en Galicia: {cat_es} para tiendas | MCS Representaciones"
     title_gl = f"{name} en Galicia: {cat_gl} para tendas | MCS Representaciones"
     desc = f"Agente comercial de {name} en Galicia. {cat_es[0].upper() + cat_es[1:]} para tiendas de A Coruña, Lugo, Ourense y Pontevedra: catálogos, tarifas y visita en tu exposición."
+    desc_gl = f"Axente comercial de {name} en Galicia. {cat_gl[0].upper() + cat_gl[1:]} para tendas da Coruña, Lugo, Ourense e Pontevedra: catálogos, tarifas e visita na túa exposición."
     pw, ph = img_size(os.path.join(ROOT, b["photo"]))
     wa_es = WA + urllib.parse.quote(f"Hola MCarmen, tengo una tienda en Galicia y me interesa {name}.")
     wa_gl_text = f"Ola MCarmen, teño unha tenda en Galicia e interésame {name}."
@@ -287,7 +288,7 @@ def page(b):
 <meta name="robots" content="index, follow">
 <title>{e(title_es)}</title>
   <script src="./cookies.js"></script>
-  <meta name="description" content="{e(desc)}">
+  <meta name="description" content="{e(desc)}" data-gl-content="{e(desc_gl)}">
   <link rel="canonical" href="{url}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCS Representaciones">
