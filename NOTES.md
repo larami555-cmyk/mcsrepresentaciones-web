@@ -227,3 +227,38 @@ Primera tanda de la auditoría SEO (rama `seo/mejoras-auditoria`):
 - Tarjetas de marca: foto y botones alineados abajo (tarjeta en `flex` columna, `.mcs-photo-box{margin-top:auto}`), así todas las fotos de una fila quedan a la misma altura aunque el texto de arriba ocupe distinto.
 - `sameAs` usa el enlace de Google Maps de la ficha que dio MCarmen (`maps.app.goo.gl/P6wNBATUDheDEgZy9`).
 - **Pendiente (segunda tanda):** HTML estático/prerender de portada y catálogo, páginas por marca y categoría, versión `/gl/`, logotipo de SweetBedding.
+
+## Páginas de marca (15 noviembre 2026)
+
+- 7 páginas estáticas, una por marca: `treku-galicia.html`, `baixmoduls-galicia.html`, `tobisa-galicia.html`, `essenzia-dormire-galicia.html`, `sweetbedding-galicia.html`, `tapizados-mayor-galicia.html`, `kingsofa-galicia.html`. Objetivo: posicionar "marca + Galicia".
+- **Se generan con `python3 scripts/build_brand_pages.py`** (sin dependencias). Los textos ES/GL están dentro del script: para cambiarlos, editar el script y volver a ejecutarlo; no tocar los `.html` a mano. La galería toma las 6 fotos más recientes de `content/catalogo/<marca>/`, así que conviene regenerar tras subir fotos nuevas.
+- Usan datos que ya estaban en la web (tarjetas de marca, catálogos, documentos) más la sección "Qué se vende y a qué tienda le encaja", con frases aportadas por MCarmen el 15/11/2026 (campo `fit` del script). En SweetBedding se omitió la mención al látex, igual que en la tarjeta de portada.
+- Enlazadas desde: el nombre de cada marca en las tarjetas de portada (campo `page` en `ql`, clase `.mcs-brandlink`), la fila "Fichas de marca" del catálogo, entre ellas y el sitemap. Marca nueva: añadirla a `BRANDS` en el script, a `ql` (con `page`), a la fila del catálogo y al sitemap.
+- `index.html` lleva al final un script que baja al ancla (`/#marcas`, `/#marca-treku`, `/#contacto`) cuando se llega desde otra página, porque React pinta la sección después de cargar.
+
+## HTML estático al publicar (15 noviembre 2026)
+
+La portada y el catálogo ya no llegan vacíos a quien no ejecuta JavaScript (Google en primera pasada, asistentes de IA).
+- **Cómo:** Netlify ejecuta `npm install && node scripts/build-static.mjs` en cada deploy (`netlify.toml`). El script pinta la app React con `jsdom` (sin navegador) y mete el resultado dentro de `<div id="root">`; en `catalogo.html` escribe las tarjetas a partir de `content/catalogo/*/*.md`.
+- **Los archivos del repo no cambian:** `index.html` sigue con `<div id="root"></div>` vacío y `catalogo.html` con la rejilla vacía. No pegar nunca el HTML generado en el repo. El script necesita encontrar esos dos huecos vacíos tal cual.
+- **Con JavaScript todo funciona igual:** React sustituye el HTML estático al arrancar. El HTML estático lleva la marca `data-static`; los scripts de animación (`initReveal`), de apertura de catálogo por ancla (`tryOpen`) y de ancla esperan a que desaparezca.
+- **Catálogo:** con las tarjetas ya escritas, los filtros solo muestran u ocultan (ya no llama a la API de GitHub, que tenía límite de 60 peticiones por hora). Sin el paso de publicación (p. ej. en local) sigue funcionando el método antiguo.
+- **Si el paso falla** en producción, la página se publica como antes y el log de Netlify muestra `[static] AVISO`. En las vistas previas de un pull request, el fallo detiene el deploy.
+- **Probar en local:** `npm install && node scripts/build-static.mjs --strict`, mirar, y después `git checkout index.html catalogo.html` para no subir el resultado.
+- El idioma del HTML estático es castellano; el gallego sigue aplicándose en el navegador.
+
+## Versión en gallego con dirección propia: /gl/ (15 noviembre 2026)
+
+- El mismo paso de publicación (`scripts/build-static.mjs`) genera **`/gl/`**: portada, catálogo, las 7 páginas de marca y los 5 artículos, 14 páginas en total. No existe carpeta `gl/` en el repo; se crea al publicar.
+- **De dónde sale el texto:** la portada se pinta con la app en gallego (`mcsI18n.gl`); el resto, de los atributos `data-gl` de cada página. El título gallego sale de la línea `document.title="…"` del script de cada página y la descripción, de `data-gl-content` en `<meta name="description">`. Página nueva con versión gallega: ponerle `data-gl`, esas dos cosas, y añadirla a `GL_PAGES` en el script.
+- Cada pareja lleva `hreflang` es/gl recíproco y canonical propio; las direcciones `/gl/` se añaden solas al sitemap publicado.
+- `_redirects`: `/gl/* /:splat 200` sirve desde la raíz todo lo que no exista en `/gl/` (imágenes, fuentes, páginas sin traducir), así que las rutas relativas `./images/...` funcionan igual.
+- Las páginas `/gl/` fijan `localStorage.mcsLang="gl"` al cargar. En la portada, el botón "Galego" lleva a `/gl/` y "Castellano" vuelve a `/`.
+- Logotipo de SweetBedding: `images/logo-sweetbedding.png`, recortado de la portada de su dosier (baja resolución; sustituir si llega un archivo mejor).
+
+## ⚠️ No subir un `index.html` antiguo por "Add files via upload" (15 noviembre 2026)
+
+El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 con un bloque de schema pegado a mano. Eso borró de producción todo lo hecho después (H1 nuevo, SweetBedding, alt de imágenes, alineación de tarjetas) y dejó un trozo de código suelto en la cabecera. Se restauró al fusionar el PR 5.
+- Antes de editar `index.html` a mano, **descargar siempre la versión actual desde GitHub**; nunca partir de una copia guardada en el ordenador.
+- El schema `ProfessionalService` ya está en la cabecera: no hace falta pegarlo otra vez.
+- `llms.txt` (raíz): resumen del sitio para asistentes de IA. Actualizarlo si cambian las marcas.

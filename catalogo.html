@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Catálogo de muebles, sofás y descanso para tiendas en Galicia | MCS Representaciones</title>
   <script src="./cookies.js"></script>
-  <meta name="description" content="Fotos de catálogo de Treku, Baixmoduls, Tobisa, KingSofá, Tapizados Mayor y Essenzia Dormire: muebles, tapicería y descanso para tiendas en Galicia.">
+  <meta name="description" content="Fotos de catálogo de Treku, Baixmoduls, Tobisa, KingSofá, Tapizados Mayor y Essenzia Dormire: muebles, tapicería y descanso para tiendas en Galicia." data-gl-content="Fotos de catálogo de Treku, Baixmoduls, Tobisa, KingSofá, Tapizados Mayor e Essenzia Dormire: mobles, tapicería e descanso para tendas en Galicia.">
   <link rel="canonical" href="https://mcsrepresentaciones.es/catalogo.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCS Representaciones">
@@ -71,6 +71,7 @@
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
   }
+  .card[hidden], .empty[hidden] { display: none; }
   .card {
     border-radius: 14px;
     overflow: hidden;
@@ -113,6 +114,7 @@
   <a class="back" href="/" data-gl="&larr; Volver á web">&larr; Volver a la web</a>
   <h1 data-gl="Catálogo de mobles, sofás e descanso para tendas">Catálogo de muebles, sofás y descanso para tiendas</h1>
   <p class="lead" data-gl="Fotos reais de produto dos fabricantes nacionais que MCS Representaciones representa en Galicia: moble de deseño de Treku, moble modular e xuvenil de Baixmoduls e Tobisa, sofás de KingSofá e Tapizados Mayor, e colchóns e descanso de Essenzia Dormire. Filtra por marca e, se algunha peza encaixa na túa tenda, <a href=&quot;/#contacto&quot;>escríbeme</a>.">Fotos reales de producto de los fabricantes nacionales que MCS Representaciones representa en Galicia: mueble de diseño de Treku, mueble modular y juvenil de Baixmoduls y Tobisa, sofás de KingSofá y Tapizados Mayor, y colchones y descanso de Essenzia Dormire. Filtra por marca y, si alguna pieza encaja en tu tienda, <a href="/#contacto">escríbeme</a>.</p>
+  <p class="lead"><span data-gl="Fichas de marca:">Fichas de marca:</span> <a href="/treku-galicia.html">Treku</a> · <a href="/baixmoduls-galicia.html">Baixmoduls</a> · <a href="/tobisa-galicia.html">Tobisa</a> · <a href="/kingsofa-galicia.html">KingSofá</a> · <a href="/tapizados-mayor-galicia.html">Tapizados Mayor</a> · <a href="/essenzia-dormire-galicia.html">Essenzia Dormire</a> · <a href="/sweetbedding-galicia.html">SweetBedding</a></p>
   <div class="filters" id="filters"></div>
   <div id="grid" class="grid"></div>
 </div>
@@ -199,7 +201,27 @@ async function loadBrand(brandKey) {
   }
 }
 
+const STATIC = gridEl.hasAttribute("data-static"); // tarjetas ya escritas al publicar (scripts/build-static.mjs)
+
+function filterStatic() {
+  let shown = 0;
+  gridEl.querySelectorAll(".card").forEach(card => {
+    const on = currentFilter === "all" || card.dataset.brand === currentFilter;
+    card.hidden = !on;
+    if (on) shown++;
+  });
+  let empty = gridEl.querySelector(".empty");
+  if (!shown && !empty) {
+    empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = MCS_GL ? "Aínda non hai fotografías nesta sección." : "Todavía no hay fotografías en esta sección.";
+    gridEl.appendChild(empty);
+  }
+  if (empty) empty.hidden = shown > 0;
+}
+
 async function renderGrid() {
+  if (STATIC) { filterStatic(); return; }
   gridEl.innerHTML = '<div class="loading">Cargando…</div>';
 
   const brandKeys = currentFilter === "all" ? BRANDS.map(b => b.key) : [currentFilter];
