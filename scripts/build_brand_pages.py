@@ -45,7 +45,9 @@ def img_size(path):
 
 BRANDS = [
     dict(
-        slug="treku-galicia", id="treku", folder="treku", name="Treku", photo="images/foto-treku.jpg",
+        slug="treku-galicia",
+        fit=("Mobiliario contemporáneo personalizable, con especial protagonismo de aparadores, muebles de televisión y estanterías de colecciones como Aura, Lauki y Bost. Encaja en tiendas de diseño y estudios de interiorismo que buscan piezas con identidad y distintas posibilidades de composición.",
+             "Mobiliario contemporáneo personalizable, con especial protagonismo de aparadores, mobles de televisión e andeis de coleccións como Aura, Lauki e Bost. Encaixa en tendas de deseño e estudios de interiorismo que buscan pezas con identidade e distintas posibilidades de composición."), id="treku", folder="treku", name="Treku", photo="images/foto-treku.jpg",
         logo="images/logo-treku.png", web="https://www.treku.com",
         cat=("mueble de diseño contemporáneo", "moble de deseño contemporáneo"),
         tag=("Diseño de autor · Zarautz, 1947", "Deseño de autor · Zarautz, 1947"),
@@ -59,7 +61,9 @@ BRANDS = [
             "As tendas distribuidoras teñen ademais o configurador en liña DecoTreku: serve para xerar orzamentos, enviar pedidos e gardar proxectos cos prezos da túa tarifa. Na <a href=\"/feria-habitat-2026.html\">Feira Hábitat València 2026</a> estiven coas súas novidades."),
     ),
     dict(
-        slug="baixmoduls-galicia", id="baixmoduls", folder="baixmoduls", name="Baixmoduls", photo="images/foto-baixmoduls.jpg",
+        slug="baixmoduls-galicia",
+        fit=("Salones modernos, muebles de televisión, dormitorios de matrimonio y armarios, con variedad de medidas y acabados. Encaja en tiendas de muebles que trabajan por proyectos y necesitan coordinar varias estancias con una estética actual.",
+             "Salóns modernos, mobles de televisión, dormitorios de matrimonio e armarios, con variedade de medidas e acabados. Encaixa en tendas de mobles que traballan por proxectos e precisan coordinar varias estancias cunha estética actual."), id="baixmoduls", folder="baixmoduls", name="Baixmoduls", photo="images/foto-baixmoduls.jpg",
         logo="images/logo-baixmoduls.jpeg", web="https://www.baixmoduls.com",
         cat=("mueble modular", "moble modular"),
         tag=("Mueble funcional · Barcelona", "Moble funcional · Barcelona"),
@@ -73,7 +77,9 @@ BRANDS = [
             "De Arko 360 hai un dossier con 13 composicións de módulos TV para ensinar na tenda, e a marca ten unha web de recursos con renders, fichas técnicas e materiais de apoio á venda."),
     ),
     dict(
-        slug="tobisa-galicia", id="tobisa", folder="tobisa", name="Tobisa", photo="images/foto-tobisa.jpg",
+        slug="tobisa-galicia",
+        fit=("Mobiliario a medida y personalizado, con propuestas de dormitorios juveniles, armarios y vestidores. Encaja en tiendas que ofrecen asesoramiento y soluciones para aprovechar el espacio, además de estudios de decoración e interiorismo.",
+             "Mobiliario á medida e personalizado, con propostas de dormitorios xuvenís, armarios e vestidores. Encaixa en tendas que ofrecen asesoramento e solucións para aproveitar o espazo, ademais de estudios de decoración e interiorismo."), id="tobisa", folder="tobisa", name="Tobisa", photo="images/foto-tobisa.jpg",
         logo="images/logo-tobisa.jpeg", web="https://www.tobisamuebles.com",
         cat=("mueble juvenil y a medida", "moble xuvenil e á medida"),
         tag=("A medida · La Sénia, 1999", "Á medida · La Sénia, 1999"),
@@ -87,7 +93,9 @@ BRANDS = [
             "É a marca para o dormitorio xuvenil e o proxecto á medida: dormitorio, salón, o que se che ocorra. Proxectos que fidelizan o cliente da túa tenda."),
     ),
     dict(
-        slug="essenzia-dormire-galicia", id="essenzia", folder="essenzia", name="Essenzia Dormire", photo="images/foto-essenzia.jpg",
+        slug="essenzia-dormire-galicia",
+        fit=("Colchones y sistemas de descanso, con propuestas de muelles ensacados, espumaciones y diferentes niveles de firmeza. Encaja en colchonerías y tiendas de muebles con sección de descanso que quieren ofrecer una elección asesorada según las preferencias del cliente.",
+             "Colchóns e sistemas de descanso, con propostas de molas ensacadas, espumacións e diferentes niveis de firmeza. Encaixa en colchoarías e tendas de mobles con sección de descanso que queren ofrecer unha elección asesorada segundo as preferencias do cliente."), id="essenzia", folder="essenzia", name="Essenzia Dormire", photo="images/foto-essenzia.jpg",
         logo="images/logo-essenzia.jpeg", web="https://www.essenziadormire.es",
         cat=("colchones y descanso", "colchóns e descanso"),
         tag=("Descanso premium · Murcia", "Descanso premium · Murcia"),
@@ -101,7 +109,9 @@ BRANDS = [
             "Na <a href=\"/feria-habitat-2026.html\">Feira Hábitat València 2026</a> estiven coas súas novidades; nesa páxina tes fotos e vídeos do stand. E se un cliente che pregunta polas engurras dunha funda, serviráche a <a href=\"/guia-tejidos-naturales.html\">guía de tecidos naturais</a>."),
     ),
     dict(
-        slug="sweetbedding-galicia", id="sweetbedding", folder=None, name="SweetBedding", photo="images/novedad-sweetbedding.jpg",
+        slug="sweetbedding-galicia",
+        fit=("Colchones de núcleos perfilados y muelles ensacados, junto con complementos de descanso. Encaja en colchonerías que buscan diferenciar su oferta y explicar al cliente las características de los materiales y del soporte.",
+             "Colchóns de núcleos perfilados e molas ensacadas, xunto con complementos de descanso. Encaixa en colchoarías que buscan diferenciar a súa oferta e explicarlle ao cliente as características dos materiais e do soporte."), id="sweetbedding", folder=None, name="SweetBedding", photo="images/novedad-sweetbedding.jpg",
         logo="", web="https://sweetbedding.es",
         cat=("colchones y descanso", "colchóns e descanso"),
         tag=("Descanso · Fabricación suiza", "Descanso · Fabricación suíza"),
@@ -115,7 +125,9 @@ BRANDS = [
             "As tres coleccións, modelo a modelo, están na <a href=\"/novedad-sweetbedding.html\">ficha de SweetBedding</a>."),
     ),
     dict(
-        slug="tapizados-mayor-galicia", id="mayor", folder="tapizadosmayor", name="Tapizados Mayor", photo="images/foto-mayor.jpg",
+        slug="tapizados-mayor-galicia",
+        fit=("Sofás cama, sofás relax y composiciones modulares que combinan diseño, comodidad y funcionalidad. Encaja en tiendas especializadas en sofás y comercios de mobiliario que necesitan resolver tanto el uso diario del salón como una cama adicional.",
+             "Sofás cama, sofás relax e composicións modulares que combinan deseño, comodidade e funcionalidade. Encaixa en tendas especializadas en sofás e comercios de mobiliario que precisan resolver tanto o uso diario do salón como unha cama adicional."), id="mayor", folder="tapizadosmayor", name="Tapizados Mayor", photo="images/foto-mayor.jpg",
         logo="images/logo-mayor.jpeg", web="https://www.mayortapizados.com",
         cat=("sofás y tapicería", "sofás e tapicería"),
         tag=("Tapicería · Yecla", "Tapicería · Yecla"),
@@ -129,7 +141,9 @@ BRANDS = [
             "Para a liña Aurum hai unha guía de mantemento que podes entregar ao cliente final co sofá."),
     ),
     dict(
-        slug="kingsofa-galicia", id="kingsofa", folder="kingsofa", name="KingSofá", photo="images/foto-kingsofa.webp",
+        slug="kingsofa-galicia",
+        fit=("Sofás relax eléctricos, deslizantes y sillones relax, con propuestas que incorporan el sistema KingSofá Cardio System. Encaja en tiendas de tapicería y mobiliario que centran la venta en la prueba del producto, el confort y las distintas opciones de mecanismo.",
+             "Sofás relax eléctricos, deslizantes e butacas relax, con propostas que incorporan o sistema KingSofá Cardio System. Encaixa en tendas de tapicería e mobiliario que centran a venda na proba do produto, o confort e as distintas opcións de mecanismo."), id="kingsofa", folder="kingsofa", name="KingSofá", photo="images/foto-kingsofa.webp",
         logo="images/logo-kingsofa.jpeg", web="https://www.kingsofayecla.com",
         cat=("sofás contemporáneos", "sofás contemporáneos"),
         tag=("Sofá contemporáneo · Yecla", "Sofá contemporáneo · Yecla"),
@@ -323,13 +337,17 @@ def page(b):
   </section>
 
   <section class="section">
+    {bi("h2", f"Qué se vende de {name} y a qué tienda le encaja", f"Que se vende de {name} e a que tenda lle encaixa")}
+    {bi("p", b["fit"][0].split(". Encaja")[0] + ".", b["fit"][1].split(". Encaixa")[0] + ".")}
+    {bi("p", "Encaja" + b["fit"][0].split(". Encaja")[1], "Encaixa" + b["fit"][1].split(". Encaixa")[1])}
+  </section>
+
+  <section class="section">
     {bi("h2", f"Cómo trabajo {name} en Galicia", f"Como traballo {name} en Galicia")}
     {bi("p", f"Me llamo MCarmen Sánchez y soy agente comercial multicartera de mueble, descanso y tapizado. Llevo {name} en las cuatro provincias gallegas y trabajo únicamente con tiendas y profesionales.",
         f"Chámome MCarmen Sánchez e son axente comercial multicarteira de moble, descanso e tapizado. Levo {name} nas catro provincias galegas e traballo unicamente con tendas e profesionais.")}
     {bi("p", f"Trabajo cliente a cliente y en persona: veo tu exposición, comentamos qué hueco tiene {name} en ella y te dejo catálogos y tarifas actualizadas. Si hay una incidencia, tienes un número y una cara.",
         f"Traballo cliente a cliente e en persoa: vexo a túa exposición, comentamos que oco ten {name} nela e déixoche catálogos e tarifas actualizadas. Se hai unha incidencia, tes un número e unha cara.")}
-    <!-- MCARMEN: añade aquí 2-3 frases tuyas sobre {name} (qué vendes más, a qué tipo de tienda le encaja).
-         Hazlo en scripts/build_brand_pages.py y dile a Claude que regenere las páginas. -->
   </section>
 
   <div class="cta">
