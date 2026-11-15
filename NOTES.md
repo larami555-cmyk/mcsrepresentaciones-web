@@ -270,3 +270,9 @@ El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 co
 - Imágenes reducidas sin cambiar de nombre: `mcarmen-foto.webp` (238 → 5 KB, se muestra a 48 px), `foto-kingsofa.webp`, `foto-baixmoduls.jpg`, `foto-tobisa.jpg`, `foto-hero.jpg`, `mcarmen-quiensoy.jpg`, `novedad-essenzia-blue-friday.jpg`. Regla: no subir fotos de más de 1200 px de ancho para la portada.
 - `.mcs-brandlink{font-family:inherit}`: sin esto, el nombre de marca enlazado perdía la tipografía Playfair (la regla `*{font-family:Inter}` de la app pisa a los enlaces).
 - Avisos de SEOptimer que se dejan como están a propósito: analítica "no detectada" (GA solo carga tras aceptar cookies), estilos en línea, píxel de Facebook, perfiles de X/LinkedIn/YouTube, correo visible (es el contacto del negocio).
+
+## Tarjetas de marca alineadas también con la lista de catálogos abierta (15 noviembre 2026)
+
+- Las tarjetas comparten filas con `grid-template-rows:subgrid` (cabecera, texto, enlace, foto, botones, lista). Al desplegar "Ver catálogo" en una tarjeta, las fotos de la fila no se mueven. Navegadores sin subgrid usan la alineación anterior.
+- La tarjeta debe tener **6 hijos en ese orden**; si se añade otro elemento, cambiar `grid-row:span 6`.
+- Catálogo de SweetBedding: enlace de HiDrive al PDF reducido (`/lnk/e8PVJCkrU`), subido por MCarmen. No se aloja en el repo.
