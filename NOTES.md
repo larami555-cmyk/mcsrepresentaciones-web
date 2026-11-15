@@ -221,4 +221,9 @@ Primera tanda de la auditoría SEO (rama `seo/mejoras-auditoria`):
 - **robots.txt** ya no enumera rutas internas (era público y además impedía a Google leer el `noindex`). Las páginas internas llevan `X-Robots-Tag: noindex, nofollow` desde `netlify.toml`. Al añadir una página interna nueva: añadir su bloque `[[headers]]` ahí, no en robots.txt.
 - **sitemap.xml:** solo páginas con intención de búsqueda (fuera suscripciones y textos legales).
 - `scripts/check_links.py`: `/` ya no cuenta como enlace roto.
-- **Pendiente (segunda tanda):** HTML estático/prerender de portada y catálogo, páginas por marca y categoría, versión `/gl/`, decidir si SweetBedding es 7.ª marca.
+- **SweetBedding es la 7.ª marca** (decisión de MCarmen, 15/11/2026): añadida a `ql`, descripciones, schema, "Quién soy", "7 marcas — 1 sola interlocutora", servicios y pie. Va sin logotipo (`logo:""`) hasta que MCarmen envíe el archivo; la tarjeta muestra solo el nombre. No tiene fotos en el catálogo ni tarifa.
+- La rejilla de marcas ya no deja celdas grises si el número de marcas no es múltiplo de 3 (regla `#marcas .grid.lg\:grid-cols-3` en el `<style>`).
+- **Taekwondo retirado del dominio** (decisión de MCarmen): borrados `monitor-taekwondo-dashboard.html`, `manifest-tkd.json`, `images/icon-tkd-*` y la redirección `/tkd`. Sigue en el historial de git si hiciera falta recuperarlo.
+- Tarjetas de marca: foto y botones alineados abajo (tarjeta en `flex` columna, `.mcs-photo-box{margin-top:auto}`), así todas las fotos de una fila quedan a la misma altura aunque el texto de arriba ocupe distinto.
+- `sameAs` usa el enlace de Google Maps de la ficha que dio MCarmen (`maps.app.goo.gl/P6wNBATUDheDEgZy9`).
+- **Pendiente (segunda tanda):** HTML estático/prerender de portada y catálogo, páginas por marca y categoría, versión `/gl/`, logotipo de SweetBedding.
