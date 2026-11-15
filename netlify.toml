@@ -62,16 +62,6 @@
     X-Robots-Tag = "noindex, nofollow"
 
 [[headers]]
-  for = "/monitor-taekwondo-dashboard.html"
-  [headers.values]
-    X-Robots-Tag = "noindex, nofollow"
-
-[[headers]]
-  for = "/tkd"
-  [headers.values]
-    X-Robots-Tag = "noindex, nofollow"
-
-[[headers]]
   for = "/suscripcion-confirmada.html"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
