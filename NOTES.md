@@ -282,3 +282,8 @@ El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 co
 - Retiradas de Novedades (array de novedades en `index.html`) las tarjetas `balance-feria-habitat-2026`, `feria-habitat`, `treku-aura` y `essenzia-buckingham`. El banner "En directo · Feria" queda desactivado (`!1&&` delante). Las páginas `feria-habitat-2026.html` y `balance-feria-habitat-2026.html` se mantienen publicadas y en el sitemap, por decisión de MCarmen.
 - Cada tarjeta de marca lleva un botón visible "Ver [MARCA] en Galicia" (`.mcs-brandbtn`, estilos en línea) que enlaza a `s.page`. Va **dentro del mismo `div` que "Web del fabricante"**, para que la tarjeta siga teniendo 6 hijos (regla del subgrid de arriba).
 - Los enlaces sin `.html` que se ven en la web publicada los pone Netlify (Pretty URLs), no el código. Los canonical apuntan a `.html`; se deja así.
+
+## Tapizados Mayor: solo Ourense y Pontevedra (16 noviembre 2026)
+
+- MCarmen representa Tapizados Mayor **solo en Ourense y Pontevedra**, no en las cuatro provincias. En `scripts/build_brand_pages.py` la marca lleva `zona=("Ourense y Pontevedra", "Ourense e Pontevedra")`; la plantilla usa ese campo en la descripción, la introducción, "Cómo trabajo…", la llamada final y el texto de WhatsApp. Sin `zona`, la página habla de las cuatro provincias.
+- Se mantienen "en Galicia" en el título, el H1 y la dirección (`tapizados-mayor-galicia.html`): las dos provincias son Galicia y cambiar la URL rompería enlaces.

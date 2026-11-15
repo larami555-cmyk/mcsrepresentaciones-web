@@ -131,8 +131,10 @@ BRANDS = [
         logo="images/logo-mayor.jpeg", web="https://www.mayortapizados.com",
         cat=("sofás y tapicería", "sofás e tapicería"),
         tag=("Tapicería · Yecla", "Tapicería · Yecla"),
-        intro=("Soy la agente comercial de Tapizados Mayor para las tiendas de muebles y de sofás de A Coruña, Lugo, Ourense y Pontevedra.",
-               "Son a axente comercial de Tapizados Mayor para as tendas de mobles e de sofás da Coruña, Lugo, Ourense e Pontevedra."),
+        # Mayor solo se representa en estas dos provincias (lo indicó MCarmen el 16/11/2026).
+        zona=("Ourense y Pontevedra", "Ourense e Pontevedra"),
+        intro=("Soy la agente comercial de Tapizados Mayor para las tiendas de muebles y de sofás de Ourense y Pontevedra.",
+               "Son a axente comercial de Tapizados Mayor para as tendas de mobles e de sofás de Ourense e Pontevedra."),
         p1=("Tapizados Mayor es un fabricante de tapicería de Yecla: sofás relax, deslizantes al suelo y sofás cama italianos.",
             "Tapizados Mayor é un fabricante de tapicería de Yecla: sofás relax, deslizantes ao chan e sofás cama italianos."),
         p2=("Trabajo con el Catálogo General, el catálogo Aurum, el de Sofás Cama, la carta de Telas 2026 y el programa Mayor Express 2026.",
@@ -259,11 +261,20 @@ def page(b):
     url = f"{SITE}/{b['slug']}.html"
     title_es = f"{name} en Galicia: {cat_es} para tiendas | MCS Representaciones"
     title_gl = f"{name} en Galicia: {cat_gl} para tendas | MCS Representaciones"
-    desc = f"Agente comercial de {name} en Galicia. {cat_es[0].upper() + cat_es[1:]} para tiendas de A Coruña, Lugo, Ourense y Pontevedra: catálogos, tarifas y visita en tu exposición."
-    desc_gl = f"Axente comercial de {name} en Galicia. {cat_gl[0].upper() + cat_gl[1:]} para tendas da Coruña, Lugo, Ourense e Pontevedra: catálogos, tarifas e visita na túa exposición."
+    # Zona: por defecto las cuatro provincias; una marca puede limitarla con zona=(es, gl).
+    zona = b.get("zona")
+    z_es, z_gl = zona if zona else ("A Coruña, Lugo, Ourense y Pontevedra", "da Coruña, Lugo, Ourense e Pontevedra")
+    if zona:
+        z_gl = "de " + z_gl
+    prov_es = f"en las provincias de {zona[0]}" if zona else "en las cuatro provincias gallegas"
+    prov_gl = f"nas provincias de {zona[1]}" if zona else "nas catro provincias galegas"
+    donde_es = f"en {zona[0].replace(' y ', ' o ')}" if zona else "en Galicia"
+    donde_gl = f"en {zona[1].replace(' e ', ' ou ')}" if zona else "en Galicia"
+    desc = f"Agente comercial de {name} en Galicia. {cat_es[0].upper() + cat_es[1:]} para tiendas de {z_es}: catálogos, tarifas y visita en tu exposición."
+    desc_gl = f"Axente comercial de {name} en Galicia. {cat_gl[0].upper() + cat_gl[1:]} para tendas {z_gl}: catálogos, tarifas e visita na túa exposición."
     pw, ph = img_size(os.path.join(ROOT, b["photo"]))
-    wa_es = WA + urllib.parse.quote(f"Hola MCarmen, tengo una tienda en Galicia y me interesa {name}.")
-    wa_gl_text = f"Ola MCarmen, teño unha tenda en Galicia e interésame {name}."
+    wa_es = WA + urllib.parse.quote(f"Hola MCarmen, tengo una tienda {donde_es} y me interesa {name}.")
+    wa_gl_text = f"Ola MCarmen, teño unha tenda {donde_gl} e interésame {name}."
     ld = {"@context": "https://schema.org", "@graph": [
         {"@type": "WebPage", "@id": url, "url": url, "name": title_es.split(" | ")[0], "description": desc, "inLanguage": "es",
          "isPartOf": {"@id": SITE + "/#web"}, "about": {"@type": "Brand", "name": name, "url": b["web"]},
@@ -345,16 +356,16 @@ def page(b):
 
   <section class="section">
     {bi("h2", f"Cómo trabajo {name} en Galicia", f"Como traballo {name} en Galicia")}
-    {bi("p", f"Me llamo MCarmen Sánchez y soy agente comercial multicartera de mueble, descanso y tapizado. Llevo {name} en las cuatro provincias gallegas y trabajo únicamente con tiendas y profesionales.",
-        f"Chámome MCarmen Sánchez e son axente comercial multicarteira de moble, descanso e tapizado. Levo {name} nas catro provincias galegas e traballo unicamente con tendas e profesionais.")}
+    {bi("p", f"Me llamo MCarmen Sánchez y soy agente comercial multicartera de mueble, descanso y tapizado. Llevo {name} {prov_es} y trabajo únicamente con tiendas y profesionales.",
+        f"Chámome MCarmen Sánchez e son axente comercial multicarteira de moble, descanso e tapizado. Levo {name} {prov_gl} e traballo unicamente con tendas e profesionais.")}
     {bi("p", f"Trabajo cliente a cliente y en persona: veo tu exposición, comentamos qué hueco tiene {name} en ella y te dejo catálogos y tarifas actualizadas. Si hay una incidencia, tienes un número y una cara.",
         f"Traballo cliente a cliente e en persoa: vexo a túa exposición, comentamos que oco ten {name} nela e déixoche catálogos e tarifas actualizadas. Se hai unha incidencia, tes un número e unha cara.")}
   </section>
 
   <div class="cta">
     {bi("div", f"¿Quieres {name} en tu tienda?", f"Queres {name} na túa tenda?", "eyebrow")}
-    {bi("p", f"Si tienes una tienda en Galicia y te interesa {name}, escríbeme y concertamos una visita para verlo sobre tu exposición.",
-        f"Se tes unha tenda en Galicia e che interesa {name}, escríbeme e concertamos unha visita para velo sobre a túa exposición.")}
+    {bi("p", f"Si tienes una tienda {donde_es} y te interesa {name}, escríbeme y concertamos una visita para verlo sobre tu exposición.",
+        f"Se tes unha tenda {donde_gl} e che interesa {name}, escríbeme e concertamos unha visita para velo sobre a túa exposición.")}
     <a class="btn" id="wa" href="{wa_es}" target="_blank" rel="noopener noreferrer">WhatsApp · 619 620 363</a>
   </div>
 
