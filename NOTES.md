@@ -262,3 +262,11 @@ El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 co
 - Antes de editar `index.html` a mano, **descargar siempre la versión actual desde GitHub**; nunca partir de una copia guardada en el ordenador.
 - El schema `ProfessionalService` ya está en la cabecera: no hace falta pegarlo otra vez.
 - `llms.txt` (raíz): resumen del sitio para asistentes de IA. Actualizarlo si cambian las marcas.
+
+## Pulido tras el informe de SEOptimer (15 noviembre 2026)
+
+- Título de portada: "Agente comercial de muebles en Galicia: MCS Representaciones" (60 caracteres; GL en `GL_INDEX` de `scripts/build-static.mjs`). Descripción ajustada a 160.
+- Todas las imágenes de portada llevan `alt` y `width`/`height`. Los logos de marca usan `style:{width:"auto"}` para que las medidas no los deformen.
+- Imágenes reducidas sin cambiar de nombre: `mcarmen-foto.webp` (238 → 5 KB, se muestra a 48 px), `foto-kingsofa.webp`, `foto-baixmoduls.jpg`, `foto-tobisa.jpg`, `foto-hero.jpg`, `mcarmen-quiensoy.jpg`, `novedad-essenzia-blue-friday.jpg`. Regla: no subir fotos de más de 1200 px de ancho para la portada.
+- `.mcs-brandlink{font-family:inherit}`: sin esto, el nombre de marca enlazado perdía la tipografía Playfair (la regla `*{font-family:Inter}` de la app pisa a los enlaces).
+- Avisos de SEOptimer que se dejan como están a propósito: analítica "no detectada" (GA solo carga tras aceptar cookies), estilos en línea, píxel de Facebook, perfiles de X/LinkedIn/YouTube, correo visible (es el contacto del negocio).
