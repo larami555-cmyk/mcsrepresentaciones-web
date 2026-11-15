@@ -255,3 +255,10 @@ La portada y el catálogo ya no llegan vacíos a quien no ejecuta JavaScript (Go
 - `_redirects`: `/gl/* /:splat 200` sirve desde la raíz todo lo que no exista en `/gl/` (imágenes, fuentes, páginas sin traducir), así que las rutas relativas `./images/...` funcionan igual.
 - Las páginas `/gl/` fijan `localStorage.mcsLang="gl"` al cargar. En la portada, el botón "Galego" lleva a `/gl/` y "Castellano" vuelve a `/`.
 - Logotipo de SweetBedding: `images/logo-sweetbedding.png`, recortado de la portada de su dosier (baja resolución; sustituir si llega un archivo mejor).
+
+## ⚠️ No subir un `index.html` antiguo por "Add files via upload" (15 noviembre 2026)
+
+El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 con un bloque de schema pegado a mano. Eso borró de producción todo lo hecho después (H1 nuevo, SweetBedding, alt de imágenes, alineación de tarjetas) y dejó un trozo de código suelto en la cabecera. Se restauró al fusionar el PR 5.
+- Antes de editar `index.html` a mano, **descargar siempre la versión actual desde GitHub**; nunca partir de una copia guardada en el ordenador.
+- El schema `ProfessionalService` ya está en la cabecera: no hace falta pegarlo otra vez.
+- `llms.txt` (raíz): resumen del sitio para asistentes de IA. Actualizarlo si cambian las marcas.
