@@ -136,8 +136,8 @@ const GL_PAGES = [
   "feria-habitat-2026.html", "balance-feria-habitat-2026.html",
 ];
 const GL_INDEX = {
-  title: "MCS Representaciones | Mobles, tapicería e descanso en Galicia",
-  desc: "Axente comercial de mobiliario, tapicería e descanso en Galicia para tendas. Treku, Baixmoduls, Tobisa, Essenzia Dormire, SweetBedding, Tapizados Mayor e KingSofá.",
+  title: "Axente comercial de mobles en Galicia: MCS Representaciones",
+  desc: "Axente comercial de mobles, tapicería e descanso para tendas en Galicia: Treku, Baixmoduls, Tobisa, Essenzia Dormire, SweetBedding, Tapizados Mayor, KingSofá.",
 };
 const esUrl = (f) => SITE + "/" + (f === "index.html" ? "" : f);
 const glUrl = (f) => SITE + "/gl/" + (f === "index.html" ? "" : f);
