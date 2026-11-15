@@ -227,3 +227,11 @@ Primera tanda de la auditoría SEO (rama `seo/mejoras-auditoria`):
 - Tarjetas de marca: foto y botones alineados abajo (tarjeta en `flex` columna, `.mcs-photo-box{margin-top:auto}`), así todas las fotos de una fila quedan a la misma altura aunque el texto de arriba ocupe distinto.
 - `sameAs` usa el enlace de Google Maps de la ficha que dio MCarmen (`maps.app.goo.gl/P6wNBATUDheDEgZy9`).
 - **Pendiente (segunda tanda):** HTML estático/prerender de portada y catálogo, páginas por marca y categoría, versión `/gl/`, logotipo de SweetBedding.
+
+## Páginas de marca (15 noviembre 2026)
+
+- 7 páginas estáticas, una por marca: `treku-galicia.html`, `baixmoduls-galicia.html`, `tobisa-galicia.html`, `essenzia-dormire-galicia.html`, `sweetbedding-galicia.html`, `tapizados-mayor-galicia.html`, `kingsofa-galicia.html`. Objetivo: posicionar "marca + Galicia".
+- **Se generan con `python3 scripts/build_brand_pages.py`** (sin dependencias). Los textos ES/GL están dentro del script: para cambiarlos, editar el script y volver a ejecutarlo; no tocar los `.html` a mano. La galería toma las 6 fotos más recientes de `content/catalogo/<marca>/`, así que conviene regenerar tras subir fotos nuevas.
+- Solo usan datos que ya estaban en la web (tarjetas de marca, catálogos, documentos). **Pendiente de MCarmen:** 2-3 frases propias por marca (hay un comentario `MCARMEN:` en cada página que indica dónde).
+- Enlazadas desde: el nombre de cada marca en las tarjetas de portada (campo `page` en `ql`, clase `.mcs-brandlink`), la fila "Fichas de marca" del catálogo, entre ellas y el sitemap. Marca nueva: añadirla a `BRANDS` en el script, a `ql` (con `page`), a la fila del catálogo y al sitemap.
+- `index.html` lleva al final un script que baja al ancla (`/#marcas`, `/#marca-treku`, `/#contacto`) cuando se llega desde otra página, porque React pinta la sección después de cargar.
