@@ -276,3 +276,9 @@ El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 co
 - Las tarjetas comparten filas con `grid-template-rows:subgrid` (cabecera, texto, enlace, foto, botones, lista). Al desplegar "Ver catálogo" en una tarjeta, las fotos de la fila no se mueven. Navegadores sin subgrid usan la alineación anterior.
 - La tarjeta debe tener **6 hijos en ese orden**; si se añade otro elemento, cambiar `grid-row:span 6`.
 - Catálogo de SweetBedding: enlace de HiDrive al PDF reducido (`/lnk/e8PVJCkrU`), subido por MCarmen. No se aloja en el repo.
+
+## Novedades sin Feria Hábitat y botón a la página de marca (16 noviembre 2026)
+
+- Retiradas de Novedades (array de novedades en `index.html`) las tarjetas `balance-feria-habitat-2026`, `feria-habitat`, `treku-aura` y `essenzia-buckingham`. El banner "En directo · Feria" queda desactivado (`!1&&` delante). Las páginas `feria-habitat-2026.html` y `balance-feria-habitat-2026.html` se mantienen publicadas y en el sitemap, por decisión de MCarmen.
+- Cada tarjeta de marca lleva un botón visible "Ver [MARCA] en Galicia" (`.mcs-brandbtn`, estilos en línea) que enlaza a `s.page`. Va **dentro del mismo `div` que "Web del fabricante"**, para que la tarjeta siga teniendo 6 hijos (regla del subgrid de arriba).
+- Los enlaces sin `.html` que se ven en la web publicada los pone Netlify (Pretty URLs), no el código. Los canonical apuntan a `.html`; se deja así.
