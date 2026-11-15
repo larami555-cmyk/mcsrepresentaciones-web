@@ -209,3 +209,16 @@ Todas las tarjetas llevan etiqueta superior (`fecha`), título en Playfair y des
 - `suscribirse.html` (también `/suscribirse` y `/suscribete`): enlace directo para compartir con clientes. Mismo alta que el bloque `#newsletter` (función `newsletter.js`, doble confirmación Brevo). ES/GL con botones; `?lang=gl` abre en gallego.
 - Logo: todas las páginas sueltas usan `images/logo-mcs-h.png` (recorte sin tocar de `logo-mcs.png`, el logotipo oficial e inalterable). Nunca sustituirlo por texto "MCS".
 - `suscribirse-feria.html` (`/suscribirse-feria`): versión solo Feria Valencia 2026 para la invitación. Misma lista de Brevo; envía `origen:"feria"` y el aviso a MCarmen lo indica en el asunto.
+
+## Mejoras SEO tras auditoría (15 noviembre 2026)
+
+Primera tanda de la auditoría SEO (rama `seo/mejoras-auditoria`):
+- **Portada:** H1 nuevo con actividad y zona (`mcsI18n.es/gl` → `h1a/h1b/h1c`); el lema anterior pasa a subtítulo (`tx.lema`, clase propia `.mcs-lema`). JSON-LD ampliado a `ProfessionalService` (Cambre, A Coruña; `areaServed` por provincias; `brand`) + `WebSite`. Alt en fotos de marca y novedades, `loading:"lazy"` bajo el pliegue y `width/height` en logo, hero y foto de MCarmen.
+- **`og:locale:alternate` retirado** de todas las páginas: no existe una URL en gallego que lo respalde. Volver a ponerlo solo si se publica `/gl/` con hreflang.
+- **`notranslate` se mantiene** a propósito (evita "Mayor"→"Alcalde"), aunque la auditoría proponía quitarlo.
+- **Catálogo:** URL única `/catalogo.html` (`/catalogo` redirige con 301 en `_redirects`), title y description nuevos, H1 + introducción ES/GL, alt descriptivo por marca.
+- **Artículos** (normativa, tejidos, SweetBedding, feria, balance): el logo enlaza a la portada, bloque "También te puede interesar" (`.mcs-rel`, ES/GL) antes de `</main>`, JSON-LD `Article` + `BreadcrumbList`, títulos más descriptivos. Al crear un artículo nuevo: copiar ese bloque y añadir el artículo a los demás. `balance-feria-habitat-2026.html` usa ya el logo oficial, las fuentes locales y Open Graph.
+- **robots.txt** ya no enumera rutas internas (era público y además impedía a Google leer el `noindex`). Las páginas internas llevan `X-Robots-Tag: noindex, nofollow` desde `netlify.toml`. Al añadir una página interna nueva: añadir su bloque `[[headers]]` ahí, no en robots.txt.
+- **sitemap.xml:** solo páginas con intención de búsqueda (fuera suscripciones y textos legales).
+- `scripts/check_links.py`: `/` ya no cuenta como enlace roto.
+- **Pendiente (segunda tanda):** HTML estático/prerender de portada y catálogo, páginas por marca y categoría, versión `/gl/`, decidir si SweetBedding es 7.ª marca.
