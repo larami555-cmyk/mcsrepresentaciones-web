@@ -71,6 +71,7 @@
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
   }
+  .card[hidden], .empty[hidden] { display: none; }
   .card {
     border-radius: 14px;
     overflow: hidden;
@@ -200,7 +201,27 @@ async function loadBrand(brandKey) {
   }
 }
 
+const STATIC = gridEl.hasAttribute("data-static"); // tarjetas ya escritas al publicar (scripts/build-static.mjs)
+
+function filterStatic() {
+  let shown = 0;
+  gridEl.querySelectorAll(".card").forEach(card => {
+    const on = currentFilter === "all" || card.dataset.brand === currentFilter;
+    card.hidden = !on;
+    if (on) shown++;
+  });
+  let empty = gridEl.querySelector(".empty");
+  if (!shown && !empty) {
+    empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = MCS_GL ? "Aínda non hai fotografías nesta sección." : "Todavía no hay fotografías en esta sección.";
+    gridEl.appendChild(empty);
+  }
+  if (empty) empty.hidden = shown > 0;
+}
+
 async function renderGrid() {
+  if (STATIC) { filterStatic(); return; }
   gridEl.innerHTML = '<div class="loading">Cargando…</div>';
 
   const brandKeys = currentFilter === "all" ? BRANDS.map(b => b.key) : [currentFilter];

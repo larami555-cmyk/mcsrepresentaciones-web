@@ -121,6 +121,7 @@ Error generating stack: `+i.message+`
   <script>
 (function(){
   function initReveal(){
+    if(document.querySelector('#root > [data-static]')) return false; // HTML estático: esperar a React
     var targets = document.querySelectorAll('#inicio, #quien-soy, #marcas, #servicios, #novedades, footer#contacto');
     if(!targets.length) return false;
     targets.forEach(function(el){ el.classList.add('mcs-reveal'); });
@@ -150,6 +151,7 @@ Error generating stack: `+i.message+`
   <script>
 (function(){
   function tryOpen(){
+    if(document.querySelector('#root > [data-static]')) return false; // HTML estático: esperar a React
     var h = location.hash;
     var m = h.match(/^#marca-([a-z0-9-]+)$/);
     if(!m) return true;
@@ -171,7 +173,7 @@ Error generating stack: `+i.message+`
   
 <script>
 // Al llegar desde otra página con ancla (/#marcas, /#marca-treku, /#contacto), bajar a la sección cuando React ya la ha pintado.
-(function(){var h=location.hash.slice(1);if(!h)return;var n=0,t=setInterval(function(){var el=document.getElementById(h);if(el){clearInterval(t);el.scrollIntoView()}else if(++n>60)clearInterval(t)},100)})();
+(function(){var h=location.hash.slice(1);if(!h)return;var n=0,t=setInterval(function(){var el=document.querySelector("#root > [data-static]")?null:document.getElementById(h);if(el){clearInterval(t);el.scrollIntoView()}else if(++n>60)clearInterval(t)},100)})();
 </script>
 </body>
 </html>

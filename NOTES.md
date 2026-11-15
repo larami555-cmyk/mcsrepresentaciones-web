@@ -235,3 +235,14 @@ Primera tanda de la auditoría SEO (rama `seo/mejoras-auditoria`):
 - Usan datos que ya estaban en la web (tarjetas de marca, catálogos, documentos) más la sección "Qué se vende y a qué tienda le encaja", con frases aportadas por MCarmen el 15/11/2026 (campo `fit` del script). En SweetBedding se omitió la mención al látex, igual que en la tarjeta de portada.
 - Enlazadas desde: el nombre de cada marca en las tarjetas de portada (campo `page` en `ql`, clase `.mcs-brandlink`), la fila "Fichas de marca" del catálogo, entre ellas y el sitemap. Marca nueva: añadirla a `BRANDS` en el script, a `ql` (con `page`), a la fila del catálogo y al sitemap.
 - `index.html` lleva al final un script que baja al ancla (`/#marcas`, `/#marca-treku`, `/#contacto`) cuando se llega desde otra página, porque React pinta la sección después de cargar.
+
+## HTML estático al publicar (15 noviembre 2026)
+
+La portada y el catálogo ya no llegan vacíos a quien no ejecuta JavaScript (Google en primera pasada, asistentes de IA).
+- **Cómo:** Netlify ejecuta `npm install && node scripts/build-static.mjs` en cada deploy (`netlify.toml`). El script pinta la app React con `jsdom` (sin navegador) y mete el resultado dentro de `<div id="root">`; en `catalogo.html` escribe las tarjetas a partir de `content/catalogo/*/*.md`.
+- **Los archivos del repo no cambian:** `index.html` sigue con `<div id="root"></div>` vacío y `catalogo.html` con la rejilla vacía. No pegar nunca el HTML generado en el repo. El script necesita encontrar esos dos huecos vacíos tal cual.
+- **Con JavaScript todo funciona igual:** React sustituye el HTML estático al arrancar. El HTML estático lleva la marca `data-static`; los scripts de animación (`initReveal`), de apertura de catálogo por ancla (`tryOpen`) y de ancla esperan a que desaparezca.
+- **Catálogo:** con las tarjetas ya escritas, los filtros solo muestran u ocultan (ya no llama a la API de GitHub, que tenía límite de 60 peticiones por hora). Sin el paso de publicación (p. ej. en local) sigue funcionando el método antiguo.
+- **Si el paso falla** en producción, la página se publica como antes y el log de Netlify muestra `[static] AVISO`. En las vistas previas de un pull request, el fallo detiene el deploy.
+- **Probar en local:** `npm install && node scripts/build-static.mjs --strict`, mirar, y después `git checkout index.html catalogo.html` para no subir el resultado.
+- El idioma del HTML estático es castellano; el gallego sigue aplicándose en el navegador.
