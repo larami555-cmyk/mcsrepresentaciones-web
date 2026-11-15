@@ -111,7 +111,7 @@ BRANDS = [
     dict(
         slug="sweetbedding-galicia",
         fit=("Colchones de núcleos perfilados y muelles ensacados, junto con complementos de descanso. Encaja en colchonerías que buscan diferenciar su oferta y explicar al cliente las características de los materiales y del soporte.",
-             "Colchóns de núcleos perfilados e molas ensacadas, xunto con complementos de descanso. Encaixa en colchoarías que buscan diferenciar a súa oferta e explicarlle ao cliente as características dos materiais e do soporte."), id="sweetbedding", folder=None, name="SweetBedding", photo="images/novedad-sweetbedding.jpg",
+             "Colchóns de núcleos perfilados e molas ensacadas, xunto con complementos de descanso. Encaixa en colchoarías que buscan diferenciar a súa oferta e explicarlle ao cliente as características dos materiais e do soporte."), id="sweetbedding", folder=None, catalogs=True, name="SweetBedding", photo="images/novedad-sweetbedding.jpg",
         logo="images/logo-sweetbedding.png", web="https://sweetbedding.es",
         cat=("colchones y descanso", "colchóns e descanso"),
         tag=("Descanso · Fabricación suiza", "Descanso · Fabricación suíza"),
@@ -272,7 +272,7 @@ def page(b):
             {"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": "Marcas", "item": SITE + "/#marcas"},
             {"@type": "ListItem", "position": 3, "name": f"{name} en Galicia", "item": url}]}]}
-    if b["folder"]:
+    if b["folder"] or b.get("catalogs"):
         main_btn = f'<a class="btn dark" href="/#marca-{b["id"]}" data-gl="Catálogos de {e(name)}">Catálogos de {e(name)}</a>'
     else:  # marca sin catálogos en la portada: el botón lleva a su ficha
         main_btn = f'<a class="btn dark" href="/novedad-sweetbedding.html" data-gl="Ver as coleccións">Ver las colecciones</a>'
