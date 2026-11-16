@@ -12,8 +12,8 @@
   var gl = false;
   try { gl = localStorage.getItem("mcsLang") === "gl"; } catch (e) {}
   var T = gl
-    ? { txt: "Usamos cookies de analítica (Google Analytics) para saber como se usa a web. Só se activan se as aceptas.", ok: "Aceptar", no: "Rexeitar", more: "Máis información" }
-    : { txt: "Usamos cookies de analítica (Google Analytics) para saber cómo se usa la web. Solo se activan si las aceptas.", ok: "Aceptar", no: "Rechazar", more: "Más información" };
+    ? { txt: "Usamos cookies de analítica (Google Analytics) para saber como se usa a web. Só se activan se as aceptas.", ok: "Aceptar", no: "Rexeitar", more: "Máis información sobre as cookies" }
+    : { txt: "Usamos cookies de analítica (Google Analytics) para saber cómo se usa la web. Solo se activan si las aceptas.", ok: "Aceptar", no: "Rechazar", more: "Más información sobre las cookies" };
 
   function read() {
     try {

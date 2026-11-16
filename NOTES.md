@@ -269,7 +269,7 @@ El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 co
 - Todas las imágenes de portada llevan `alt` y `width`/`height`. Los logos de marca usan `style:{width:"auto"}` para que las medidas no los deformen.
 - Imágenes reducidas sin cambiar de nombre: `mcarmen-foto.webp` (238 → 5 KB, se muestra a 48 px), `foto-kingsofa.webp`, `foto-baixmoduls.jpg`, `foto-tobisa.jpg`, `foto-hero.jpg`, `mcarmen-quiensoy.jpg`, `novedad-essenzia-blue-friday.jpg`. Regla: no subir fotos de más de 1200 px de ancho para la portada.
 - `.mcs-brandlink{font-family:inherit}`: sin esto, el nombre de marca enlazado perdía la tipografía Playfair (la regla `*{font-family:Inter}` de la app pisa a los enlaces).
-- Avisos de SEOptimer que se dejan como están a propósito: analítica "no detectada" (GA solo carga tras aceptar cookies), estilos en línea, píxel de Facebook, perfiles de X/LinkedIn/YouTube, correo visible (es el contacto del negocio).
+- Avisos de SEOptimer que se dejan como están a propósito: analítica "no detectada" (GA solo carga tras aceptar cookies), píxel de Facebook, perfiles de X/LinkedIn/YouTube. Los estilos en línea y el correo visible se resolvieron el 16/11 (ver "Segunda pasada").
 
 ## Tarjetas de marca alineadas también con la lista de catálogos abierta (15 noviembre 2026)
 
@@ -287,3 +287,14 @@ El 15/11 a las 16:47 se subió a GitHub una copia de `index.html` del día 13 co
 
 - MCarmen representa Tapizados Mayor **solo en Ourense y Pontevedra**, no en las cuatro provincias. En `scripts/build_brand_pages.py` la marca lleva `zona=("Ourense y Pontevedra", "Ourense e Pontevedra")`; la plantilla usa ese campo en la descripción, la introducción, "Cómo trabajo…", la llamada final y el texto de WhatsApp. Sin `zona`, la página habla de las cuatro provincias.
 - Se mantienen "en Galicia" en el título, el H1 y la dirección (`tapizados-mayor-galicia.html`): las dos provincias son Galicia y cambiar la URL rompería enlaces.
+
+## Segunda pasada sobre el informe de SEOptimer (16 noviembre 2026)
+
+Rama `seo/auditoria-rendimiento`. Solo cambia la portada (`index.html`, y con ella `/gl/`), `cookies.js` y `_redirects`.
+- **Texto de los enlaces:** fuera los "Leer más" y "Explorar". Los botones de novedades dicen a dónde llevan (`linkLabel`/`linkLabelGl` en `mcsNovedades`) y los tres de la franja superior son "Ver las marcas" (`explorar` en `mcsI18n`). Novedad nueva: escribir un `linkLabel` que nombre el destino, nunca "Leer más" ni "Ver más".
+- **Enlaces de WhatsApp con mensaje:** la dirección larga de `wa.me?text=…` ya no va en la página. Se usa una dirección corta (`/whatsapp-blue-friday`, `/whatsapp-blue-friday-gl`) definida en `_redirects`. Para otra campaña: añadir su línea en `_redirects` y enlazar la dirección corta.
+- **Nada bloquea el pintado:** `cookies.js` carga con `defer` (se sigue ejecutando antes que la app, que lee `window.mcsCookiesActive`) y las `@font-face` van dentro de `index.html` con rutas `/fonts/…` en lugar de la hoja `fonts/fonts.css` (que siguen usando las demás páginas). Se precargan Inter 400, Playfair 500 y la foto principal.
+- **Correo:** la dirección no aparece escrita en el HTML de la portada. Se ve igual en pantalla, pero el enlace se arma al pasar el ratón, tocar o enfocar (`mcsMail`, atributos `data-u`/`data-d`). También salió del JSON-LD. Las páginas legales y de marca lo mantienen visible (obligación de identificación del titular).
+- **Imágenes de portada:** copias WebP ya reducidas en `images/portada/` (1,65 MB → 0,45 MB). Los originales de `images/` no se tocan porque los usan otras páginas, los correos y Open Graph. Foto nueva para la portada: guardar el original en `images/` y la copia WebP (máx. ~960 px de ancho, calidad 76) en `images/portada/`.
+- **Sin atributos `style`:** todo pasó a clases en el último `<style>` de la cabecera (prefijo `#root` para que mantengan la prioridad que tenía el atributo). El encuadre de cada foto de marca sigue saliendo de `pos`/`zoom` en `ql`: la app escribe una regla `.mcs-ph-<id>` por marca. No volver a usar `style:{…}` en la app; añadir una clase.
+- **Se deja como está:** direcciones terminadas en `.html`. Quitarlas obliga a redirigir todas las páginas ya indexadas y Google no lo premia.
