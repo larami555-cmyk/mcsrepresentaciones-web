@@ -111,12 +111,16 @@
     <button id="gear-btn" class="gear-btn" title="Ajustes" aria-label="Ajustes">⚙</button>
   </div>
   <div id="settings-panel" class="settings-panel hidden">
-    <label for="punto-input">Valor del punto (€)</label>
+    <label for="punto-input">Valor del punto · General (€)</label>
     <div class="settings-row">
       <input type="number" id="punto-input" step="0.01" min="0.01">
+    </div>
+    <label for="punto-mg-input" style="display:block;margin-top:10px;color:#d9b45c;">Valor del punto · Magnifique (€)</label>
+    <div class="settings-row">
+      <input type="number" id="punto-mg-input" step="0.01" min="0.01">
       <button id="punto-save">Guardar</button>
     </div>
-    <div class="settings-note">Este valor se usa para calcular todos los precios de la app y queda guardado en este navegador, incluso si cierras y vuelves a abrir el archivo.</div>
+    <div class="settings-note">El punto General se aplica a todo el catálogo Essenzia. El punto Magnifique se aplica solo a los productos de la colección Magnifique, tanto en su pestaña como cuando aparecen con etiqueta dorada en las demás. Los dos quedan guardados en este navegador.</div>
   </div>
 </header>
 
@@ -198,7 +202,7 @@
   </section>
 
   <section id="s-magnifique">
-    <div class="info">Colección de lujo Magnifique, como producto aparte y más exclusivo (también aparece mezclada, con etiqueta dorada, dentro de las pestañas generales). Mismas opciones de búsqueda, filtro y orden.</div>
+    <div class="info">Colección de lujo Magnifique, como producto aparte y más exclusivo (también aparece mezclada, con etiqueta dorada, dentro de las pestañas generales). Usa su propio valor del punto: <b id="mg-punto-info"></b> € (se cambia en ⚙).</div>
     <div class="subnav">
       <button class="subtab active" data-g="mg-colchones">Colchones</button>
       <button class="subtab" data-g="mg-cabezales">Cabezales</button>
@@ -260,7 +264,7 @@
       <div class="toolcard">
         <div class="toolicon">💾</div>
         <h3>COPIA DE SEGURIDAD</h3>
-        <p>Descarga una copia completa de la app tal como está ahora mismo (todos los productos, precios y el valor del punto actual). Si algún día hay algún problema con la web, abre este archivo directamente en el navegador — funciona igual, sin necesidad de internet ni de Netlify.</p>
+        <p>Descarga una copia completa de la app tal como está ahora mismo (todos los productos, precios y los dos valores del punto actuales). Si algún día hay algún problema con la web, abre este archivo directamente en el navegador — funciona igual, sin necesidad de internet ni de Netlify.</p>
         <div class="toolbtns">
           <button id="btn-export-backup" class="toolbtn dark">Descargar copia</button>
           <button id="btn-restore-backup" class="toolbtn gold">Restaurar</button>
@@ -268,17 +272,23 @@
         <input type="file" id="file-restore-backup" accept=".html,text/html" style="display:none;">
       </div>
     </div>
-    <div class="info" style="max-width:760px;margin:14px auto 0;">"Restaurar" lee un archivo de copia de seguridad ya descargado y recupera de él el valor del punto que tenías en ese momento. Para recuperar toda la app (todos los productos), simplemente abre el archivo descargado directamente en el navegador, o súbelo de nuevo a Netlify/GitHub.</div>
+    <div class="info" style="max-width:760px;margin:14px auto 0;">"Restaurar" lee un archivo de copia de seguridad ya descargado y recupera de él los dos valores del punto (General y Magnifique) que tenías en ese momento. Para recuperar toda la app (todos los productos), simplemente abre el archivo descargado directamente en el navegador, o súbelo de nuevo a Netlify/GitHub.</div>
   </section>
 
 </main>
 
 <script>
 let PUNTO = 0.40;
+let PUNTO_MG = null; /* punto propio de la colección Magnifique; si no hay ninguno guardado, usa el general */
 try {
   const guardado = localStorage.getItem('essenzia_punto');
   if(guardado != null && !isNaN(parseFloat(guardado))) PUNTO = parseFloat(guardado);
+  const guardadoMg = localStorage.getItem('essenzia_punto_mg');
+  if(guardadoMg != null && !isNaN(parseFloat(guardadoMg))) PUNTO_MG = parseFloat(guardadoMg);
 } catch(e) { /* localStorage no disponible, se queda en 0,40 por defecto */ }
+if(PUNTO_MG == null) PUNTO_MG = PUNTO;
+/* Devuelve el valor del punto que corresponde a cada producto */
+function puntoDe(item){ return item && item.origen==='magnifique' ? PUNTO_MG : PUNTO; }
 const ANCHOS = [90,105,135,150,160,180,200];
 
 /* ============ COLCHONES: catálogo oficial ============ */
@@ -504,7 +514,7 @@ function renderColchones(){
     .map(c=>{
     const idx = c.anchos.indexOf(ancho);
     const raw = idx>-1 ? c.precios[largo][idx] : null;
-    return {...c, raw, precio: raw==null?null:raw*PUNTO};
+    return {...c, raw, precio: raw==null?null:raw*puntoDe(c)};
   });
   if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
   else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
@@ -614,7 +624,7 @@ function renderBases(){
     if(b.tipo3d){ const r = calcBase3D(b, ancho); return {...b, raw:r.raw, pts:r.pts, precio:r.precio}; }
     const idx = b.anchos.indexOf(ancho);
     const raw = idx>-1?b[serie][idx]:null;
-    return {...b, raw, precio: raw==null?null:raw*PUNTO};
+    return {...b, raw, precio: raw==null?null:raw*puntoDe(b)};
   });
   if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
   else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
@@ -677,7 +687,7 @@ function renderCabezales(){
   let items = cabezales.filter(h=> query==='' || h.nombre.toLowerCase().includes(query)).map(h=>{
     const idx = h.anchos.indexOf(ancho);
     const raw = idx>-1?h[serie][idx]:null;
-    return {...h, raw, precio: raw==null?null:raw*PUNTO};
+    return {...h, raw, precio: raw==null?null:raw*puntoDe(h)};
   });
   if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
   else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
@@ -710,15 +720,16 @@ function renderCamas(){
   camas.filter(m=> query==='' || m.nombre.toLowerCase().includes(query)).forEach(m=>{
     const idx = m.anchos.indexOf(ancho);
     const raw = idx>-1?m[serie][idx]:null;
-    const base = raw==null?null:raw*PUNTO;
+    const pm = puntoDe(m);
+    const base = raw==null?null:raw*pm;
     if(!extraStateCamas[m.nombre]) extraStateCamas[m.nombre] = new Set();
     let extraCost = 0;
-    extraStateCamas[m.nombre].forEach(n=>{ const e=m.extras.find(x=>x.n===n); if(e) extraCost += e.p*PUNTO; });
+    extraStateCamas[m.nombre].forEach(n=>{ const e=m.extras.find(x=>x.n===n); if(e) extraCost += e.p*pm; });
     const precio = base==null?null:base+extraCost;
     const card=document.createElement('div'); card.className='card';
     const extrasHtml = !m.extras.length ? '' : '<div class="extras">' + m.extras.map(e=>{
       const checked = extraStateCamas[m.nombre].has(e.n) ? 'checked' : '';
-      return `<label><input type="checkbox" data-id="${m.nombre}" data-name="${e.n}" ${checked}> ${e.n} <small>(${e.p} pts = ${(e.p*PUNTO).toFixed(2)} €)</small></label>`;
+      return `<label><input type="checkbox" data-id="${m.nombre}" data-name="${e.n}" ${checked}> ${e.n} <small>(${e.p} pts = ${(e.p*pm).toFixed(2)} €)</small></label>`;
     }).join('') + '</div>';
     card.innerHTML=`
       <div class="row"><h3>${m.nombre}</h3>${m.origen==='magnifique'?'<span class="tag mg">Magnifique</span>':'<span class="tag">Serie '+serie+'</span>'}</div>
@@ -779,7 +790,7 @@ function renderMagnifiqueColchones(){
     .map(c=>{
       const idx = c.anchos.indexOf(ancho);
       const raw = idx>-1 ? c.precios[largo][idx] : null;
-      return {...c, raw, precio: raw==null?null:raw*PUNTO};
+      return {...c, raw, precio: raw==null?null:raw*PUNTO_MG};
     });
   if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
   else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
@@ -812,7 +823,7 @@ function renderMagnifiqueCabezales(){
   let items = magnifiqueCabezales.filter(h=> query==='' || h.nombre.toLowerCase().includes(query)).map(h=>{
     const idx = h.anchos.indexOf(ancho);
     const raw = idx>-1 ? h[serie][idx] : null;
-    return {...h, raw, precio: raw==null?null:raw*PUNTO};
+    return {...h, raw, precio: raw==null?null:raw*PUNTO_MG};
   });
   if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
   else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
@@ -844,7 +855,7 @@ function renderMagnifiqueBases(){
   let items = magnifiqueBases.filter(b=> query==='' || b.nombre.toLowerCase().includes(query)).map(b=>{
     const idx = b.anchos.indexOf(ancho);
     const raw = idx>-1 ? b[serie][idx] : null;
-    return {...b, raw, precio: raw==null?null:raw*PUNTO};
+    return {...b, raw, precio: raw==null?null:raw*PUNTO_MG};
   });
   if(orden==='asc') items.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9));
   else if(orden==='desc') items.sort((a,b)=>(b.precio??-1)-(a.precio??-1));
@@ -876,7 +887,7 @@ function renderMagnifiqueCamas(){
   magnifiqueCamas.filter(m=> query==='' || m.nombre.toLowerCase().includes(query)).forEach(m=>{
     const idx = m.anchos.indexOf(ancho);
     const raw = idx>-1 ? m[serie][idx] : null;
-    const precio = raw==null?null:raw*PUNTO;
+    const precio = raw==null?null:raw*PUNTO_MG;
     const card=document.createElement('div'); card.className='card';
     card.innerHTML=`
       <div class="row"><h3>${m.nombre}</h3><span class="tag mg">Magnifique</span></div>
@@ -916,16 +927,21 @@ document.querySelectorAll('nav button').forEach(b=>{
 const gearBtn = document.getElementById('gear-btn');
 const settingsPanel = document.getElementById('settings-panel');
 const puntoInput = document.getElementById('punto-input');
-puntoInput.value = PUNTO.toFixed(2);
+const puntoMgInput = document.getElementById('punto-mg-input');
+const mgPuntoInfo = document.getElementById('mg-punto-info');
+function pintarPuntos(){ puntoInput.value = PUNTO.toFixed(2); puntoMgInput.value = PUNTO_MG.toFixed(2); mgPuntoInfo.textContent = PUNTO_MG.toFixed(2).replace('.',','); }
+pintarPuntos();
 gearBtn.addEventListener('click', ()=>{
   settingsPanel.classList.toggle('hidden');
-  puntoInput.value = PUNTO.toFixed(2);
+  pintarPuntos();
 });
 document.getElementById('punto-save').addEventListener('click', ()=>{
-  const v = parseFloat(puntoInput.value.replace(',','.'));
-  if(!isNaN(v) && v>0){
-    PUNTO = v;
-    try { localStorage.setItem('essenzia_punto', v); } catch(e) { /* no disponible */ }
+  const v = parseFloat(String(puntoInput.value).replace(',','.'));
+  const vm = parseFloat(String(puntoMgInput.value).replace(',','.'));
+  if(!isNaN(v) && v>0 && !isNaN(vm) && vm>0){
+    PUNTO = v; PUNTO_MG = vm;
+    try { localStorage.setItem('essenzia_punto', v); localStorage.setItem('essenzia_punto_mg', vm); } catch(e) { /* no disponible */ }
+    pintarPuntos();
     renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
     renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
     settingsPanel.classList.add('hidden');
@@ -957,6 +973,7 @@ document.getElementById('btn-export-backup').addEventListener('click', ()=>{
   // Incrusta el valor del punto actual como valor por defecto, para que la copia
   // funcione correctamente aunque se abra en otro navegador/dispositivo sin ese localStorage.
   html = html.replace(/let PUNTO = [\d.]+;/, 'let PUNTO = ' + PUNTO + ';');
+  html = html.replace(/let PUNTO_MG = (?:[\d.]+|null);/, 'let PUNTO_MG = ' + PUNTO_MG + ';');
   const hoy = new Date();
   const fechaStr = hoy.toISOString().slice(0,10);
   const blob = new Blob([html], {type:'text/html'});
@@ -979,11 +996,13 @@ document.getElementById('file-restore-backup').addEventListener('change', (e)=>{
     const match = contenido.match(/let PUNTO = ([\d.]+);/);
     if(match && !isNaN(parseFloat(match[1])) && parseFloat(match[1])>0){
       PUNTO = parseFloat(match[1]);
-      try { localStorage.setItem('essenzia_punto', PUNTO); } catch(err){}
-      puntoInput.value = PUNTO.toFixed(2);
+      const matchMg = contenido.match(/let PUNTO_MG = ([\d.]+);/);
+      PUNTO_MG = (matchMg && parseFloat(matchMg[1])>0) ? parseFloat(matchMg[1]) : PUNTO;
+      try { localStorage.setItem('essenzia_punto', PUNTO); localStorage.setItem('essenzia_punto_mg', PUNTO_MG); } catch(err){}
+      pintarPuntos();
       renderColchones(); renderCanapes(); renderBases(); renderCabezales(); renderCamas(); renderAlmohadas();
       renderMagnifiqueColchones(); renderMagnifiqueCabezales(); renderMagnifiqueBases(); renderMagnifiqueCamas();
-      alert('Copia de seguridad leída: valor del punto restaurado a ' + PUNTO.toFixed(2) + ' €');
+      alert('Copia de seguridad leída. Punto General: ' + PUNTO.toFixed(2) + ' € · Punto Magnifique: ' + PUNTO_MG.toFixed(2) + ' €');
     } else {
       alert('No se ha podido leer el valor del punto de este archivo. Asegúrate de que es una copia de seguridad descargada desde esta misma app.');
     }
@@ -999,7 +1018,7 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-11-13 · 21:30</div>
+<div style="text-align:center;font-size:10px;color:#b8b6ac;padding:14px 0 22px;">v2026-11-24 · 21:45</div>
 </body>
 </html>
 
